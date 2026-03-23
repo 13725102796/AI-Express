@@ -35,6 +35,7 @@ from app.models.schemas import (
 )
 from app.services.file_storage import file_storage
 from app.services.document_parser import DocumentParser, document_parser
+from app.services.embedding_service import embedding_service
 from app.services.web_scraper import web_scraper
 from app.utils.chunking import text_chunker
 from app.config import get_settings
@@ -138,20 +139,50 @@ async def upload_document(
                 raise ValueError("文件内容为空，无法提取文本")
 
             chunks = text_chunker.split_paragraphs(paragraphs)
+            chunk_objects = []
             for chunk in chunks:
-                db.add(DocChunk(
+                chunk_obj = DocChunk(
                     document_id=doc.id,
                     user_id=user.id,
                     chunk_index=chunk["chunk_index"],
                     heading=chunk.get("heading"),
                     content=chunk["content"],
                     page_num=chunk.get("page_num"),
-                ))
+                )
+                db.add(chunk_obj)
+                chunk_objects.append(chunk_obj)
+
+            # 生成 embedding 并写入
+            try:
+                chunk_texts = [c["content"] for c in chunks]
+                embeddings = await embedding_service.embed_batch(chunk_texts)
+                for i, chunk_obj in enumerate(chunk_objects):
+                    chunk_obj.embedding = embeddings[i]
+                logger.info(f"Embedding 生成完成: {len(embeddings)} 个向量")
+            except Exception as emb_err:
+                logger.warning(f"Embedding 生成失败（不影响解析）: {emb_err}")
 
             doc.status = "ready"
             doc.parsed_at = datetime.utcnow()
             if file_type == "pdf":
                 doc.page_count = len(set(c.get("page_num") for c in chunks if c.get("page_num")))
+
+            # 生成 AI 摘要和标签（异步调用 Claude CLI）
+            try:
+                from app.services.tag_generator import tag_generator
+                full_text = "\n".join(c["content"] for c in chunks)
+                summary = await tag_generator.generate_summary(full_text)
+                if summary:
+                    doc.summary = summary
+                tags = await tag_generator.generate_tags(full_text)
+                if tags:
+                    from app.models.database import DocumentTag
+                    for tag_label in tags:
+                        db.add(DocumentTag(document_id=doc.id, label=tag_label, is_ai=True))
+                logger.info(f"AI 摘要+标签生成完成: summary={len(summary or '')}字, tags={tags}")
+            except Exception as tag_err:
+                logger.warning(f"AI 摘要/标签生成失败（不影响解析）: {tag_err}")
+
             logger.info(f"开发模式同步解析完成: document_id={doc.id}, {len(chunks)} chunks")
         except Exception as e:
             logger.error(f"开发模式同步解析失败: {e}")
@@ -227,18 +258,47 @@ async def save_url(
                 raise ValueError("网页内容为空，无法提取文本")
 
             chunks = text_chunker.split_paragraphs(paragraphs)
+            chunk_objects = []
             for chunk in chunks:
-                db.add(DocChunk(
+                chunk_obj = DocChunk(
                     document_id=doc.id,
                     user_id=user.id,
                     chunk_index=chunk["chunk_index"],
                     heading=chunk.get("heading"),
                     content=chunk["content"],
                     page_num=chunk.get("page_num"),
-                ))
+                )
+                db.add(chunk_obj)
+                chunk_objects.append(chunk_obj)
+
+            # 生成 embedding 并写入
+            try:
+                chunk_texts = [c["content"] for c in chunks]
+                embeddings = await embedding_service.embed_batch(chunk_texts)
+                for i, chunk_obj in enumerate(chunk_objects):
+                    chunk_obj.embedding = embeddings[i]
+                logger.info(f"Embedding 生成完成 (URL): {len(embeddings)} 个向量")
+            except Exception as emb_err:
+                logger.warning(f"Embedding 生成失败 (URL, 不影响解析): {emb_err}")
 
             doc.status = "ready"
             doc.parsed_at = datetime.utcnow()
+
+            # 生成 AI 摘要和标签
+            try:
+                from app.services.tag_generator import tag_generator
+                full_text = "\n".join(c["content"] for c in chunks)
+                summary = await tag_generator.generate_summary(full_text)
+                if summary:
+                    doc.summary = summary
+                tags = await tag_generator.generate_tags(full_text)
+                if tags:
+                    from app.models.database import DocumentTag
+                    for tag_label in tags:
+                        db.add(DocumentTag(document_id=doc.id, label=tag_label, is_ai=True))
+            except Exception as tag_err:
+                logger.warning(f"AI 摘要/标签生成失败 (URL): {tag_err}")
+
             logger.info(f"开发模式同步解析完成 (URL): document_id={doc.id}, {len(chunks)} chunks")
         except Exception as e:
             logger.error(f"开发模式同步解析失败 (URL): {e}")

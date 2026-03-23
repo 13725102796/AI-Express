@@ -28,6 +28,9 @@ readability-lxml==0.8.1
 
 # AI / Embedding
 openai==1.58.1
+FlagEmbedding>=1.3.4
+torch>=2.5.0
+sentence-transformers>=3.4.1
 
 # Text chunking
 langchain-text-splitters==0.3.4

@@ -147,6 +147,38 @@
 - 支持对单次回答进行「有帮助 / 无帮助」反馈，用于优化检索和回答质量
 - AI 回答中明确区分「来自知识库的内容」和「AI 补充的通用知识」，避免混淆
 
+**RAG 三级检索架构（P0，核心技术需求）**：
+
+系统必须实现三级检索架构，确保语义检索精准度 ≥99%：
+
+**第一级：双路召回**
+- Dense 向量检索（pgvector HNSW）：基于语义相似度的向量检索，返回 top 50
+- Sparse 稀疏词法检索（BM25/BGE-M3 lexical weights）：基于关键词的精确匹配，返回 top 50
+- 两路结果合并，覆盖语义理解和关键词精确匹配双场景
+
+**第二级：RRF 融合排序**
+- 对双路召回的结果用 Reciprocal Rank Fusion（k=60）融合排序
+- 无需归一化分数，直接按排名倒数累加
+
+**第三级：Cross-Encoder 精排**
+- 使用 Reranker 模型（如 bge-reranker-v2-m3）对融合后的结果精排
+- 输出最终 top 10 最相关段落，作为 LLM 生成回答的上下文
+
+**Embedding 模型需求**：
+- 必须本地运行，零远程 API 依赖
+- 支持中英文混合语义理解
+- 推荐模型：BGE-M3（BAAI/bge-m3），支持 Dense + Sparse + ColBERT 三种检索模式
+- Reranker 推荐：bge-reranker-v2-m3（本地 Cross-Encoder）
+- 运行框架：FlagEmbedding + PyTorch（Apple Silicon MPS 加速）
+
+**验收标准**：
+- Given 知识库中有一篇关于"多Agent协作"的文档
+- When 用户提问「多agent 是怎么协调的」
+- Then 系统必须返回该文档的相关段落作为引用来源（语义匹配，而非关键词精确匹配）
+- Given 知识库中有 CSV 格式的城市销售数据
+- When 用户提问「北京的营收是多少」
+- Then 系统返回 CSV 中北京对应行的数据（跨格式语义检索）
+
 **优先级**：P0
 
 ### 3.4 语义搜索（P0）

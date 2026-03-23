@@ -36,8 +36,16 @@ class Settings(BaseSettings):
     OPENAI_API_KEY: str = ""  # fallback: OpenAI 兼容 API
     OPENAI_BASE_URL: str = "https://api.openai.com/v1"
     LLM_MODEL: str = "gpt-4o"
-    EMBEDDING_MODEL: str = "text-embedding-3-small"
+    EMBEDDING_MODEL: str = "BAAI/bge-m3"
     EMBEDDING_DIMENSION: int = 1024
+    EMBEDDING_BATCH_SIZE: int = 32  # Apple Silicon 推荐 32
+    RERANKER_MODEL: str = "BAAI/bge-reranker-v2-m3"
+
+    # 检索参数
+    RETRIEVAL_TOP_K: int = 50          # 一级召回数量
+    RETRIEVAL_RERANK_TOP_K: int = 10   # Reranker 精排后保留数量
+    RETRIEVAL_SCORE_THRESHOLD: float = 0.3  # 最低相似度阈值
+    RRF_K: int = 60                    # RRF 融合参数
 
     # Celery
     CELERY_BROKER_URL: str = "redis://localhost:6379/1"

@@ -43,7 +43,9 @@ effort: max
 └──────────────┴──────────────┴──────────────┴──────────────────────┘
 ```
 
-**测试顺序**：A（代码能编译）→ B（页面能打开）→ D（功能真正跑通）→ C（出报告）
+**测试顺序**：A（代码能编译）→ B（页面能打开）→ D（真实环境功能跑通）→ E（Playwright 浏览器真实模拟测试）→ C（出报告）
+
+**硬性规则**：代码测试通过 ≠ 测试完成。必须用 Playwright 打开真实页面、用真实数据操作、截图审查，确认用户实际看到的效果符合预期。没有 Playwright 截图验证的测试报告自动判定为 INCOMPLETE。
 
 ## 工作流程
 
@@ -940,7 +942,109 @@ playwright_evaluate → document.title 包含 "KnowBase"
 
 ---
 
-## E. 测试数据自给自足
+## E. Playwright 真实模拟测试（必做！不可跳过）
+
+> **这是测试的最终关卡。** A/B/C/D 层都可能遗漏前后端对接问题（字段映射、数据格式、渲染异常）。只有 Playwright 打开真实浏览器、连接真实后端、操作真实数据，才能发现用户会遇到的 Bug。
+
+### 执行前提
+- 后端服务运行中（Docker + FastAPI）
+- 前端连接真实 API（非 mock）
+- 数据库中有真实数据
+
+### 必测流程
+
+**E1：登录 → 进入主页**
+```
+playwright_navigate → /login
+playwright_fill → 邮箱密码
+playwright_click → 提交
+playwright_screenshot → 截图
+Read → 看图审查（是否跳转成功，有无报错页面）
+```
+
+**E2：知识库列表 → 验证真实数据渲染**
+```
+playwright_navigate → /library
+playwright_screenshot → 截图
+Read → 看图审查：
+  - 卡片数量是否与数据库一致
+  - 标题是否真实（不是 mock/placeholder）
+  - 格式图标是否区分正确
+  - 日期是否正常（不是 Invalid Date）
+  - 有无"暂无内容"等异常占位文案
+```
+
+**E3：搜索 → 验证语义检索精准度**
+```
+playwright_navigate → /search?q=语义查询词
+playwright_screenshot → 截图
+Read → 看图审查：
+  - 搜索结果是否与查询语义相关
+  - 第一条结果是否是最相关的文档
+  - 有无崩溃/空白/报错
+```
+
+**E4：AI 问答 → 验证完整 RAG 链路**
+```
+playwright_navigate → /chat
+playwright_fill → textarea 输入问题
+playwright_press_key → Enter
+等待回答完成（轮询 textarea.disabled）
+playwright_screenshot → 截图
+Read → 看图审查：
+  - AI 回答是否基于知识库内容（不是通用知识）
+  - 是否有引用标注 [1][2]
+  - 引用来源文件名是否正确
+  - 回答文本是否正常渲染（不是原始 JSON/SSE 数据）
+```
+
+**E5：文档详情 → 验证内容提取**
+```
+点击某个文档 → 进入详情页
+playwright_screenshot → 截图
+Read → 看图审查：
+  - 提取内容是否显示（不是"暂无提取内容"）
+  - AI 摘要是否有内容
+  - 标题、日期、文件大小是否正确
+```
+
+**E6：上传新文件 → 验证完整入库链路**
+```
+通过 playwright_evaluate 用 fetch API 上传测试文件
+刷新知识库列表
+playwright_screenshot → 截图
+Read → 看图审查：新文件是否出现在列表中
+搜索新文件中的关键词 → 验证可检索
+```
+
+**E7：移动端**
+```
+playwright_resize(device: "iPhone 13")
+逐页截图 → Read 看图审查布局
+```
+
+### 判定标准
+
+每个 E 步骤必须：
+1. 有截图文件（savePng: true）
+2. 用 Read 工具读取截图，Claude 看图审查
+3. 如果截图中看到**任何异常**（空白、报错、占位文案、数据不一致），判定 **FAIL**
+4. 全部 E1-E7 通过才算 Playwright 测试 PASS
+
+### 与 D 层的区别
+
+| D 层（API 端到端） | E 层（Playwright 真实模拟） |
+|-------------------|-------------------------|
+| curl 直接调后端 API | 浏览器打开真实页面 |
+| 验证 API 返回 JSON 正确 | 验证用户看到的渲染效果正确 |
+| 发现后端逻辑 Bug | 发现前后端对接 Bug（字段映射/格式/渲染） |
+| 不涉及前端代码 | 覆盖前端组件渲染+交互 |
+
+**两层都必须通过。D 层通过但 E 层失败 = 测试不通过。**
+
+---
+
+## F. 测试数据自给自足
 
 测试需要的文件和数据**由你自己准备**，不依赖用户提供。
 

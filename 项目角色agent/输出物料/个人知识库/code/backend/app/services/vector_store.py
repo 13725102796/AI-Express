@@ -105,6 +105,97 @@ class VectorStoreService:
         logger.info(f"相似度搜索完成: {len(search_results)} 个结果 (阈值: {score_threshold})")
         return search_results
 
+    async def sparse_search(
+        self,
+        db: AsyncSession,
+        query_sparse: dict,
+        user_id: uuid.UUID,
+        space_id: uuid.UUID | None = None,
+        top_k: int = 50,
+    ) -> list[dict]:
+        """
+        稀疏向量检索（基于 BGE-M3 lexical weights）。
+        当前实现：将 sparse weights 中的 token 还原为关键词，
+        用 PostgreSQL ILIKE 做全文匹配作为 MVP 方案。
+        """
+        from sqlalchemy import or_
+
+        # 从 sparse weights 提取关键词
+        keywords = self._extract_keywords_from_sparse(query_sparse)
+        if not keywords:
+            return []
+
+        # 构建全文检索条件
+        keyword_conditions = [
+            DocChunk.content.ilike(f"%{kw}%") for kw in keywords[:20]
+        ]
+
+        query = (
+            select(
+                DocChunk,
+                Document.title.label("doc_title"),
+                Document.file_type.label("doc_file_type"),
+            )
+            .join(Document, DocChunk.document_id == Document.id)
+            .where(
+                DocChunk.user_id == user_id,
+                Document.status == "ready",
+                or_(*keyword_conditions),
+            )
+        )
+
+        if space_id:
+            query = query.where(Document.space_id == space_id)
+
+        query = query.limit(top_k)
+        result = await db.execute(query)
+        rows = result.all()
+
+        return [
+            {
+                "chunk_id": chunk.id,
+                "document_id": chunk.document_id,
+                "document_title": doc_title,
+                "document_type": doc_file_type,
+                "heading": chunk.heading,
+                "content": chunk.content,
+                "page_num": chunk.page_num,
+                "similarity": 0.5,  # sparse 检索默认置信度
+                "chunk_index": chunk.chunk_index,
+            }
+            for chunk, doc_title, doc_file_type in rows
+        ]
+
+    def _extract_keywords_from_sparse(self, sparse_weights: dict) -> list[str]:
+        """
+        从 BGE-M3 sparse weights 提取关键词。
+        sparse_weights 格式: {token_id_str: weight}
+        用 tokenizer 将 token_id 还原为文本。
+        """
+        if not sparse_weights:
+            return []
+
+        # 按权重降序取 top 20
+        sorted_tokens = sorted(
+            sparse_weights.items(),
+            key=lambda x: float(x[1]),
+            reverse=True,
+        )[:20]
+
+        try:
+            from transformers import AutoTokenizer
+            tokenizer = AutoTokenizer.from_pretrained("BAAI/bge-m3")
+            keywords = []
+            for token_id_str, weight in sorted_tokens:
+                token_id = int(token_id_str)
+                word = tokenizer.decode([token_id]).strip()
+                if len(word) >= 2 and float(weight) > 0.1:
+                    keywords.append(word)
+            return keywords
+        except Exception as e:
+            logger.warning(f"Sparse 关键词提取失败: {e}")
+            return []
+
     async def delete_document_chunks(self, db: AsyncSession, document_id: uuid.UUID) -> int:
         """删除文档的所有向量索引"""
         result = await db.execute(
