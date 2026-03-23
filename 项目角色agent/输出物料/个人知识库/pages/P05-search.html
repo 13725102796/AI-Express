@@ -1,0 +1,1625 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KnowBase - 搜索结果</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;600;700&display=swap');
+
+:root {
+  /* Colors - Core */
+  --primary: #2563EB;
+  --primary-light: #60A5FA;
+  --primary-dark: #1E3A5F;
+  --accent: #F59E0B;
+  --accent-light: #FEF3C7;
+  --success: #10B981;
+  --error: #EF4444;
+
+  /* Colors - Background & Surface */
+  --bg-main: #F8FAFC;
+  --bg-sec: #F1F5F9;
+  --bg-card: #FFFFFF;
+
+  /* Colors - Text */
+  --text-main: #1A202C;
+  --text-sec: #64748B;
+  --text-tert: #94A3B8;
+
+  /* Colors - Border */
+  --border: #E2E8F0;
+  --divider: #F1F5F9;
+
+  /* Colors - File Formats */
+  --fmt-pdf: #EF4444;
+  --fmt-word: #2563EB;
+  --fmt-web: #10B981;
+  --fmt-md: #8B5CF6;
+  --fmt-txt: #64748B;
+
+  /* Typography */
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Noto Sans SC', 'PingFang SC', sans-serif;
+  --font-code: 'JetBrains Mono', monospace;
+
+  /* Radii */
+  --radius-btn: 8px;
+  --radius-input: 8px;
+  --radius-card: 12px;
+  --radius-modal: 16px;
+  --radius-badge: 6px;
+  --radius-pill: 9999px;
+  --radius-round: 50%;
+
+  /* Shadows */
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-card-hover: 0 4px 12px rgba(0,0,0,0.12), 0 2px 4px rgba(0,0,0,0.08);
+  --shadow-modal: 0 16px 48px rgba(0,0,0,0.16);
+  --shadow-focus: 0 0 0 3px rgba(37,99,235,0.2);
+
+  /* Transitions */
+  --trans-base: 150ms ease-out;
+  --trans-hover: 200ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-ui);
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  padding-top: 64px;
+}
+
+/* Typography Scale */
+h1, .h1 { font-size: 32px; font-weight: 700; line-height: 1.25; letter-spacing: -0.02em; }
+h2, .h2 { font-size: 24px; font-weight: 600; line-height: 1.3; letter-spacing: -0.01em; }
+h3, .h3 { font-size: 18px; font-weight: 600; line-height: 1.4; }
+p.body-text { font-size: 15px; font-weight: 400; line-height: 1.75; color: var(--text-main); }
+.caption { font-size: 13px; font-weight: 400; line-height: 1.5; color: var(--text-sec); }
+code, pre { font-family: var(--font-code); font-size: 13px; font-weight: 400; line-height: 1.6; }
+
+/* ==================== Header Bar ==================== */
+.header-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 32px;
+  z-index: 100;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+  gap: 24px;
+}
+
+.header-logo {
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  text-decoration: none;
+}
+
+.header-search {
+  flex: 1;
+  max-width: 560px;
+  position: relative;
+}
+
+.header-search-input {
+  width: 100%;
+  height: 40px;
+  padding: 0 40px 0 40px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-input);
+  font-size: 14px;
+  font-family: var(--font-ui);
+  color: var(--text-main);
+  transition: all var(--trans-hover);
+  background: var(--bg-sec);
+}
+
+.header-search-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: var(--shadow-focus);
+  background: var(--bg-card);
+}
+
+.header-search-input:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+.header-search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-tert);
+  width: 18px;
+  height: 18px;
+  pointer-events: none;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+/* ==================== App Shell Layout ==================== */
+.app-shell {
+  display: flex;
+  min-height: calc(100vh - 64px);
+}
+
+.sidebar {
+  width: 240px;
+  background: var(--bg-sec);
+  border-right: 1px solid var(--border);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+  position: fixed;
+  top: 64px;
+  bottom: 0;
+  left: 0;
+  overflow-y: auto;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-sec);
+  cursor: pointer;
+  transition: all var(--trans-base);
+  text-decoration: none;
+}
+
+.nav-item svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.nav-item:hover:not(.active) {
+  background: rgba(0,0,0,0.04);
+  color: var(--text-main);
+}
+
+.nav-item.active {
+  background: var(--primary-dark);
+  color: #ffffff;
+}
+
+.nav-item:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+.nav-section-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-tert);
+  padding: 16px 12px 4px;
+}
+
+/* ==================== Main Content ==================== */
+.main-content {
+  flex: 1;
+  margin-left: 240px;
+  padding: 32px;
+  max-width: 100%;
+}
+
+.content-inner {
+  max-width: 820px;
+  margin: 0 auto;
+}
+
+/* ==================== AI Prompt Card ==================== */
+.ai-prompt-card {
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  border-radius: var(--radius-card);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  cursor: pointer;
+  transition: all var(--trans-hover);
+}
+
+.ai-prompt-card:hover {
+  background: #DBEAFE;
+  border-color: var(--primary-light);
+}
+
+.ai-prompt-card:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+.ai-prompt-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-round);
+  background: var(--primary);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ai-prompt-text {
+  flex: 1;
+}
+
+.ai-prompt-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--primary-dark);
+  margin-bottom: 2px;
+}
+
+.ai-prompt-desc {
+  font-size: 13px;
+  color: var(--text-sec);
+}
+
+.ai-prompt-arrow {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+/* ==================== Search Stats Bar ==================== */
+.search-stats {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.search-stats-query {
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.search-stats-meta {
+  color: var(--text-sec);
+}
+
+/* ==================== Filter Toolbar ==================== */
+.filter-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.chip-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: var(--radius-pill);
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-sec);
+  cursor: pointer;
+  transition: all var(--trans-hover);
+  user-select: none;
+}
+
+.chip:hover {
+  border-color: var(--text-tert);
+  color: var(--text-main);
+}
+
+.chip:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+.chip.selected {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+.chip.selected:hover {
+  background: var(--primary-dark);
+  border-color: var(--primary-dark);
+  color: #fff;
+}
+
+.chip-exclusive.selected {
+  background: var(--primary-dark);
+  color: #fff;
+  border-color: var(--primary-dark);
+}
+
+.filter-separator {
+  width: 1px;
+  height: 24px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+.filter-dropdown {
+  position: relative;
+}
+
+.filter-dropdown-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: var(--radius-btn);
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-sec);
+  cursor: pointer;
+  transition: all var(--trans-hover);
+  font-family: var(--font-ui);
+}
+
+.filter-dropdown-btn:hover {
+  border-color: var(--text-tert);
+  color: var(--text-main);
+}
+
+.filter-dropdown-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+.filter-dropdown-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.filter-dropdown-panel {
+  display: none;
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 160px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-btn);
+  box-shadow: var(--shadow-card-hover);
+  z-index: 50;
+  padding: 4px 0;
+}
+
+.filter-dropdown-panel.open {
+  display: block;
+}
+
+.filter-dropdown-option {
+  display: block;
+  width: 100%;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: var(--font-ui);
+  color: var(--text-sec);
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  transition: all var(--trans-base);
+}
+
+.filter-dropdown-option:hover {
+  background: var(--bg-sec);
+  color: var(--text-main);
+}
+
+.filter-dropdown-option.active {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* ==================== Search Results ==================== */
+.results-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.result-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 20px;
+  box-shadow: var(--shadow-card);
+  transition: all var(--trans-hover);
+  cursor: pointer;
+  display: flex;
+  gap: 16px;
+  opacity: 0;
+  transform: translateY(8px);
+  animation: fadeInUp 250ms ease-out forwards;
+}
+
+.result-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-hover);
+  border-color: #CBD5E1;
+}
+
+.result-card:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.result-card:nth-child(1) { animation-delay: 0ms; }
+.result-card:nth-child(2) { animation-delay: 50ms; }
+.result-card:nth-child(3) { animation-delay: 100ms; }
+.result-card:nth-child(4) { animation-delay: 150ms; }
+.result-card:nth-child(5) { animation-delay: 200ms; }
+.result-card:nth-child(6) { animation-delay: 250ms; }
+
+.result-format-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.result-format-icon.pdf { background: #FEE2E2; color: var(--fmt-pdf); }
+.result-format-icon.word { background: #DBEAFE; color: var(--fmt-word); }
+.result-format-icon.web { background: #D1FAE5; color: var(--fmt-web); }
+.result-format-icon.markdown { background: #EDE9FE; color: var(--fmt-md); }
+.result-format-icon.txt { background: #F1F5F9; color: var(--fmt-txt); }
+
+.result-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.result-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.result-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-main);
+  line-height: 1.4;
+}
+
+.result-title:hover {
+  color: var(--primary);
+}
+
+.relevance-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: var(--radius-badge);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.relevance-high { background: #D1FAE5; color: #047857; }
+.relevance-medium { background: #DBEAFE; color: #1D4ED8; }
+.relevance-low { background: #F1F5F9; color: #475569; }
+
+.result-excerpt {
+  font-size: 14px;
+  color: var(--text-sec);
+  line-height: 1.6;
+  margin-bottom: 10px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.result-excerpt mark {
+  background: #DBEAFE;
+  color: var(--primary);
+  padding: 1px 3px;
+  border-radius: 3px;
+  font-weight: 500;
+}
+
+.result-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.result-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: var(--radius-badge);
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--bg-sec);
+  color: var(--text-sec);
+}
+
+.result-time {
+  font-size: 12px;
+  color: var(--text-tert);
+}
+
+.result-score {
+  font-size: 12px;
+  color: var(--text-tert);
+  font-family: var(--font-code);
+}
+
+/* ==================== Load More ==================== */
+.load-more-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 16px;
+  border-radius: var(--radius-btn);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--trans-hover);
+  border: none;
+  text-decoration: none;
+  font-family: var(--font-ui);
+}
+
+.btn:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(37,99,235,0.2);
+}
+
+.btn-secondary {
+  background: var(--bg-card);
+  color: var(--text-main);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--bg-sec);
+  border-color: var(--text-tert);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-sec);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: var(--bg-sec);
+  color: var(--text-main);
+}
+
+.btn:disabled {
+  background: var(--bg-sec);
+  color: var(--text-tert);
+  border-color: var(--border);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-load-more {
+  height: 40px;
+  padding: 0 24px;
+  font-size: 14px;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ==================== State: Loading Skeleton ==================== */
+.state-loading,
+.state-results,
+.state-empty,
+.state-error {
+  display: none;
+}
+
+.state-loading.active,
+.state-results.active,
+.state-empty.active,
+.state-error.active {
+  display: block;
+}
+
+.skeleton-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 20px;
+  display: flex;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.skeleton-box {
+  background: var(--bg-sec);
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton-box::after {
+  content: "";
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(90deg, rgba(255,255,255,0) 0, rgba(255,255,255,0.4) 20%, rgba(255,255,255,0.6) 60%, rgba(255,255,255,0));
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  100% { transform: translateX(100%); }
+}
+
+.skeleton-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.skeleton-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.skeleton-title {
+  height: 16px;
+  width: 60%;
+  border-radius: 4px;
+}
+
+.skeleton-text {
+  height: 12px;
+  width: 90%;
+  border-radius: 4px;
+}
+
+.skeleton-text-short {
+  height: 12px;
+  width: 40%;
+  border-radius: 4px;
+}
+
+/* ==================== State: Empty ==================== */
+.empty-state {
+  text-align: center;
+  padding: 64px 32px;
+}
+
+.empty-state-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 16px;
+  color: var(--text-tert);
+}
+
+.empty-state-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 8px;
+}
+
+.empty-state-desc {
+  font-size: 14px;
+  color: var(--text-sec);
+}
+
+/* ==================== State: Error ==================== */
+.error-state {
+  text-align: center;
+  padding: 64px 32px;
+}
+
+.error-state-icon {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 16px;
+  color: var(--error);
+}
+
+.error-state-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 8px;
+}
+
+.error-state-desc {
+  font-size: 14px;
+  color: var(--text-sec);
+  margin-bottom: 16px;
+}
+
+/* ==================== State Switcher (demo only) ==================== */
+.state-switcher {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 12px 16px;
+  box-shadow: var(--shadow-modal);
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.state-switcher-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-tert);
+  margin-bottom: 4px;
+}
+
+.state-switcher label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-sec);
+  cursor: pointer;
+}
+
+.state-switcher input[type="radio"] {
+  accent-color: var(--primary);
+}
+
+/* ==================== Hamburger Menu Button ==================== */
+.hamburger-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  color: var(--text-main);
+  cursor: pointer;
+  border-radius: var(--radius-btn);
+  flex-shrink: 0;
+  transition: background var(--trans-base);
+}
+
+.hamburger-btn:hover {
+  background: var(--bg-sec);
+}
+
+.hamburger-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+/* ==================== Sidebar Overlay ==================== */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: 64px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 89;
+}
+
+.sidebar-overlay.active {
+  display: block;
+}
+
+/* ==================== Responsive: Mobile (max-width: 768px) ==================== */
+@media (max-width: 768px) {
+  .hamburger-btn {
+    display: flex;
+  }
+
+  .header-bar {
+    padding: 0 16px;
+    gap: 12px;
+  }
+
+  .header-search {
+    max-width: none;
+  }
+
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    z-index: 90;
+    background: var(--bg-card);
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .main-content {
+    margin-left: 0;
+    padding: 20px 16px;
+  }
+
+  .ai-prompt-card {
+    padding: 12px 14px;
+  }
+
+  .filter-toolbar {
+    gap: 10px;
+  }
+
+  .result-card {
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .result-format-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 11px;
+  }
+
+  .empty-state,
+  .error-state {
+    padding: 40px 16px;
+  }
+
+  .state-switcher {
+    bottom: 12px;
+    right: 12px;
+    padding: 10px 12px;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- ==================== Header Bar ==================== -->
+<header class="header-bar">
+  <button class="hamburger-btn" id="hamburger-btn" aria-label="打开导航菜单" aria-expanded="false">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+  </button>
+  <a class="header-logo" href="#">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+    </svg>
+    KnowBase
+  </a>
+
+  <div class="header-search">
+    <svg class="header-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+    </svg>
+    <input class="header-search-input" type="search" value="用户留存率分析" placeholder="搜索知识库..." aria-label="搜索知识库">
+  </div>
+
+  <div class="header-actions">
+    <button class="btn btn-secondary" style="height:32px; padding:0 12px; font-size:13px;" aria-label="上传资料">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+      </svg>
+      上传
+    </button>
+    <div style="width:32px;height:32px;border-radius:50%;background:var(--primary-dark);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;cursor:pointer;" aria-label="用户头像">Z</div>
+  </div>
+</header>
+
+<!-- Sidebar Overlay (mobile) -->
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+<!-- ==================== App Shell ==================== -->
+<div class="app-shell">
+
+  <!-- Sidebar -->
+  <nav class="sidebar" aria-label="主导航">
+    <a class="nav-item" href="#" tabindex="0">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      AI 对话
+    </a>
+    <a class="nav-item" href="#" tabindex="0">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      知识库
+    </a>
+    <a class="nav-item active" href="#" tabindex="0" aria-current="page">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      搜索
+    </a>
+    <div class="nav-section-label">知识空间</div>
+    <a class="nav-item" href="#" tabindex="0">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+      产品方法论
+    </a>
+    <a class="nav-item" href="#" tabindex="0">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+      Q1 竞品分析项目
+    </a>
+    <a class="nav-item" href="#" tabindex="0">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+      技术学习
+    </a>
+    <div style="flex:1;"></div>
+    <a class="nav-item" href="#" tabindex="0">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      设置
+    </a>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="content-inner">
+
+      <!-- AI Prompt Card -->
+      <div class="ai-prompt-card" tabindex="0" role="button" aria-label="向 AI 提问关于用户留存率分析的问题">
+        <div class="ai-prompt-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+          </svg>
+        </div>
+        <div class="ai-prompt-text">
+          <div class="ai-prompt-title">向 AI 提问："用户留存率分析"</div>
+          <div class="ai-prompt-desc">基于你的知识库内容，让 AI 为你总结和分析相关信息</div>
+        </div>
+        <svg class="ai-prompt-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </div>
+
+      <!-- Search Stats -->
+      <div class="search-stats">
+        <span class="search-stats-query">搜索: "用户留存率分析"</span>
+        <span class="search-stats-meta">&mdash; 共 6 条结果 (耗时 0.8s)</span>
+      </div>
+
+      <!-- Filter Toolbar -->
+      <div class="filter-toolbar" role="toolbar" aria-label="搜索筛选">
+        <div class="chip-group" role="group" aria-label="格式筛选">
+          <button class="chip chip-exclusive selected" data-filter="all" tabindex="0">全部</button>
+          <button class="chip" data-filter="pdf" tabindex="0">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            PDF
+          </button>
+          <button class="chip" data-filter="word" tabindex="0">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Word
+          </button>
+          <button class="chip" data-filter="web" tabindex="0">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            网页
+          </button>
+          <button class="chip" data-filter="markdown" tabindex="0">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Markdown
+          </button>
+          <button class="chip" data-filter="txt" tabindex="0">纯文本</button>
+        </div>
+
+        <div class="filter-separator"></div>
+
+        <div class="filter-dropdown" id="dropdown-time">
+          <button class="filter-dropdown-btn" tabindex="0" aria-haspopup="listbox" aria-expanded="false" aria-label="时间范围筛选">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span class="filter-dropdown-label">全部时间</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="filter-dropdown-panel" role="listbox">
+            <button class="filter-dropdown-option active" data-value="全部时间" role="option">全部时间</button>
+            <button class="filter-dropdown-option" data-value="最近7天" role="option">最近7天</button>
+            <button class="filter-dropdown-option" data-value="最近30天" role="option">最近30天</button>
+            <button class="filter-dropdown-option" data-value="最近90天" role="option">最近90天</button>
+          </div>
+        </div>
+
+        <div class="filter-dropdown" id="dropdown-sort" style="margin-left:auto;">
+          <button class="filter-dropdown-btn" tabindex="0" aria-haspopup="listbox" aria-expanded="false" aria-label="排序方式">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="16" y2="6"/><line x1="4" y1="12" x2="12" y2="12"/><line x1="4" y1="18" x2="8" y2="18"/></svg>
+            <span class="filter-dropdown-label">相关度最高</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="filter-dropdown-panel" role="listbox">
+            <button class="filter-dropdown-option active" data-value="相关度最高" role="option">相关度最高</button>
+            <button class="filter-dropdown-option" data-value="最近上传" role="option">最近上传</button>
+            <button class="filter-dropdown-option" data-value="标题A-Z" role="option">标题A-Z</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== State: Loading ==================== -->
+      <div class="state-loading" id="state-loading">
+        <div class="skeleton-card">
+          <div class="skeleton-box skeleton-icon"></div>
+          <div class="skeleton-body">
+            <div class="skeleton-box skeleton-title"></div>
+            <div class="skeleton-box skeleton-text"></div>
+            <div class="skeleton-box skeleton-text-short"></div>
+          </div>
+        </div>
+        <div class="skeleton-card">
+          <div class="skeleton-box skeleton-icon"></div>
+          <div class="skeleton-body">
+            <div class="skeleton-box skeleton-title"></div>
+            <div class="skeleton-box skeleton-text"></div>
+            <div class="skeleton-box skeleton-text-short"></div>
+          </div>
+        </div>
+        <div class="skeleton-card">
+          <div class="skeleton-box skeleton-icon"></div>
+          <div class="skeleton-body">
+            <div class="skeleton-box skeleton-title"></div>
+            <div class="skeleton-box skeleton-text"></div>
+            <div class="skeleton-box skeleton-text-short"></div>
+          </div>
+        </div>
+        <div class="skeleton-card">
+          <div class="skeleton-box skeleton-icon"></div>
+          <div class="skeleton-body">
+            <div class="skeleton-box skeleton-title"></div>
+            <div class="skeleton-box skeleton-text"></div>
+            <div class="skeleton-box skeleton-text-short"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== State: Has Results ==================== -->
+      <div class="state-results active" id="state-results">
+        <div class="results-list" id="results-list">
+
+          <!-- Result 1: ki-005 -->
+          <article class="result-card" tabindex="0" role="link" aria-label="用户访谈记录 - 知识管理工具使用习惯调研">
+            <div class="result-format-icon pdf">PDF</div>
+            <div class="result-body">
+              <div class="result-header">
+                <span class="result-title">用户访谈记录 - 知识管理工具使用习惯调研</span>
+                <span class="relevance-badge relevance-high">高度相关</span>
+              </div>
+              <p class="result-excerpt">...85% 的受访者表示资料散落在 3 个以上平台，平均每天花 30 分钟查找资料。关于<mark>用户留存</mark>，68% 的用户表示如果工具不能快速找到资料就会放弃使用...</p>
+              <div class="result-meta">
+                <span class="result-tag">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                  产品方法论
+                </span>
+                <span class="result-time">2026-03-14</span>
+                <span class="result-score">0.94</span>
+              </div>
+            </div>
+          </article>
+
+          <!-- Result 2: ki-009 -->
+          <article class="result-card" tabindex="0" role="link" aria-label="产品数据周报 - 第11周(3.10-3.16)">
+            <div class="result-format-icon markdown">MD</div>
+            <div class="result-body">
+              <div class="result-header">
+                <span class="result-title">产品数据周报 - 第11周(3.10-3.16)</span>
+                <span class="relevance-badge relevance-high">高度相关</span>
+              </div>
+              <p class="result-excerpt">...本周7日<mark>留存率</mark>为 42.3%，较上周下降 1.2 个百分点。<mark>分析</mark>发现新用户在第 3 天的流失率最高(28%)，主要原因是未完成首次上传...</p>
+              <div class="result-meta">
+                <span class="result-tag">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                  产品方法论
+                </span>
+                <span class="result-time">2026-03-16</span>
+                <span class="result-score">0.91</span>
+              </div>
+            </div>
+          </article>
+
+          <!-- Result 3: ki-010 -->
+          <article class="result-card" tabindex="0" role="link" aria-label="SaaS 产品留存策略研究 - 来自 a16z 的框架">
+            <div class="result-format-icon web">WEB</div>
+            <div class="result-body">
+              <div class="result-header">
+                <span class="result-title">SaaS 产品留存策略研究 - 来自 a16z 的框架</span>
+                <span class="relevance-badge relevance-medium">相关</span>
+              </div>
+              <p class="result-excerpt">...a16z 提出的<mark>用户留存</mark>四阶段模型：激活留存(Day 1)、习惯留存(Week 1)、核心留存(Month 1)和长期留存(Month 6+)。每个阶段的<mark>分析</mark>指标和干预策略各不相同...</p>
+              <div class="result-meta">
+                <span class="result-tag">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                  产品方法论
+                </span>
+                <span class="result-time">2026-03-11</span>
+                <span class="result-score">0.87</span>
+              </div>
+            </div>
+          </article>
+
+          <!-- Result 4: ki-011 -->
+          <article class="result-card" tabindex="0" role="link" aria-label="2025年度运营数据总结">
+            <div class="result-format-icon word">DOC</div>
+            <div class="result-body">
+              <div class="result-header">
+                <span class="result-title">2025年度运营数据总结</span>
+                <span class="relevance-badge relevance-medium">相关</span>
+              </div>
+              <p class="result-excerpt">...全年<mark>用户留存</mark>趋势：1月<mark>留存率</mark> 38%，经过持续优化，12月提升至 45%。核心驱动因素包括 onboarding 流程优化（+3%）、推送策略调整（+2%）...</p>
+              <div class="result-meta">
+                <span class="result-tag">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                  Q1 竞品分析项目
+                </span>
+                <span class="result-time">2026-03-08</span>
+                <span class="result-score">0.83</span>
+              </div>
+            </div>
+          </article>
+
+          <!-- Result 5: ki-012 -->
+          <article class="result-card" tabindex="0" role="link" aria-label="Mixpanel 留存分析最佳实践">
+            <div class="result-format-icon web">WEB</div>
+            <div class="result-body">
+              <div class="result-header">
+                <span class="result-title">Mixpanel 留存分析最佳实践</span>
+                <span class="relevance-badge relevance-low">部分相关</span>
+              </div>
+              <p class="result-excerpt">...使用 Mixpanel 构建<mark>留存</mark>看板的三个关键步骤：定义核心事件、设置队列<mark>分析</mark>时间窗口、配置自动告警阈值...</p>
+              <div class="result-meta">
+                <span class="result-tag">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                  技术学习
+                </span>
+                <span class="result-time">2026-03-05</span>
+                <span class="result-score">0.78</span>
+              </div>
+            </div>
+          </article>
+
+          <!-- Result 6: ki-013 -->
+          <article class="result-card" tabindex="0" role="link" aria-label="竞品用户增长策略对比">
+            <div class="result-format-icon pdf">PDF</div>
+            <div class="result-body">
+              <div class="result-header">
+                <span class="result-title">竞品用户增长策略对比</span>
+                <span class="relevance-badge relevance-low">部分相关</span>
+              </div>
+              <p class="result-excerpt">...Notion 的<mark>用户留存</mark>策略核心是模板生态——用户创建或使用模板后 30 日<mark>留存率</mark>达 65%，远高于未使用模板的用户(32%)...</p>
+              <div class="result-meta">
+                <span class="result-tag">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                  Q1 竞品分析项目
+                </span>
+                <span class="result-time">2026-03-03</span>
+                <span class="result-score">0.75</span>
+              </div>
+            </div>
+          </article>
+
+        </div>
+
+        <!-- Load More -->
+        <div class="load-more-wrapper">
+          <button class="btn btn-secondary btn-load-more" id="btn-load-more" tabindex="0">
+            加载更多结果
+          </button>
+        </div>
+      </div>
+
+      <!-- ==================== State: Empty ==================== -->
+      <div class="state-empty" id="state-empty">
+        <div class="empty-state">
+          <div class="empty-state-icon">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+            </svg>
+          </div>
+          <div class="empty-state-title">未找到相关内容</div>
+          <div class="empty-state-desc">试试换个描述方式，或减少筛选条件</div>
+        </div>
+      </div>
+
+      <!-- ==================== State: Error ==================== -->
+      <div class="state-error" id="state-error">
+        <div class="error-state">
+          <div class="error-state-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+          </div>
+          <div class="error-state-title">搜索出错</div>
+          <div class="error-state-desc">请稍后重试，或检查网络连接</div>
+          <button class="btn btn-primary" id="btn-retry" tabindex="0">重试</button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- ==================== State Switcher (demo control) ==================== -->
+<div class="state-switcher" role="radiogroup" aria-label="页面状态切换">
+  <div class="state-switcher-title">状态切换</div>
+  <label><input type="radio" name="page-state" value="loading"> 加载中</label>
+  <label><input type="radio" name="page-state" value="results" checked> 有结果</label>
+  <label><input type="radio" name="page-state" value="empty"> 无结果</label>
+  <label><input type="radio" name="page-state" value="error"> 搜索失败</label>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  // ==================== State Switching ====================
+  var states = ['loading', 'results', 'empty', 'error'];
+  var radios = document.querySelectorAll('input[name="page-state"]');
+
+  function switchState(stateName) {
+    states.forEach(function(s) {
+      var el = document.getElementById('state-' + s);
+      if (el) el.classList.toggle('active', s === stateName);
+    });
+  }
+
+  radios.forEach(function(radio) {
+    radio.addEventListener('change', function() {
+      switchState(this.value);
+    });
+  });
+
+  // ==================== Chip Filter (multi-select, "all" is exclusive) ====================
+  var chips = document.querySelectorAll('.chip-group .chip');
+  var allChip = document.querySelector('.chip[data-filter="all"]');
+
+  chips.forEach(function(chip) {
+    chip.addEventListener('click', function() {
+      var filter = this.getAttribute('data-filter');
+
+      if (filter === 'all') {
+        // "全部" is exclusive: deselect all others
+        chips.forEach(function(c) { c.classList.remove('selected'); });
+        allChip.classList.add('selected');
+      } else {
+        // Deselect "全部"
+        allChip.classList.remove('selected');
+        // Toggle this chip
+        this.classList.toggle('selected');
+
+        // If nothing selected, revert to "全部"
+        var anySelected = Array.from(chips).some(function(c) {
+          return c.classList.contains('selected');
+        });
+        if (!anySelected) {
+          allChip.classList.add('selected');
+        }
+      }
+
+      applyFilters();
+    });
+  });
+
+  function applyFilters() {
+    var selected = Array.from(chips)
+      .filter(function(c) { return c.classList.contains('selected'); })
+      .map(function(c) { return c.getAttribute('data-filter'); });
+
+    var cards = document.querySelectorAll('.result-card');
+    cards.forEach(function(card) {
+      if (selected.includes('all')) {
+        card.style.display = '';
+        return;
+      }
+      var iconEl = card.querySelector('.result-format-icon');
+      var cardType = '';
+      if (iconEl.classList.contains('pdf')) cardType = 'pdf';
+      else if (iconEl.classList.contains('word')) cardType = 'word';
+      else if (iconEl.classList.contains('web')) cardType = 'web';
+      else if (iconEl.classList.contains('markdown')) cardType = 'markdown';
+      else if (iconEl.classList.contains('txt')) cardType = 'txt';
+
+      card.style.display = selected.includes(cardType) ? '' : 'none';
+    });
+
+    // Update result count
+    var visible = document.querySelectorAll('.result-card:not([style*="display: none"])');
+    var meta = document.querySelector('.search-stats-meta');
+    if (meta) {
+      meta.textContent = '\u2014 \u5171 ' + visible.length + ' \u6761\u7ed3\u679c (\u8017\u65f6 0.8s)';
+    }
+  }
+
+  // ==================== Load More (clone & append) ====================
+  var loadMoreBtn = document.getElementById('btn-load-more');
+  var loadMoreClicked = false;
+
+  if (loadMoreBtn) {
+    loadMoreBtn.addEventListener('click', function() {
+      if (loadMoreClicked) return;
+      loadMoreClicked = true;
+
+      var btn = this;
+      btn.disabled = true;
+      btn.innerHTML = '<svg class="spinner" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> \u52a0\u8f7d\u4e2d...';
+
+      setTimeout(function() {
+        var list = document.getElementById('results-list');
+
+        var moreData = [
+          {
+            type: 'markdown',
+            typeLabel: 'MD',
+            title: '\u7559\u5b58\u7387\u4f18\u5316\u5b9e\u9a8c\u8bb0\u5f55 - A/B \u6d4b\u8bd5\u6c47\u603b',
+            excerpt: '...\u901a\u8fc7\u5bf9\u5f15\u5bfc\u6d41\u7a0b\u8fdb\u884c A/B \u6d4b\u8bd5\uff0c\u4f18\u5316\u540e\u7ec4\u7684 Day7 <mark>\u7559\u5b58\u7387</mark>\u63d0\u5347\u4e86 8.3%\u3002\u5173\u952e\u53d1\u73b0\uff1a\u7b80\u5316\u7684\u4e09\u6b65\u5f15\u5bfc\u6bd4\u539f\u6709\u4e94\u6b65\u6d41\u7a0b<mark>\u7528\u6237</mark>\u5b8c\u6210\u7387\u9ad8 42%...',
+            space: '\u4ea7\u54c1\u65b9\u6cd5\u8bba',
+            time: '2026-02-28',
+            score: '0.72',
+            badge: '\u90e8\u5206\u76f8\u5173',
+            badgeClass: 'relevance-low'
+          },
+          {
+            type: 'pdf',
+            typeLabel: 'PDF',
+            title: '\u79fb\u52a8\u7aef\u7528\u6237\u884c\u4e3a\u5206\u6790\u62a5\u544a Q4 2025',
+            excerpt: '...\u79fb\u52a8\u7aef<mark>\u7528\u6237</mark>\u7684<mark>\u7559\u5b58</mark>\u8868\u73b0\u6574\u4f53\u4f18\u4e8e\u684c\u9762\u7aef\uff0cDay30 <mark>\u7559\u5b58\u7387</mark>\u9ad8\u51fa 12 \u4e2a\u767e\u5206\u70b9\u3002\u9ad8\u9891\u4f7f\u7528\u573a\u666f\u96c6\u4e2d\u5728\u901a\u52e4\u65f6\u95f4\u6bb5\uff088:00-9:00, 18:00-19:00\uff09...',
+            space: '\u4ea7\u54c1\u65b9\u6cd5\u8bba',
+            time: '2026-02-20',
+            score: '0.68',
+            badge: '\u90e8\u5206\u76f8\u5173',
+            badgeClass: 'relevance-low'
+          }
+        ];
+
+        moreData.forEach(function(item, idx) {
+          var card = document.createElement('article');
+          card.className = 'result-card';
+          card.setAttribute('tabindex', '0');
+          card.setAttribute('role', 'link');
+          card.setAttribute('aria-label', item.title);
+          card.style.animationDelay = (idx * 50) + 'ms';
+
+          card.innerHTML =
+            '<div class="result-format-icon ' + item.type + '">' + item.typeLabel + '</div>' +
+            '<div class="result-body">' +
+              '<div class="result-header">' +
+                '<span class="result-title">' + item.title + '</span>' +
+                '<span class="relevance-badge ' + item.badgeClass + '">' + item.badge + '</span>' +
+              '</div>' +
+              '<p class="result-excerpt">' + item.excerpt + '</p>' +
+              '<div class="result-meta">' +
+                '<span class="result-tag">' +
+                  '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> ' +
+                  item.space +
+                '</span>' +
+                '<span class="result-time">' + item.time + '</span>' +
+                '<span class="result-score">' + item.score + '</span>' +
+              '</div>' +
+            '</div>';
+
+          list.appendChild(card);
+        });
+
+        // Update stats
+        var meta = document.querySelector('.search-stats-meta');
+        if (meta) {
+          meta.textContent = '\u2014 \u5171 8 \u6761\u7ed3\u679c (\u8017\u65f6 0.8s)';
+        }
+
+        btn.textContent = '\u5df2\u52a0\u8f7d\u5168\u90e8\u7ed3\u679c';
+        btn.disabled = true;
+        btn.style.color = 'var(--text-tert)';
+      }, 800);
+    });
+  }
+
+  // ==================== Dropdown Panels ====================
+  var dropdowns = document.querySelectorAll('.filter-dropdown');
+
+  dropdowns.forEach(function(dropdown) {
+    var btn = dropdown.querySelector('.filter-dropdown-btn');
+    var panel = dropdown.querySelector('.filter-dropdown-panel');
+    if (!btn || !panel) return;
+
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var isOpen = panel.classList.contains('open');
+
+      // Close all other panels first
+      document.querySelectorAll('.filter-dropdown-panel.open').forEach(function(p) {
+        p.classList.remove('open');
+        p.closest('.filter-dropdown').querySelector('.filter-dropdown-btn').setAttribute('aria-expanded', 'false');
+      });
+
+      if (!isOpen) {
+        panel.classList.add('open');
+        btn.setAttribute('aria-expanded', 'true');
+      }
+    });
+
+    var options = panel.querySelectorAll('.filter-dropdown-option');
+    options.forEach(function(option) {
+      option.addEventListener('click', function() {
+        var value = this.getAttribute('data-value');
+
+        // Update active state
+        options.forEach(function(o) { o.classList.remove('active'); });
+        this.classList.add('active');
+
+        // Update button label
+        var label = btn.querySelector('.filter-dropdown-label');
+        if (label) label.textContent = value;
+
+        // Close panel
+        panel.classList.remove('open');
+        btn.setAttribute('aria-expanded', 'false');
+      });
+    });
+  });
+
+  // Close dropdowns on outside click
+  document.addEventListener('click', function() {
+    document.querySelectorAll('.filter-dropdown-panel.open').forEach(function(p) {
+      p.classList.remove('open');
+      p.closest('.filter-dropdown').querySelector('.filter-dropdown-btn').setAttribute('aria-expanded', 'false');
+    });
+  });
+
+  // ==================== Hamburger Menu (mobile) ====================
+  var hamburgerBtn = document.getElementById('hamburger-btn');
+  var sidebar = document.querySelector('.sidebar');
+  var sidebarOverlay = document.getElementById('sidebar-overlay');
+
+  function openSidebar() {
+    sidebar.classList.add('open');
+    sidebarOverlay.classList.add('active');
+    hamburgerBtn.setAttribute('aria-expanded', 'true');
+  }
+
+  function closeSidebar() {
+    sidebar.classList.remove('open');
+    sidebarOverlay.classList.remove('active');
+    hamburgerBtn.setAttribute('aria-expanded', 'false');
+  }
+
+  if (hamburgerBtn) {
+    hamburgerBtn.addEventListener('click', function() {
+      var isOpen = sidebar.classList.contains('open');
+      if (isOpen) {
+        closeSidebar();
+      } else {
+        openSidebar();
+      }
+    });
+  }
+
+  if (sidebarOverlay) {
+    sidebarOverlay.addEventListener('click', closeSidebar);
+  }
+
+  // Close sidebar when a nav item is clicked (mobile)
+  var navItems = document.querySelectorAll('.sidebar .nav-item');
+  navItems.forEach(function(item) {
+    item.addEventListener('click', function() {
+      if (window.innerWidth <= 768) {
+        closeSidebar();
+      }
+    });
+  });
+
+  // ==================== Retry button ====================
+  var retryBtn = document.getElementById('btn-retry');
+  if (retryBtn) {
+    retryBtn.addEventListener('click', function() {
+      switchState('loading');
+      document.querySelector('input[name="page-state"][value="loading"]').checked = true;
+      setTimeout(function() {
+        switchState('results');
+        document.querySelector('input[name="page-state"][value="results"]').checked = true;
+      }, 1500);
+    });
+  }
+
+})();
+</script>
+
+</body>
+</html>

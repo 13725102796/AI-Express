@@ -1,0 +1,1749 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P-06 上传弹窗/上传状态面板 — KnowBase</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;600;700&display=swap');
+
+:root {
+  /* Colors - Core */
+  --primary: #2563EB;
+  --primary-light: #60A5FA;
+  --primary-dark: #1E3A5F;
+  --accent: #F59E0B;
+  --accent-light: #FEF3C7;
+  --success: #10B981;
+  --error: #EF4444;
+
+  /* Colors - Background & Surface */
+  --bg-main: #F8FAFC;
+  --bg-sec: #F1F5F9;
+  --bg-card: #FFFFFF;
+
+  /* Colors - Text */
+  --text-main: #1A202C;
+  --text-sec: #64748B;
+  --text-tert: #94A3B8;
+
+  /* Colors - Border */
+  --border: #E2E8F0;
+  --divider: #F1F5F9;
+
+  /* Colors - File Formats */
+  --fmt-pdf: #EF4444;
+  --fmt-word: #2563EB;
+  --fmt-web: #10B981;
+  --fmt-md: #8B5CF6;
+  --fmt-txt: #64748B;
+
+  /* Typography */
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Noto Sans SC', 'PingFang SC', sans-serif;
+  --font-code: 'JetBrains Mono', monospace;
+
+  /* Radii */
+  --radius-btn: 8px;
+  --radius-input: 8px;
+  --radius-card: 12px;
+  --radius-modal: 16px;
+  --radius-badge: 6px;
+  --radius-pill: 9999px;
+  --radius-round: 50%;
+
+  /* Shadows */
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-card-hover: 0 4px 12px rgba(0,0,0,0.12), 0 2px 4px rgba(0,0,0,0.08);
+  --shadow-modal: 0 16px 48px rgba(0,0,0,0.16);
+  --shadow-focus: 0 0 0 3px rgba(37,99,235,0.2);
+
+  /* Transitions */
+  --trans-base: 150ms ease-out;
+  --trans-hover: 200ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-ui);
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================
+   AppShell Background (blurred)
+   ============================================ */
+.app-shell-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  filter: blur(5px);
+  pointer-events: none;
+}
+
+.app-shell-bg .header-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 32px;
+}
+
+.app-shell-bg .header-title {
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.app-shell-bg .shell-sidebar {
+  position: absolute;
+  top: 64px;
+  left: 0;
+  bottom: 0;
+  width: 240px;
+  background: var(--bg-sec);
+  border-right: 1px solid var(--border);
+  padding: 16px;
+}
+
+.app-shell-bg .nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-sec);
+  margin-bottom: 4px;
+}
+
+.app-shell-bg .nav-item.active {
+  background: var(--primary-dark);
+  color: #fff;
+}
+
+.app-shell-bg .shell-main {
+  position: absolute;
+  top: 64px;
+  left: 240px;
+  right: 0;
+  bottom: 0;
+  background: var(--bg-main);
+  padding: 32px;
+}
+
+.app-shell-bg .shell-placeholder {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.app-shell-bg .shell-placeholder div {
+  background: var(--bg-sec);
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+/* ============================================
+   Modal Overlay
+   ============================================ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 200ms ease-out;
+}
+
+.modal-overlay.hidden {
+  display: none;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ============================================
+   Upload Modal
+   ============================================ */
+.upload-modal {
+  background: var(--bg-card);
+  border-radius: var(--radius-modal);
+  box-shadow: var(--shadow-modal);
+  width: 560px;
+  max-width: calc(100vw - 48px);
+  max-height: calc(100vh - 96px);
+  display: flex;
+  flex-direction: column;
+  animation: modalSlideIn 250ms ease-out;
+  overflow: hidden;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Modal Header */
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--divider);
+}
+
+.modal-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.modal-close-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--text-tert);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all var(--trans-base);
+}
+
+.modal-close-btn:hover {
+  background: var(--bg-sec);
+  color: var(--text-main);
+}
+
+.modal-close-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+/* Modal Body */
+.modal-body {
+  padding: 20px 24px;
+  overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Space Selector */
+.space-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.space-selector-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-main);
+}
+
+.space-dropdown {
+  position: relative;
+  width: 100%;
+}
+
+.space-dropdown-trigger {
+  width: 100%;
+  height: 38px;
+  padding: 0 36px 0 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-input);
+  font-size: 14px;
+  font-family: var(--font-ui);
+  color: var(--text-main);
+  background: var(--bg-card);
+  cursor: pointer;
+  transition: all var(--trans-base);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-align: left;
+  appearance: none;
+}
+
+.space-dropdown-trigger:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: var(--shadow-focus);
+}
+
+.space-dropdown-arrow {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-tert);
+  pointer-events: none;
+}
+
+/* Dropzone */
+.dropzone {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-card);
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--trans-hover);
+  background: var(--bg-main);
+}
+
+.dropzone:hover {
+  border-color: var(--primary-light);
+  background: #EFF6FF;
+}
+
+.dropzone.dragover {
+  border-color: var(--primary);
+  background: #DBEAFE;
+  border-style: solid;
+}
+
+.dropzone.dragover .dropzone-text {
+  color: var(--primary);
+}
+
+.dropzone-icon {
+  width: 48px;
+  height: 48px;
+  color: var(--text-tert);
+}
+
+.dropzone.dragover .dropzone-icon {
+  color: var(--primary);
+}
+
+.dropzone-text {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-sec);
+}
+
+.dropzone-hint {
+  font-size: 13px;
+  color: var(--text-tert);
+}
+
+.dropzone-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 16px;
+  border-radius: var(--radius-btn);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--trans-hover);
+  border: none;
+  text-decoration: none;
+  font-family: var(--font-ui);
+}
+
+.btn:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+.btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(37,99,235,0.2);
+}
+
+.btn-secondary {
+  background: var(--bg-card);
+  color: var(--text-main);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--bg-sec);
+  border-color: var(--text-tert);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-sec);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: var(--bg-sec);
+  color: var(--text-main);
+}
+
+.btn-danger {
+  background: var(--error);
+  color: #fff;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #DC2626;
+}
+
+.btn:disabled {
+  background: var(--bg-sec);
+  color: var(--text-tert);
+  border-color: var(--border);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-sm {
+  height: 28px;
+  padding: 0 10px;
+  font-size: 12px;
+}
+
+.btn-sm svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* URL Input Area */
+.url-input-area {
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.url-input-area.visible {
+  display: flex;
+}
+
+.url-input-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.url-input {
+  flex: 1;
+  height: 38px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-input);
+  font-size: 14px;
+  font-family: var(--font-ui);
+  color: var(--text-main);
+  transition: all var(--trans-base);
+  background: var(--bg-card);
+}
+
+.url-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: var(--shadow-focus);
+}
+
+.url-input.error {
+  border-color: var(--error);
+}
+
+.url-input.error:focus {
+  box-shadow: 0 0 0 3px rgba(239,68,68,0.2);
+}
+
+.url-error-msg {
+  font-size: 12px;
+  color: var(--error);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* File List */
+.file-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.file-list-header {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-sec);
+  margin-bottom: 8px;
+}
+
+.file-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  margin-bottom: 8px;
+  background: var(--bg-card);
+  transition: background var(--trans-base);
+}
+
+.file-item:hover {
+  background: var(--bg-sec);
+}
+
+.file-item-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.file-icon-pdf { background: #FEE2E2; color: #B91C1C; }
+.file-icon-word { background: #DBEAFE; color: #1D4ED8; }
+.file-icon-md { background: #EDE9FE; color: #6D28D9; }
+.file-icon-web { background: #D1FAE5; color: #047857; }
+.file-icon-txt { background: #F1F5F9; color: #475569; }
+
+.file-item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.file-item-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.file-item-meta {
+  font-size: 12px;
+  color: var(--text-tert);
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Progress Bar */
+.progress-bar-wrapper {
+  flex: 1;
+  min-width: 80px;
+  max-width: 140px;
+}
+
+.progress-bar {
+  height: 6px;
+  background: var(--bg-sec);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: var(--radius-pill);
+  transition: width 300ms ease-out;
+}
+
+.progress-bar-fill.uploading {
+  background: var(--primary);
+}
+
+.progress-bar-fill.parsing {
+  background: var(--accent);
+}
+
+.progress-bar-fill.completed {
+  background: var(--success);
+}
+
+.progress-bar-fill.error {
+  background: var(--error);
+}
+
+.progress-text {
+  font-size: 11px;
+  font-family: var(--font-code);
+  color: var(--text-tert);
+  margin-top: 2px;
+  text-align: right;
+}
+
+/* File Status */
+.file-item-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.status-icon {
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.status-icon.success { color: var(--success); }
+.status-icon.error { color: var(--error); }
+.status-icon.uploading { color: var(--primary); }
+.status-icon.parsing { color: var(--accent); }
+.status-icon.pending { color: var(--text-tert); }
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.file-remove-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--text-tert);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all var(--trans-base);
+  flex-shrink: 0;
+}
+
+.file-remove-btn:hover {
+  background: #FEE2E2;
+  color: var(--error);
+}
+
+.file-remove-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+/* Modal Footer */
+.modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px 20px;
+  border-top: 1px solid var(--divider);
+}
+
+/* ============================================
+   Upload Status Bar (floating bottom bar)
+   ============================================ */
+.upload-status-bar {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 900;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-modal);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 480px;
+  max-width: calc(100vw - 48px);
+  animation: statusBarSlideUp 300ms ease-out;
+}
+
+.upload-status-bar.hidden {
+  display: none;
+}
+
+.upload-status-bar.collapsing {
+  animation: statusBarSlideDown 300ms ease-out forwards;
+}
+
+@keyframes statusBarSlideUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+@keyframes statusBarSlideDown {
+  from {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+  }
+}
+
+.status-bar-summary {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-main);
+  white-space: nowrap;
+}
+
+.status-bar-items {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  overflow-x: auto;
+}
+
+.status-bar-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-sec);
+  white-space: nowrap;
+}
+
+.status-bar-item .status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-round);
+  flex-shrink: 0;
+}
+
+.status-dot.dot-success { background: var(--success); }
+.status-dot.dot-uploading { background: var(--primary); animation: pulse 1.5s ease-in-out infinite; }
+.status-dot.dot-pending { background: var(--text-tert); }
+.status-dot.dot-error { background: var(--error); }
+.status-dot.dot-parsing { background: var(--accent); animation: pulse 1.5s ease-in-out infinite; }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.status-bar-close {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--text-tert);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all var(--trans-base);
+  flex-shrink: 0;
+}
+
+.status-bar-close:hover {
+  background: var(--bg-sec);
+  color: var(--text-main);
+}
+
+/* ============================================
+   Toast Notifications
+   ============================================ */
+.toast-container {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.toast {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-modal);
+  padding: 12px 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 320px;
+  max-width: 420px;
+  animation: toastSlideIn 250ms ease-out;
+}
+
+.toast.toast-leaving {
+  animation: toastSlideOut 200ms ease-in forwards;
+}
+
+@keyframes toastSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes toastSlideOut {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+}
+
+.toast-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.toast-icon.toast-error { color: var(--error); }
+.toast-icon.toast-warning { color: var(--accent); }
+.toast-icon.toast-success { color: var(--success); }
+
+.toast-content {
+  flex: 1;
+}
+
+.toast-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-main);
+  margin-bottom: 2px;
+}
+
+.toast-message {
+  font-size: 13px;
+  color: var(--text-sec);
+  line-height: 1.4;
+}
+
+.toast-close {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--text-tert);
+  cursor: pointer;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.toast-close:hover {
+  color: var(--text-main);
+}
+
+/* ============================================
+   State Switcher (Demo Controls)
+   ============================================ */
+.state-switcher {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3000;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  padding: 4px;
+  display: flex;
+  gap: 2px;
+  box-shadow: var(--shadow-modal);
+  flex-wrap: wrap;
+  max-width: calc(100vw - 32px);
+  justify-content: center;
+}
+
+.state-btn {
+  padding: 6px 12px;
+  border: none;
+  background: transparent;
+  color: var(--text-sec);
+  font-size: 12px;
+  font-weight: 500;
+  font-family: var(--font-ui);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: all var(--trans-base);
+  white-space: nowrap;
+}
+
+.state-btn:hover {
+  background: var(--bg-sec);
+  color: var(--text-main);
+}
+
+.state-btn.active {
+  background: var(--primary);
+  color: #fff;
+}
+
+/* ============================================
+   Retry Button
+   ============================================ */
+.retry-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 26px;
+  padding: 0 10px;
+  border: 1px solid var(--error);
+  border-radius: var(--radius-btn);
+  background: transparent;
+  color: var(--error);
+  font-size: 12px;
+  font-weight: 500;
+  font-family: var(--font-ui);
+  cursor: pointer;
+  transition: all var(--trans-base);
+  flex-shrink: 0;
+}
+
+.retry-btn:hover {
+  background: #FEE2E2;
+}
+
+.retry-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(239,68,68,0.2);
+}
+
+.retry-btn svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* Badge */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: var(--radius-badge);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.badge-pdf { background: #FEE2E2; color: #B91C1C; }
+.badge-word { background: #DBEAFE; color: #1D4ED8; }
+.badge-web { background: #D1FAE5; color: #047857; }
+.badge-md { background: #EDE9FE; color: #6D28D9; }
+
+/* ============================================
+   Mobile Responsive — max-width: 768px
+   ============================================ */
+@media (max-width: 768px) {
+  /* Modal sizing */
+  .upload-modal {
+    width: calc(100vw - 32px);
+    max-height: calc(100vh - 64px);
+  }
+
+  /* Modal header / body / footer padding */
+  .modal-header {
+    padding: 16px 16px 12px;
+  }
+
+  .modal-body {
+    padding: 16px;
+    gap: 16px;
+  }
+
+  .modal-footer {
+    padding: 12px 16px 16px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* Dropzone compact */
+  .dropzone {
+    padding: 24px 16px;
+  }
+
+  .dropzone-actions {
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .dropzone-actions .btn {
+    width: 100%;
+  }
+
+  /* URL input area — vertical stack */
+  .url-input-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .url-input-row .btn {
+    width: 100%;
+  }
+
+  /* File list items — allow wrapping */
+  .file-item {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .file-item-info {
+    min-width: calc(100% - 56px);
+  }
+
+  .progress-bar-wrapper {
+    max-width: none;
+    width: 100%;
+    order: 1;
+  }
+
+  .file-item-status {
+    order: 1;
+  }
+
+  /* Upload Status Bar — full width */
+  .upload-status-bar {
+    min-width: unset;
+    width: calc(100vw - 32px);
+    left: 16px;
+    right: 16px;
+    transform: none;
+    bottom: 16px;
+    padding: 10px 14px;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  @keyframes statusBarSlideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes statusBarSlideDown {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+  }
+
+  .status-bar-items {
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* Toast notifications */
+  .toast-container {
+    left: 16px;
+    right: 16px;
+    top: 16px;
+  }
+
+  .toast {
+    min-width: unset;
+    max-width: none;
+    width: 100%;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================
+     AppShell Background (blurred)
+     ============================================ -->
+<div class="app-shell-bg" aria-hidden="true">
+  <div class="header-bar">
+    <div class="header-title">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      KnowBase
+    </div>
+  </div>
+  <div class="shell-sidebar">
+    <div class="nav-item active">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      AI 问答
+    </div>
+    <div class="nav-item">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      知识库
+    </div>
+    <div class="nav-item">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"/></svg>
+      设置
+    </div>
+  </div>
+  <div class="shell-main">
+    <div class="shell-placeholder">
+      <div style="height:20px;width:200px;"></div>
+      <div style="height:120px;width:100%;"></div>
+      <div style="height:80px;width:100%;"></div>
+      <div style="height:80px;width:60%;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================
+     State Switcher (Demo Controls)
+     ============================================ -->
+<nav class="state-switcher" role="tablist" aria-label="状态切换">
+  <button class="state-btn active" onclick="showState('empty')" role="tab">空弹窗</button>
+  <button class="state-btn" onclick="showState('files-selected')" role="tab">已选文件</button>
+  <button class="state-btn" onclick="showState('uploading')" role="tab">上传中</button>
+  <button class="state-btn" onclick="showState('all-done')" role="tab">全部完成</button>
+  <button class="state-btn" onclick="showState('partial-fail')" role="tab">部分失败</button>
+  <button class="state-btn" onclick="showState('unsupported')" role="tab">格式不支持</button>
+  <button class="state-btn" onclick="showState('url-input')" role="tab">URL输入</button>
+  <button class="state-btn" onclick="showState('status-bar')" role="tab">底部浮动条</button>
+</nav>
+
+<!-- ============================================
+     Toast Container
+     ============================================ -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ============================================
+     Modal Overlay
+     ============================================ -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="upload-modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <!-- Header -->
+    <div class="modal-header">
+      <h2 class="modal-title" id="modalTitle">上传资料到知识库</h2>
+      <button class="modal-close-btn" onclick="closeModal()" aria-label="关闭">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-body" id="modalBody">
+      <!-- Space Selector -->
+      <div class="space-selector">
+        <label class="space-selector-label">目标知识空间</label>
+        <div class="space-dropdown">
+          <button class="space-dropdown-trigger" type="button">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            产品方法论
+          </button>
+          <span class="space-dropdown-arrow">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </span>
+        </div>
+      </div>
+
+      <!-- Dropzone -->
+      <div class="dropzone" id="dropzone" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)" onclick="document.getElementById('fileInput').click()">
+        <svg class="dropzone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="17 8 12 3 7 8"/>
+          <line x1="12" y1="3" x2="12" y2="15"/>
+        </svg>
+        <span class="dropzone-text" id="dropzoneText">拖拽文件到此处上传</span>
+        <span class="dropzone-hint">支持 PDF、Word、Markdown、纯文本、网页链接</span>
+        <div class="dropzone-actions">
+          <button class="btn btn-secondary btn-sm" type="button" onclick="event.stopPropagation(); document.getElementById('fileInput').click();">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            选择文件
+          </button>
+          <button class="btn btn-ghost btn-sm" type="button" id="urlToggleBtn" onclick="event.stopPropagation(); toggleUrlInput();">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            输入网页链接
+          </button>
+        </div>
+        <input type="file" id="fileInput" multiple accept=".pdf,.doc,.docx,.md,.txt" style="display:none" />
+      </div>
+
+      <!-- URL Input Area (hidden by default) -->
+      <div class="url-input-area" id="urlInputArea">
+        <div class="url-input-row">
+          <input type="url" class="url-input" id="urlInput" placeholder="粘贴网页链接，如 https://arxiv.org/abs/..." />
+          <button class="btn btn-primary btn-sm" id="urlSaveBtn" type="button">保存</button>
+        </div>
+        <div class="url-error-msg" id="urlError" style="display:none;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+          <span id="urlErrorText">该网页无法访问，请检查链接是否有效</span>
+        </div>
+      </div>
+
+      <!-- File List -->
+      <div id="fileListSection" style="display:none;">
+        <div class="file-list-header" id="fileListHeader">已选文件 (0)</div>
+        <div class="file-list" id="fileList"></div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer">
+      <button class="btn btn-ghost" type="button" onclick="closeModal()">取消</button>
+      <button class="btn btn-primary" type="button" id="uploadBtn" disabled>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        开始上传
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================
+     Upload Status Bar (floating bottom)
+     ============================================ -->
+<div class="upload-status-bar hidden" id="uploadStatusBar">
+  <span class="status-bar-summary" id="statusBarSummary">上传进度：2/4 完成</span>
+  <div class="status-bar-items" id="statusBarItems">
+    <div class="status-bar-item">
+      <span class="status-dot dot-success"></span>
+      2026-Q1-Marketing-Plan.pdf
+    </div>
+    <div class="status-bar-item">
+      <span class="status-dot dot-uploading"></span>
+      竞品定价策略分析.docx 72%
+    </div>
+    <div class="status-bar-item">
+      <span class="status-dot dot-pending"></span>
+      技术选型评审记录.md
+    </div>
+    <div class="status-bar-item">
+      <span class="status-dot dot-success"></span>
+      深度学习在推荐系统中的应用综述
+    </div>
+  </div>
+  <button class="status-bar-close" onclick="hideStatusBar()" aria-label="关闭状态栏">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  </button>
+</div>
+
+<script>
+// ============================================
+// Mock Data (from page-specs.md)
+// ============================================
+var MOCK_DATA = {
+  uploadQueue: [
+    {
+      id: 'upload-001',
+      fileName: '2026-Q1-Marketing-Plan.pdf',
+      fileType: 'pdf',
+      fileSize: '4.5MB',
+      status: 'completed',
+      progress: 100,
+      parseStatus: 'parsing',
+      parseProgress: 65
+    },
+    {
+      id: 'upload-002',
+      fileName: '竞品定价策略分析.docx',
+      fileType: 'word',
+      fileSize: '1.2MB',
+      status: 'uploading',
+      progress: 72,
+      parseStatus: null
+    },
+    {
+      id: 'upload-003',
+      fileName: '技术选型评审记录.md',
+      fileType: 'markdown',
+      fileSize: '35KB',
+      status: 'pending',
+      progress: 0,
+      parseStatus: null
+    },
+    {
+      id: 'upload-url-001',
+      fileName: '深度学习在推荐系统中的应用综述',
+      fileType: 'web',
+      originalUrl: 'https://arxiv.org/abs/2025.12345',
+      fileSize: null,
+      status: 'completed',
+      progress: 100,
+      parseStatus: 'completed'
+    }
+  ],
+  targetSpace: { id: 'sp-002', name: '产品方法论' },
+  errorExamples: {
+    fileTooLarge: { fileName: '全量数据导出.pdf', fileSize: '128MB', error: '文件过大(超过50MB)，请拆分后上传' },
+    unsupportedFormat: { fileName: 'demo.sketch', error: '暂不支持 .sketch 格式，当前支持：PDF、Word、Markdown、纯文本、网页链接' },
+    urlNotAccessible: { url: 'https://private.example.com/404', error: '该网页无法访问，请检查链接是否有效' }
+  }
+};
+
+// ============================================
+// File type helpers
+// ============================================
+function getFileIconClass(type) {
+  var map = { pdf: 'file-icon-pdf', word: 'file-icon-word', markdown: 'file-icon-md', web: 'file-icon-web', txt: 'file-icon-txt' };
+  return map[type] || 'file-icon-txt';
+}
+
+function getFileIconLabel(type) {
+  var map = { pdf: 'PDF', word: 'DOC', markdown: 'MD', web: 'URL', txt: 'TXT' };
+  return map[type] || 'FILE';
+}
+
+function getStatusIcon(file) {
+  if (file.status === 'completed' && file.parseStatus === 'completed') {
+    return '<span class="status-icon success"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>';
+  }
+  if (file.status === 'completed' && file.parseStatus === 'parsing') {
+    return '<span class="status-icon parsing"><svg class="spinner" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg></span>';
+  }
+  if (file.status === 'uploading') {
+    return '<span class="status-icon uploading"><svg class="spinner" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg></span>';
+  }
+  if (file.status === 'failed') {
+    return '<span class="status-icon error"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></span>';
+  }
+  if (file.status === 'pending') {
+    return '<span class="status-icon pending"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>';
+  }
+  return '';
+}
+
+function getProgressBar(file) {
+  if (file.status === 'pending') return '';
+  if (file.status === 'completed' && file.parseStatus === 'completed') return '';
+  if (file.status === 'failed') return '';
+
+  var fillClass = 'uploading';
+  var pct = file.progress;
+  var label = pct + '%';
+
+  if (file.status === 'completed' && file.parseStatus === 'parsing') {
+    fillClass = 'parsing';
+    pct = file.parseProgress || 0;
+    label = '解析中 ' + pct + '%';
+  }
+
+  return '<div class="progress-bar-wrapper">' +
+    '<div class="progress-bar"><div class="progress-bar-fill ' + fillClass + '" style="width:' + pct + '%"></div></div>' +
+    '<div class="progress-text">' + label + '</div>' +
+    '</div>';
+}
+
+// ============================================
+// Render file list
+// ============================================
+function renderFileList(files, opts) {
+  opts = opts || {};
+  var listEl = document.getElementById('fileList');
+  var sectionEl = document.getElementById('fileListSection');
+  var headerEl = document.getElementById('fileListHeader');
+
+  if (!files || files.length === 0) {
+    sectionEl.style.display = 'none';
+    return;
+  }
+
+  sectionEl.style.display = 'block';
+  headerEl.textContent = '已选文件 (' + files.length + ')';
+
+  var html = '';
+  for (var i = 0; i < files.length; i++) {
+    var f = files[i];
+    var canRemove = (f.status === 'pending' || opts.canRemoveAll);
+    var isFailed = f.status === 'failed';
+
+    html += '<div class="file-item">';
+    html += '<div class="file-item-icon ' + getFileIconClass(f.fileType) + '">' + getFileIconLabel(f.fileType) + '</div>';
+    html += '<div class="file-item-info">';
+    html += '<div class="file-item-name">' + f.fileName + '</div>';
+    html += '<div class="file-item-meta">';
+    if (f.fileSize) html += '<span>' + f.fileSize + '</span>';
+    if (f.originalUrl) html += '<span style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;vertical-align:bottom;">' + f.originalUrl + '</span>';
+    if (f.parseStatus === 'parsing') html += '<span style="color:var(--accent);">解析中...</span>';
+    if (f.parseStatus === 'completed') html += '<span style="color:var(--success);">已就绪</span>';
+    if (isFailed) html += '<span style="color:var(--error);">上传失败</span>';
+    html += '</div></div>';
+    html += getProgressBar(f);
+    html += '<div class="file-item-status">';
+    html += getStatusIcon(f);
+    if (isFailed) {
+      html += '<button class="retry-btn" type="button" onclick="showToast(\'warning\', \'重新上传\', \'重新上传中...\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>重试</button>';
+    }
+    html += '</div>';
+    if (canRemove) {
+      html += '<button class="file-remove-btn" aria-label="移除文件"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>';
+    }
+    html += '</div>';
+  }
+  listEl.innerHTML = html;
+}
+
+// ============================================
+// Toast system
+// ============================================
+function showToast(type, title, message) {
+  var container = document.getElementById('toastContainer');
+  var iconMap = {
+    error: '<svg class="toast-icon toast-error" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
+    warning: '<svg class="toast-icon toast-warning" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+    success: '<svg class="toast-icon toast-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>'
+  };
+
+  var toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.innerHTML = (iconMap[type] || iconMap.error) +
+    '<div class="toast-content">' +
+    '<div class="toast-title">' + title + '</div>' +
+    '<div class="toast-message">' + message + '</div>' +
+    '</div>' +
+    '<button class="toast-close" onclick="this.parentElement.classList.add(\'toast-leaving\'); setTimeout(function(){toast.remove();}, 200);" aria-label="关闭">' +
+    '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
+    '</button>';
+
+  container.appendChild(toast);
+
+  // Auto-close toast close button with proper reference
+  var closeBtn = toast.querySelector('.toast-close');
+  closeBtn.onclick = function() {
+    toast.classList.add('toast-leaving');
+    setTimeout(function() { if (toast.parentElement) toast.remove(); }, 200);
+  };
+
+  setTimeout(function() {
+    if (toast.parentElement) {
+      toast.classList.add('toast-leaving');
+      setTimeout(function() { if (toast.parentElement) toast.remove(); }, 200);
+    }
+  }, 3000);
+}
+
+// ============================================
+// Drag & Drop handlers
+// ============================================
+function handleDragOver(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  document.getElementById('dropzone').classList.add('dragover');
+  document.getElementById('dropzoneText').textContent = '释放以添加';
+}
+
+function handleDragLeave(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  document.getElementById('dropzone').classList.remove('dragover');
+  document.getElementById('dropzoneText').textContent = '拖拽文件到此处上传';
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  document.getElementById('dropzone').classList.remove('dragover');
+  document.getElementById('dropzoneText').textContent = '拖拽文件到此处上传';
+
+  var files = e.dataTransfer.files;
+  if (!files || files.length === 0) return;
+
+  var droppedFiles = [];
+  for (var i = 0; i < files.length; i++) {
+    var f = files[i];
+    var ext = f.name.split('.').pop().toLowerCase();
+    var typeMap = { pdf: 'pdf', doc: 'word', docx: 'word', md: 'markdown', txt: 'txt' };
+    var fileType = typeMap[ext] || 'txt';
+    var sizeStr = f.size < 1024 ? f.size + 'B'
+      : f.size < 1048576 ? (f.size / 1024).toFixed(1) + 'KB'
+      : (f.size / 1048576).toFixed(1) + 'MB';
+    droppedFiles.push({
+      id: 'drop-' + Date.now() + '-' + i,
+      fileName: f.name,
+      fileType: fileType,
+      fileSize: sizeStr,
+      status: 'pending',
+      progress: 0,
+      parseStatus: null
+    });
+  }
+
+  renderFileList(droppedFiles, { canRemoveAll: true });
+  document.getElementById('uploadBtn').disabled = false;
+  showToast('success', '文件已添加', '已添加 ' + files.length + ' 个文件');
+}
+
+// ============================================
+// URL input toggle
+// ============================================
+function toggleUrlInput() {
+  var area = document.getElementById('urlInputArea');
+  area.classList.toggle('visible');
+}
+
+// ============================================
+// Modal close — checks active uploads
+// ============================================
+var hasActiveUploads = false;
+
+function closeModal() {
+  var overlay = document.getElementById('modalOverlay');
+  overlay.classList.add('hidden');
+
+  if (hasActiveUploads) {
+    showStatusBar();
+  }
+}
+
+function openModal() {
+  var overlay = document.getElementById('modalOverlay');
+  overlay.classList.remove('hidden');
+  document.getElementById('uploadStatusBar').classList.add('hidden');
+}
+
+// ============================================
+// Status Bar
+// ============================================
+function showStatusBar() {
+  var bar = document.getElementById('uploadStatusBar');
+  bar.classList.remove('hidden');
+  bar.classList.remove('collapsing');
+}
+
+function hideStatusBar() {
+  var bar = document.getElementById('uploadStatusBar');
+  bar.classList.add('collapsing');
+  setTimeout(function() { bar.classList.add('hidden'); bar.classList.remove('collapsing'); }, 300);
+}
+
+function autoCollapseStatusBar(delayMs) {
+  setTimeout(function() {
+    hideStatusBar();
+  }, delayMs || 5000);
+}
+
+// ============================================
+// State Switcher
+// ============================================
+function showState(state) {
+  // Update active button
+  var btns = document.querySelectorAll('.state-btn');
+  for (var i = 0; i < btns.length; i++) { btns[i].classList.remove('active'); }
+  if (event && event.target) event.target.classList.add('active');
+
+  // Reset
+  var overlay = document.getElementById('modalOverlay');
+  var statusBar = document.getElementById('uploadStatusBar');
+  var urlArea = document.getElementById('urlInputArea');
+  var urlInput = document.getElementById('urlInput');
+  var urlError = document.getElementById('urlError');
+  var uploadBtn = document.getElementById('uploadBtn');
+  var toastContainer = document.getElementById('toastContainer');
+
+  overlay.classList.remove('hidden');
+  statusBar.classList.add('hidden');
+  statusBar.classList.remove('collapsing');
+  urlArea.classList.remove('visible');
+  urlInput.classList.remove('error');
+  urlError.style.display = 'none';
+  toastContainer.innerHTML = '';
+  hasActiveUploads = false;
+  uploadBtn.style.background = '';
+  uploadBtn.style.color = '';
+
+  switch (state) {
+    case 'empty':
+      renderFileList([]);
+      uploadBtn.disabled = true;
+      uploadBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> 开始上传';
+      break;
+
+    case 'files-selected':
+      var selectedFiles = [];
+      for (var i = 0; i < MOCK_DATA.uploadQueue.length; i++) {
+        var src = MOCK_DATA.uploadQueue[i];
+        selectedFiles.push({
+          id: src.id, fileName: src.fileName, fileType: src.fileType,
+          fileSize: src.fileSize, originalUrl: src.originalUrl,
+          status: 'pending', progress: 0, parseStatus: null
+        });
+      }
+      renderFileList(selectedFiles, { canRemoveAll: true });
+      uploadBtn.disabled = false;
+      uploadBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> 开始上传';
+      break;
+
+    case 'uploading':
+      hasActiveUploads = true;
+      renderFileList(MOCK_DATA.uploadQueue);
+      uploadBtn.disabled = true;
+      uploadBtn.innerHTML = '<svg class="spinner" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> 上传中...';
+      break;
+
+    case 'all-done':
+      var doneFiles = [];
+      for (var i = 0; i < MOCK_DATA.uploadQueue.length; i++) {
+        var src = MOCK_DATA.uploadQueue[i];
+        doneFiles.push({
+          id: src.id, fileName: src.fileName, fileType: src.fileType,
+          fileSize: src.fileSize, originalUrl: src.originalUrl,
+          status: 'completed', progress: 100, parseStatus: 'completed'
+        });
+      }
+      renderFileList(doneFiles);
+      uploadBtn.disabled = true;
+      uploadBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> 全部上传成功';
+      uploadBtn.style.background = 'var(--success)';
+      uploadBtn.style.color = '#fff';
+      autoCollapseStatusBar();
+      break;
+
+    case 'partial-fail':
+      var failFiles = [
+        { id: 'upload-001', fileName: '2026-Q1-Marketing-Plan.pdf', fileType: 'pdf', fileSize: '4.5MB', status: 'completed', progress: 100, parseStatus: 'completed' },
+        { id: 'upload-002', fileName: '竞品定价策略分析.docx', fileType: 'word', fileSize: '1.2MB', status: 'failed', progress: 45, parseStatus: null },
+        { id: 'upload-003', fileName: '技术选型评审记录.md', fileType: 'markdown', fileSize: '35KB', status: 'completed', progress: 100, parseStatus: 'completed' },
+        { id: 'upload-url-001', fileName: '深度学习在推荐系统中的应用综述', fileType: 'web', originalUrl: 'https://arxiv.org/abs/2025.12345', status: 'failed', progress: 0, parseStatus: null }
+      ];
+      renderFileList(failFiles);
+      uploadBtn.disabled = false;
+      uploadBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> 重试失败项';
+      break;
+
+    case 'unsupported':
+      renderFileList([]);
+      uploadBtn.disabled = true;
+      uploadBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> 开始上传';
+      showToast('error', '格式不支持', MOCK_DATA.errorExamples.unsupportedFormat.error);
+      setTimeout(function() {
+        showToast('warning', '文件过大', MOCK_DATA.errorExamples.fileTooLarge.error);
+      }, 400);
+      break;
+
+    case 'url-input':
+      renderFileList([]);
+      uploadBtn.disabled = true;
+      uploadBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> 开始上传';
+      urlArea.classList.add('visible');
+      urlInput.value = 'https://private.example.com/404';
+      urlInput.classList.add('error');
+      urlError.style.display = 'flex';
+      document.getElementById('urlErrorText').textContent = MOCK_DATA.errorExamples.urlNotAccessible.error;
+      break;
+
+    case 'status-bar':
+      overlay.classList.add('hidden');
+      showStatusBar();
+      document.getElementById('statusBarSummary').textContent = '上传进度：2/4 完成';
+      document.getElementById('statusBarItems').innerHTML =
+        '<div class="status-bar-item"><span class="status-dot dot-success"></span>2026-Q1-Marketing-Plan.pdf</div>' +
+        '<div class="status-bar-item"><span class="status-dot dot-uploading"></span>竞品定价策略分析.docx 72%</div>' +
+        '<div class="status-bar-item"><span class="status-dot dot-pending"></span>技术选型评审记录.md</div>' +
+        '<div class="status-bar-item"><span class="status-dot dot-success"></span>深度学习在推荐系统中的应用综述</div>';
+      break;
+  }
+}
+
+// ============================================
+// ESC key close modal
+// ============================================
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    var overlay = document.getElementById('modalOverlay');
+    if (!overlay.classList.contains('hidden')) {
+      closeModal();
+    }
+  }
+});
+
+// ============================================
+// Click overlay (outside modal) to close
+// ============================================
+document.getElementById('modalOverlay').addEventListener('click', function(e) {
+  if (e.target === this) {
+    closeModal();
+  }
+});
+
+// ============================================
+// Initialize with empty modal state
+// ============================================
+document.addEventListener('DOMContentLoaded', function() {
+  renderFileList([]);
+});
+</script>
+</body>
+</html>

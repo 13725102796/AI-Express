@@ -1,0 +1,1403 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KnowBase - 知识空间管理</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;600;700&display=swap');
+
+:root {
+  /* Colors - Core */
+  --primary: #2563EB;
+  --primary-light: #60A5FA;
+  --primary-dark: #1E3A5F;
+  --accent: #F59E0B;
+  --accent-light: #FEF3C7;
+  --success: #10B981;
+  --error: #EF4444;
+
+  /* Colors - Background & Surface */
+  --bg-main: #F8FAFC;
+  --bg-sec: #F1F5F9;
+  --bg-card: #FFFFFF;
+
+  /* Colors - Text */
+  --text-main: #1A202C;
+  --text-sec: #64748B;
+  --text-tert: #94A3B8;
+
+  /* Colors - Border */
+  --border: #E2E8F0;
+  --divider: #F1F5F9;
+
+  /* Typography */
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Noto Sans SC', 'PingFang SC', sans-serif;
+  --font-code: 'JetBrains Mono', monospace;
+
+  /* Radii */
+  --radius-btn: 8px;
+  --radius-input: 8px;
+  --radius-card: 12px;
+  --radius-modal: 16px;
+  --radius-badge: 6px;
+  --radius-pill: 9999px;
+  --radius-round: 50%;
+
+  /* Shadows */
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-card-hover: 0 4px 12px rgba(0,0,0,0.12), 0 2px 4px rgba(0,0,0,0.08);
+  --shadow-modal: 0 16px 48px rgba(0,0,0,0.16);
+  --shadow-focus: 0 0 0 3px rgba(37,99,235,0.2);
+
+  /* Transitions */
+  --trans-base: 150ms ease-out;
+  --trans-hover: 200ms ease;
+
+  /* Layout */
+  --devbar-height: 48px;
+  --topbar-height: 64px;
+  --sidenav-width: 240px;
+  --settings-nav-width: 200px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-ui);
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+  height: 100vh;
+  padding-top: var(--devbar-height);
+}
+
+a { text-decoration: none; color: inherit; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; outline: none; transition: all var(--trans-base); }
+input, textarea { font-family: inherit; outline: none; transition: border-color var(--trans-base), box-shadow var(--trans-base); }
+svg { display: block; }
+
+/* ====== Dev Bar ====== */
+.dev-bar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--devbar-height);
+  background: #1e293b;
+  color: white;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 12px;
+  font-size: 13px;
+}
+.dev-bar-title {
+  font-weight: 600;
+  color: #94a3b8;
+  margin-right: 8px;
+  white-space: nowrap;
+}
+.dev-btn {
+  background: #334155;
+  color: #f8fafc;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-weight: 500;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.dev-btn:hover { background: #475569; }
+.dev-btn.active { background: var(--primary); color: white; }
+
+/* ====== App Shell ====== */
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - var(--devbar-height));
+}
+
+/* TopBar */
+.topbar {
+  height: var(--topbar-height);
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  flex-shrink: 0;
+}
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--primary-dark);
+}
+.logo {
+  width: 32px; height: 32px;
+  background: var(--primary);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+.topbar-center {
+  flex: 1;
+  max-width: 480px;
+  margin: 0 40px;
+}
+.search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.search-box svg {
+  position: absolute;
+  left: 12px;
+  color: var(--text-tert);
+  width: 16px; height: 16px;
+}
+.search-box input {
+  width: 100%;
+  height: 36px;
+  padding: 0 40px 0 36px;
+  background: var(--bg-sec);
+  border: 1px solid transparent;
+  border-radius: var(--radius-input);
+  color: var(--text-main);
+  font-size: 14px;
+}
+.search-box input:focus {
+  background: var(--bg-card);
+  border-color: var(--primary);
+  box-shadow: var(--shadow-focus);
+}
+.search-shortcut {
+  position: absolute;
+  right: 12px;
+  font-size: 12px;
+  color: var(--text-tert);
+  background: var(--bg-card);
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  font-family: var(--font-code);
+}
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px; height: 32px;
+  border-radius: var(--radius-btn);
+  color: var(--text-sec);
+  background: var(--bg-sec);
+}
+.btn-icon:hover { background: var(--border); color: var(--text-main); }
+.avatar {
+  width: 32px; height: 32px;
+  border-radius: var(--radius-round);
+  background: var(--primary-light);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Main Body */
+.app-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* SideNav */
+.sidenav {
+  width: var(--sidenav-width);
+  background: var(--bg-card);
+  border-right: 1px solid var(--border);
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: var(--radius-btn);
+  color: var(--text-sec);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.nav-item:hover { background: var(--bg-sec); color: var(--text-main); }
+.nav-item.active {
+  background: rgba(37,99,235,0.1);
+  color: var(--primary);
+  box-shadow: inset 3px 0 0 0 var(--primary);
+}
+.nav-item svg { width: 18px; height: 18px; }
+
+/* Main Content Area */
+.main-content {
+  flex: 1;
+  display: flex;
+  padding: 40px;
+  gap: 48px;
+  overflow-y: auto;
+  min-width: 0;
+}
+
+/* Settings SubNav */
+.subnav {
+  width: var(--settings-nav-width);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.subnav-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-tert);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+  padding-left: 12px;
+}
+.subnav-item {
+  display: block;
+  padding: 8px 12px;
+  border-radius: var(--radius-btn);
+  color: var(--text-sec);
+  font-size: 14px;
+  cursor: pointer;
+}
+.subnav-item:hover { background: var(--bg-sec); color: var(--text-main); }
+.subnav-item.active {
+  background: var(--bg-card);
+  color: var(--primary);
+  font-weight: 600;
+  box-shadow: var(--shadow-card);
+}
+
+/* ====== Page Content ====== */
+.page-container {
+  flex: 1;
+  max-width: 800px;
+  min-width: 0;
+}
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+.page-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: var(--radius-btn);
+  font-size: 14px;
+  font-weight: 500;
+}
+.btn-primary {
+  background: var(--primary);
+  color: white;
+}
+.btn-primary:hover:not(:disabled) {
+  background: #1D4ED8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(37,99,235,0.2);
+}
+.btn-primary:disabled {
+  background: var(--bg-sec);
+  color: var(--text-tert);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+.btn-secondary {
+  background: var(--bg-card);
+  color: var(--text-main);
+  border: 1px solid var(--border);
+}
+.btn-secondary:hover { background: var(--bg-sec); }
+.btn-danger {
+  background: var(--error);
+  color: white;
+}
+.btn-danger:hover { background: #DC2626; }
+.btn-ghost {
+  background: transparent;
+  color: var(--text-sec);
+}
+.btn-ghost:hover { background: var(--bg-sec); color: var(--text-main); }
+
+/* Banner */
+.banner {
+  background: var(--accent-light);
+  border: 1px solid #FDE68A;
+  border-radius: var(--radius-card);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+.banner-text {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #92400E;
+  font-size: 14px;
+  font-weight: 500;
+}
+.banner-text svg { color: var(--accent); width: 18px; height: 18px; flex-shrink: 0; }
+.btn-upgrade {
+  background: #D97706;
+  color: white;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.btn-upgrade:hover { background: #B45309; }
+
+/* ====== View Sections ====== */
+.view-section {
+  display: none;
+  animation: fadeIn 0.3s ease-out;
+}
+.view-section.active { display: block; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ====== Cards Grid ====== */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+/* Space Card */
+.space-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  transition: all var(--trans-hover);
+  position: relative;
+  min-height: 170px;
+  box-shadow: var(--shadow-card);
+}
+.space-card:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-2px);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+.card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-main);
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 12px;
+  line-height: 1.4;
+}
+.card-actions {
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity var(--trans-base);
+  flex-shrink: 0;
+}
+.space-card:hover .card-actions { opacity: 1; }
+
+.action-btn {
+  width: 28px; height: 28px;
+  border-radius: var(--radius-btn);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-sec);
+  background: var(--bg-sec);
+}
+.action-btn:hover { color: var(--primary); background: var(--bg-main); }
+.action-btn.delete:hover { color: var(--error); background: #FEF2F2; }
+
+.card-desc {
+  font-size: 13px;
+  color: var(--text-sec);
+  margin-bottom: auto;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.5;
+}
+
+.card-footer {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--divider);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 12px;
+  color: var(--text-tert);
+}
+.footer-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.footer-item svg { width: 14px; height: 14px; }
+
+/* New Card (Dashed) */
+.card-new {
+  background: transparent;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-card);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all var(--trans-hover);
+  min-height: 170px;
+  color: var(--text-sec);
+}
+.card-new:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: rgba(37,99,235,0.02);
+}
+.new-icon {
+  width: 40px; height: 40px;
+  border-radius: var(--radius-round);
+  background: var(--bg-sec);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--trans-hover);
+}
+.card-new:hover .new-icon {
+  background: var(--primary-light);
+  color: white;
+}
+.new-text { font-size: 14px; font-weight: 500; }
+
+/* ====== Empty State ====== */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 24px;
+  text-align: center;
+  background: var(--bg-card);
+  border-radius: var(--radius-card);
+  border: 1px dashed var(--border);
+}
+.empty-illustration {
+  width: 160px; height: 160px;
+  margin-bottom: 24px;
+  color: var(--border);
+}
+.empty-text {
+  font-size: 16px;
+  color: var(--text-sec);
+  margin-bottom: 24px;
+  max-width: 300px;
+  line-height: 1.6;
+}
+
+/* ====== Skeleton ====== */
+.skeleton {
+  background: linear-gradient(90deg, var(--bg-sec) 25%, #E2E8F0 50%, var(--bg-sec) 75%);
+  background-size: 400% 100%;
+  animation: shimmer 1.5s infinite ease-in-out;
+  border-radius: 4px;
+}
+@keyframes shimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+.skel-title { width: 60%; height: 20px; margin-bottom: 12px; }
+.skel-desc1 { width: 90%; height: 14px; margin-bottom: 8px; }
+.skel-desc2 { width: 70%; height: 14px; margin-bottom: 24px; }
+.skel-footer { display: flex; gap: 16px; margin-top: auto; border-top: 1px solid var(--divider); padding-top: 16px; }
+.skel-foot-item { width: 60px; height: 12px; }
+
+/* ====== Inline Edit Input ====== */
+.card-title-input {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-main);
+  border: 1px solid var(--primary);
+  border-radius: var(--radius-input);
+  padding: 2px 8px;
+  box-shadow: var(--shadow-focus);
+  width: 100%;
+  font-family: inherit;
+  background: var(--bg-card);
+}
+
+/* ====== Modals ====== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15,23,42,0.5);
+  backdrop-filter: blur(2px);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--trans-base);
+}
+.modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+.modal-container {
+  background: var(--bg-card);
+  border-radius: var(--radius-modal);
+  box-shadow: var(--shadow-modal);
+  width: 100%;
+  max-width: 480px;
+  transform: translateY(20px) scale(0.95);
+  transition: transform var(--trans-base);
+  overflow: hidden;
+}
+.modal-overlay.active .modal-container {
+  transform: translateY(0) scale(1);
+}
+.modal-header {
+  padding: 24px 24px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.modal-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-main);
+}
+.modal-close {
+  color: var(--text-tert);
+  width: 24px; height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-btn);
+}
+.modal-close:hover { background: var(--bg-sec); color: var(--text-main); }
+.modal-body { padding: 0 24px 24px; }
+.modal-footer {
+  padding: 16px 24px;
+  background: var(--bg-sec);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+/* Form */
+.form-group { margin-bottom: 16px; }
+.form-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-main);
+  margin-bottom: 8px;
+}
+.form-label .required { color: var(--error); margin-left: 4px; }
+.form-input, .form-textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-input);
+  font-size: 14px;
+  color: var(--text-main);
+  background: var(--bg-card);
+  transition: all var(--trans-base);
+}
+.form-input:focus, .form-textarea:focus {
+  border-color: var(--primary);
+  box-shadow: var(--shadow-focus);
+}
+.form-input::placeholder, .form-textarea::placeholder { color: var(--text-tert); }
+.form-textarea { resize: vertical; min-height: 80px; }
+
+/* Delete Modal */
+.delete-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 24px 24px 16px;
+  position: relative;
+}
+.delete-icon-wrap {
+  width: 40px; height: 40px;
+  border-radius: var(--radius-round);
+  background: #FEF2F2;
+  color: var(--error);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.delete-close {
+  position: absolute;
+  top: 24px; right: 24px;
+  color: var(--text-tert);
+  width: 24px; height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-btn);
+}
+.delete-close:hover { background: var(--bg-sec); color: var(--text-main); }
+.delete-text {
+  font-size: 14px;
+  color: var(--text-sec);
+  padding: 0 24px 24px;
+  line-height: 1.6;
+}
+.delete-text strong { color: var(--text-main); }
+
+/* Upgrade Modal */
+.upgrade-icon-wrap {
+  width: 40px; height: 40px;
+  border-radius: var(--radius-round);
+  background: var(--accent-light);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ====== Toast ====== */
+.toast {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: #1E293B;
+  color: white;
+  padding: 10px 20px;
+  border-radius: var(--radius-btn);
+  font-size: 14px;
+  z-index: 100000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  white-space: nowrap;
+}
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+  pointer-events: auto;
+}
+
+/* ====== Hamburger Menu Button ====== */
+.hamburger-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-btn);
+  color: var(--text-sec);
+  background: var(--bg-sec);
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+.hamburger-btn:hover { background: var(--border); color: var(--text-main); }
+
+/* ====== Sidebar Overlay ====== */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.4);
+  z-index: 999;
+  opacity: 0;
+  transition: opacity var(--trans-base);
+}
+.sidebar-overlay.active {
+  opacity: 1;
+}
+
+/* ====== Mobile Responsive ====== */
+@media (max-width: 768px) {
+  /* Hamburger visible */
+  .hamburger-btn { display: flex; }
+
+  /* Sidebar overlay visible when needed */
+  .sidebar-overlay { display: block; pointer-events: none; }
+  .sidebar-overlay.active { pointer-events: auto; }
+
+  /* SideNav: hidden by default, slide in with .open */
+  .sidenav {
+    position: fixed;
+    top: calc(var(--devbar-height) + var(--topbar-height));
+    left: 0;
+    bottom: 0;
+    z-index: 1000;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    box-shadow: none;
+  }
+  .sidenav.open {
+    transform: translateX(0);
+    box-shadow: 4px 0 16px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Main content full width */
+  .main-content {
+    margin-left: 0;
+    padding: 20px 16px;
+    gap: 0;
+    flex-direction: column;
+  }
+
+  /* TopBar adjustments */
+  .topbar { padding: 0 12px; }
+  .topbar-center { margin: 0 12px; }
+  .search-shortcut { display: none; }
+
+  /* SubNav: horizontal tab bar */
+  .subnav {
+    width: 100%;
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 0;
+    margin-bottom: 20px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    -webkit-overflow-scrolling: touch;
+  }
+  .subnav-title { display: none; }
+  .subnav-item {
+    white-space: nowrap;
+    padding: 8px 16px;
+    border-radius: var(--radius-pill);
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+
+  /* Cards grid: single column */
+  .cards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Page header stacking */
+  .page-header {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  /* Modal: adaptive width */
+  .modal-container {
+    max-width: calc(100vw - 32px);
+    margin: 0 16px;
+  }
+
+  /* Banner responsive */
+  .banner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  /* Empty state */
+  .empty-state { padding: 40px 16px; }
+  .empty-illustration { width: 120px; height: 120px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ====== Dev Bar ====== -->
+<div class="dev-bar">
+  <span class="dev-bar-title">P-07 知识空间管理</span>
+  <button class="dev-btn active" data-state="normal">正常状态</button>
+  <button class="dev-btn" data-state="empty">空状态</button>
+  <button class="dev-btn" data-state="loading">加载中</button>
+  <button class="dev-btn" data-state="modal-new">新建弹窗</button>
+  <button class="dev-btn" data-state="modal-delete">删除确认</button>
+</div>
+
+<!-- ====== App Shell ====== -->
+<div class="app-shell">
+
+  <!-- TopBar -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="hamburger-btn" id="hamburger-btn" aria-label="菜单" onclick="toggleSidebar()">
+        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+      <div class="logo">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+      </div>
+      KnowBase
+    </div>
+    <div class="topbar-center">
+      <div class="search-box">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <input type="text" placeholder="搜索知识空间、文档...">
+        <span class="search-shortcut">Cmd+K</span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="btn-icon" title="上传">
+        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+      </button>
+      <div class="avatar" title="李伟">李</div>
+    </div>
+  </header>
+
+  <!-- App Body -->
+  <div class="app-body">
+
+    <!-- SideNav -->
+    <nav class="sidenav">
+      <a class="nav-item" title="AI 问答">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+        AI 问答
+      </a>
+      <a class="nav-item" title="知识库">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+        知识库
+      </a>
+      <a class="nav-item" title="知识图谱">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5"/></svg>
+        知识图谱
+      </a>
+      <a class="nav-item active" title="设置">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        设置
+      </a>
+    </nav>
+
+    <!-- Sidebar Overlay (mobile) -->
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+      <!-- Settings SubNav -->
+      <aside class="subnav">
+        <div class="subnav-title">系统设置</div>
+        <a class="subnav-item">账户设置</a>
+        <a class="subnav-item active">知识空间管理</a>
+        <a class="subnav-item">导入/导出</a>
+      </aside>
+
+      <!-- Page Content -->
+      <section class="page-container">
+        <div class="page-header">
+          <h1 class="page-title">知识空间管理</h1>
+          <button id="btn-new-space" class="btn btn-primary" onclick="handleNewSpace()">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            新建知识空间
+          </button>
+        </div>
+
+        <!-- Normal View -->
+        <div id="view-normal" class="view-section active">
+          <div id="quota-banner" class="banner">
+            <div class="banner-text">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              免费版最多 3 个知识空间，升级解锁更多
+            </div>
+            <button class="btn-upgrade" onclick="showToast('跳转到定价页')">升级套餐</button>
+          </div>
+          <div class="cards-grid" id="data-grid"></div>
+        </div>
+
+        <!-- Empty View -->
+        <div id="view-empty" class="view-section">
+          <div class="empty-state">
+            <svg class="empty-illustration" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="20" y="30" width="120" height="100" rx="12" fill="var(--bg-sec)" stroke="currentColor" stroke-width="4" stroke-dasharray="8 8"/>
+              <path d="M50 70h60M50 90h40" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+              <circle cx="110" cy="110" r="30" fill="var(--bg-card)" stroke="var(--primary)" stroke-width="4"/>
+              <path d="M110 95v30m-15-15h30" stroke="var(--primary)" stroke-width="4" stroke-linecap="round"/>
+            </svg>
+            <p class="empty-text">还没有知识空间，创建一个开始整理你的知识吧</p>
+            <button class="btn btn-primary" onclick="handleNewSpace()">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+              新建知识空间
+            </button>
+          </div>
+        </div>
+
+        <!-- Loading View (Skeleton) -->
+        <div id="view-loading" class="view-section">
+          <div class="cards-grid">
+            <div class="space-card" style="cursor:default;pointer-events:none;">
+              <div class="skeleton skel-title"></div>
+              <div class="skeleton skel-desc1"></div>
+              <div class="skeleton skel-desc2"></div>
+              <div class="skel-footer">
+                <div class="skeleton skel-foot-item"></div>
+                <div class="skeleton skel-foot-item"></div>
+                <div class="skeleton skel-foot-item" style="width:80px"></div>
+              </div>
+            </div>
+            <div class="space-card" style="cursor:default;pointer-events:none;">
+              <div class="skeleton skel-title" style="width:50%"></div>
+              <div class="skeleton skel-desc1"></div>
+              <div class="skeleton skel-desc2" style="width:80%"></div>
+              <div class="skel-footer">
+                <div class="skeleton skel-foot-item"></div>
+                <div class="skeleton skel-foot-item"></div>
+                <div class="skeleton skel-foot-item" style="width:80px"></div>
+              </div>
+            </div>
+            <div class="space-card" style="cursor:default;pointer-events:none;">
+              <div class="skeleton skel-title" style="width:70%"></div>
+              <div class="skeleton skel-desc1"></div>
+              <div class="skeleton skel-desc2" style="width:50%"></div>
+              <div class="skel-footer">
+                <div class="skeleton skel-foot-item"></div>
+                <div class="skeleton skel-foot-item"></div>
+                <div class="skeleton skel-foot-item" style="width:80px"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+    </main>
+  </div>
+</div>
+
+<!-- ====== New Space Modal ====== -->
+<div id="modal-new" class="modal-overlay" onclick="handleOverlayClick(event, 'modal-new')">
+  <div class="modal-container" role="dialog" aria-labelledby="modal-new-title">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-new-title">新建知识空间</div>
+      <button class="modal-close" onclick="closeModal('modal-new')" aria-label="关闭">
+        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">空间名称<span class="required">*</span></label>
+        <input id="new-space-name" type="text" class="form-input" placeholder="输入知识空间名称" maxlength="50">
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label">描述</label>
+        <textarea id="new-space-desc" class="form-textarea" placeholder="简短描述这个知识空间的用途" maxlength="200"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-new')">取消</button>
+      <button class="btn btn-primary" onclick="confirmCreate()">创建</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== Delete Confirm Modal ====== -->
+<div id="modal-delete" class="modal-overlay" onclick="handleOverlayClick(event, 'modal-delete')">
+  <div class="modal-container" role="alertdialog" aria-labelledby="modal-delete-title">
+    <div class="delete-header">
+      <div class="delete-icon-wrap">
+        <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+      </div>
+      <div class="modal-title" id="modal-delete-title">删除知识空间</div>
+      <button class="delete-close" onclick="closeModal('modal-delete')" aria-label="关闭">
+        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="delete-text">
+      确定要删除知识空间「<strong id="delete-space-name"></strong>」吗？删除后空间内的所有资料将被永久删除，此操作不可恢复。
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-delete')">取消</button>
+      <button class="btn btn-danger" onclick="confirmDelete()">删除</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== Upgrade Prompt Modal ====== -->
+<div id="modal-upgrade" class="modal-overlay" onclick="handleOverlayClick(event, 'modal-upgrade')">
+  <div class="modal-container" role="dialog" aria-labelledby="modal-upgrade-title">
+    <div class="delete-header">
+      <div class="upgrade-icon-wrap">
+        <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+      </div>
+      <div class="modal-title" id="modal-upgrade-title">已达免费版上限</div>
+      <button class="delete-close" onclick="closeModal('modal-upgrade')" aria-label="关闭">
+        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="delete-text">
+      免费版最多创建 <strong>3</strong> 个知识空间。升级到 Pro 版即可创建无限知识空间，并享受更多高级功能。
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-upgrade')">稍后再说</button>
+      <button class="btn-upgrade" style="padding:8px 20px;font-size:14px;" onclick="showToast('跳转到定价页'); closeModal('modal-upgrade')">升级 Pro</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ====== Mock Data ======
+const mockData = {
+  spaces: [
+    {
+      id: 'sp-001',
+      name: 'Q1 竞品分析项目',
+      description: '2026年第一季度竞品调研相关资料',
+      docCount: 23,
+      totalSize: '45.2MB',
+      createdAt: '2026-02-15',
+      lastUpdatedAt: '2026-03-18'
+    },
+    {
+      id: 'sp-002',
+      name: '产品方法论',
+      description: '产品设计、用户研究、增长策略等方法论资料',
+      docCount: 15,
+      totalSize: '28.7MB',
+      createdAt: '2026-01-20',
+      lastUpdatedAt: '2026-03-16'
+    },
+    {
+      id: 'sp-003',
+      name: '技术学习',
+      description: 'RAG、LLM、向量数据库等技术资料',
+      docCount: 41,
+      totalSize: '62.1MB',
+      createdAt: '2026-01-05',
+      lastUpdatedAt: '2026-03-17'
+    }
+  ],
+  quota: { used: 3, limit: 3, plan: 'free' }
+};
+
+const FREE_LIMIT = 3;
+
+// ====== Toast ======
+function showToast(message) {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.classList.add('show');
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
+// ====== Modal Helpers ======
+function openModal(modalId) {
+  document.getElementById(modalId).classList.add('active');
+  if (modalId === 'modal-new') {
+    const nameInput = document.getElementById('new-space-name');
+    nameInput.value = '';
+    document.getElementById('new-space-desc').value = '';
+    setTimeout(() => nameInput.focus(), 100);
+  }
+}
+
+function closeModal(modalId) {
+  document.getElementById(modalId).classList.remove('active');
+}
+
+function handleOverlayClick(event, modalId) {
+  if (event.target.id === modalId) {
+    closeModal(modalId);
+  }
+}
+
+// ====== Keyboard: Escape to close modals ======
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    ['modal-new', 'modal-delete', 'modal-upgrade'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el && el.classList.contains('active')) {
+        closeModal(id);
+      }
+    });
+  }
+});
+
+// ====== New Space ======
+function handleNewSpace() {
+  if (mockData.spaces.length >= FREE_LIMIT) {
+    openModal('modal-upgrade');
+    return;
+  }
+  openModal('modal-new');
+}
+
+function confirmCreate() {
+  const name = document.getElementById('new-space-name').value.trim();
+  if (!name) {
+    document.getElementById('new-space-name').style.borderColor = 'var(--error)';
+    document.getElementById('new-space-name').focus();
+    return;
+  }
+  const desc = document.getElementById('new-space-desc').value.trim();
+  const newId = 'sp-' + String(Date.now()).slice(-6);
+  mockData.spaces.push({
+    id: newId,
+    name: name,
+    description: desc || '',
+    docCount: 0,
+    totalSize: '0MB',
+    createdAt: new Date().toISOString().slice(0, 10),
+    lastUpdatedAt: new Date().toISOString().slice(0, 10)
+  });
+  mockData.quota.used = mockData.spaces.length;
+  closeModal('modal-new');
+  renderCards();
+  updateBanner();
+  showToast('知识空间「' + name + '」已创建');
+}
+
+// ====== Inline Edit ======
+function startInlineEdit(btn, spaceId) {
+  const card = btn.closest('.space-card');
+  const titleEl = card.querySelector('.card-title');
+  const originalName = titleEl.textContent;
+
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'card-title-input';
+  input.value = originalName;
+  titleEl.replaceWith(input);
+  input.focus();
+  input.select();
+
+  let _cancelling = false;
+
+  function save() {
+    if (_cancelling) return;
+    const newName = input.value.trim() || originalName;
+    const space = mockData.spaces.find(function(s) { return s.id === spaceId; });
+    if (space) space.name = newName;
+    renderCards();
+    if (newName !== originalName) {
+      showToast('空间名称已更新为「' + newName + '」');
+    }
+  }
+
+  function cancel() {
+    _cancelling = true;
+    renderCards();
+  }
+
+  input.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') { e.preventDefault(); save(); }
+    if (e.key === 'Escape') { e.preventDefault(); cancel(); }
+  });
+  input.addEventListener('blur', save);
+}
+
+// ====== Delete ======
+let _pendingDeleteId = null;
+
+function openDeleteModal(spaceId, spaceName) {
+  _pendingDeleteId = spaceId;
+  document.getElementById('delete-space-name').textContent = spaceName;
+  openModal('modal-delete');
+}
+
+function confirmDelete() {
+  if (_pendingDeleteId) {
+    const space = mockData.spaces.find(function(s) { return s.id === _pendingDeleteId; });
+    const name = space ? space.name : '';
+    mockData.spaces = mockData.spaces.filter(function(s) { return s.id !== _pendingDeleteId; });
+    mockData.quota.used = mockData.spaces.length;
+    _pendingDeleteId = null;
+    renderCards();
+    updateBanner();
+    showToast('知识空间「' + name + '」已删除');
+  }
+  closeModal('modal-delete');
+}
+
+// ====== Banner ======
+function updateBanner() {
+  const banner = document.getElementById('quota-banner');
+  if (mockData.spaces.length >= FREE_LIMIT) {
+    banner.style.display = 'flex';
+  } else {
+    banner.style.display = 'none';
+  }
+}
+
+// ====== Render Cards ======
+function renderCards() {
+  const grid = document.getElementById('data-grid');
+  let html = '';
+
+  mockData.spaces.forEach(function(space) {
+    html += '<div class="space-card" data-space-id="' + space.id + '" onclick="showToast(\'跳转到知识库，筛选空间: ' + space.name.replace(/'/g, "\\'") + '\')">'
+      + '<div class="card-header">'
+      + '<div class="card-title" title="' + space.name + '">' + space.name + '</div>'
+      + '<div class="card-actions" onclick="event.stopPropagation()">'
+      + '<button class="action-btn" title="编辑名称" onclick="event.stopPropagation(); startInlineEdit(this, \'' + space.id + '\')">'
+      + '<svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>'
+      + '</button>'
+      + '<button class="action-btn delete" title="删除空间" onclick="event.stopPropagation(); openDeleteModal(\'' + space.id + '\', \'' + space.name.replace(/'/g, "\\'") + '\')">'
+      + '<svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>'
+      + '</button>'
+      + '</div>'
+      + '</div>'
+      + '<div class="card-desc">' + space.description + '</div>'
+      + '<div class="card-footer">'
+      + '<div class="footer-item"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>' + space.docCount + ' 篇</div>'
+      + '<div class="footer-item"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/></svg>' + space.totalSize + '</div>'
+      + '<div class="footer-item"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>' + space.lastUpdatedAt + '</div>'
+      + '</div>'
+      + '</div>';
+  });
+
+  // New space dashed card
+  html += '<div class="card-new" onclick="handleNewSpace()">'
+    + '<div class="new-icon"><svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg></div>'
+    + '<div class="new-text">新建知识空间</div>'
+    + '</div>';
+
+  grid.innerHTML = html;
+}
+
+// ====== Dev State Switching ======
+const devBtns = document.querySelectorAll('.dev-btn');
+const views = {
+  normal: document.getElementById('view-normal'),
+  empty: document.getElementById('view-empty'),
+  loading: document.getElementById('view-loading')
+};
+
+function switchState(state) {
+  // Close all modals
+  closeModal('modal-new');
+  closeModal('modal-delete');
+  closeModal('modal-upgrade');
+
+  // Switch view sections
+  Object.values(views).forEach(function(v) { v.classList.remove('active'); });
+
+  if (state === 'normal' || state === 'empty' || state === 'loading') {
+    views[state].classList.add('active');
+  } else if (state === 'modal-new') {
+    views.normal.classList.add('active');
+    openModal('modal-new');
+  } else if (state === 'modal-delete') {
+    views.normal.classList.add('active');
+    // Show delete modal with last space name
+    var lastSpace = mockData.spaces[mockData.spaces.length - 1];
+    if (lastSpace) {
+      document.getElementById('delete-space-name').textContent = lastSpace.name;
+      _pendingDeleteId = lastSpace.id;
+    } else {
+      document.getElementById('delete-space-name').textContent = '示例空间';
+    }
+    openModal('modal-delete');
+  }
+}
+
+devBtns.forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    devBtns.forEach(function(b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    switchState(btn.getAttribute('data-state'));
+  });
+});
+
+// ====== Mobile Sidebar Toggle ======
+function toggleSidebar() {
+  var sidenav = document.querySelector('.sidenav');
+  var overlay = document.getElementById('sidebar-overlay');
+  var isOpen = sidenav.classList.contains('open');
+  if (isOpen) {
+    closeSidebar();
+  } else {
+    sidenav.classList.add('open');
+    overlay.classList.add('active');
+  }
+}
+
+function closeSidebar() {
+  var sidenav = document.querySelector('.sidenav');
+  var overlay = document.getElementById('sidebar-overlay');
+  sidenav.classList.remove('open');
+  overlay.classList.remove('active');
+}
+
+// Close sidebar on window resize to desktop
+window.addEventListener('resize', function() {
+  if (window.innerWidth > 768) {
+    closeSidebar();
+  }
+});
+
+// ====== Init ======
+renderCards();
+updateBanner();
+</script>
+</body>
+</html>

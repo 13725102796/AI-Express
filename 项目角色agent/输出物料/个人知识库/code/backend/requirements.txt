@@ -1,0 +1,41 @@
+# FastAPI + ASGI Server
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+python-multipart==0.0.18
+pydantic[email]==2.10.4
+pydantic-settings==2.7.1
+
+# Database
+sqlalchemy[asyncio]==2.0.36
+asyncpg==0.30.0
+alembic==1.14.1
+pgvector==0.3.6
+
+# Redis
+redis==5.2.1
+
+# Authentication
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+bcrypt==4.2.1
+
+# File parsing
+pdfplumber==0.11.4
+python-docx==1.1.2
+beautifulsoup4==4.12.3
+httpx==0.28.1
+readability-lxml==0.8.1
+
+# AI / Embedding
+openai==1.58.1
+
+# Text chunking
+langchain-text-splitters==0.3.4
+
+# Async task queue
+celery[redis]==5.4.0
+
+# Utilities
+python-dotenv==1.0.1
+aiofiles==24.1.0
+loguru==0.7.3

@@ -1,0 +1,1419 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KnowBase 设计风格参考</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;600;700&display=swap');
+
+:root {
+  /* Colors - Core */
+  --primary: #2563EB;
+  --primary-light: #60A5FA;
+  --primary-dark: #1E3A5F;
+  --accent: #F59E0B;
+  --accent-light: #FEF3C7;
+  --success: #10B981;
+  --error: #EF4444;
+  
+  /* Colors - Background & Surface */
+  --bg-main: #F8FAFC;
+  --bg-sec: #F1F5F9;
+  --bg-card: #FFFFFF;
+  
+  /* Colors - Text */
+  --text-main: #1A202C;
+  --text-sec: #64748B;
+  --text-tert: #94A3B8;
+  
+  /* Colors - Border */
+  --border: #E2E8F0;
+  --divider: #F1F5F9;
+  
+  /* Colors - File Formats */
+  --fmt-pdf: #EF4444;
+  --fmt-word: #2563EB;
+  --fmt-web: #10B981;
+  --fmt-md: #8B5CF6;
+  --fmt-txt: #64748B;
+
+  /* Typography */
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Noto Sans SC', 'PingFang SC', sans-serif;
+  --font-code: 'JetBrains Mono', monospace;
+  
+  /* Radii */
+  --radius-btn: 8px;
+  --radius-input: 8px;
+  --radius-card: 12px;
+  --radius-modal: 16px;
+  --radius-badge: 6px;
+  --radius-pill: 9999px;
+  --radius-round: 50%;
+  
+  /* Shadows */
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-card-hover: 0 4px 12px rgba(0,0,0,0.12), 0 2px 4px rgba(0,0,0,0.08);
+  --shadow-modal: 0 16px 48px rgba(0,0,0,0.16);
+  --shadow-focus: 0 0 0 3px rgba(37,99,235,0.2);
+  
+  /* Transitions */
+  --trans-base: 150ms ease-out;
+  --trans-hover: 200ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-ui);
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  padding-top: 64px;
+}
+
+/* Typography Scale */
+h1, .h1 { font-size: 32px; font-weight: 700; line-height: 1.25; letter-spacing: -0.02em; }
+h2, .h2 { font-size: 24px; font-weight: 600; line-height: 1.3; letter-spacing: -0.01em; }
+h3, .h3 { font-size: 18px; font-weight: 600; line-height: 1.4; }
+p.body-text { font-size: 15px; font-weight: 400; line-height: 1.75; color: var(--text-main); }
+.caption { font-size: 13px; font-weight: 400; line-height: 1.5; color: var(--text-sec); }
+code, pre { font-family: var(--font-code); font-size: 13px; font-weight: 400; line-height: 1.6; }
+
+/* Layout Containers */
+.header-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 32px;
+  z-index: 100;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+}
+
+.header-title {
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.version-badge {
+  background: var(--bg-sec);
+  color: var(--text-sec);
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-family: var(--font-code);
+}
+
+.container {
+  max-width: 1024px;
+  margin: 0 auto;
+  padding: 48px 32px;
+}
+
+section {
+  margin-bottom: 64px;
+  padding-bottom: 64px;
+  border-bottom: 1px solid var(--border);
+}
+
+section:last-child {
+  border-bottom: none;
+}
+
+.section-header {
+  margin-bottom: 32px;
+}
+
+.section-title {
+  color: var(--primary-dark);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.section-num {
+  color: var(--text-tert);
+  font-family: var(--font-code);
+  font-weight: 400;
+  font-size: 16px;
+}
+
+/* Color Blocks */
+.color-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.color-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  background: var(--bg-card);
+  box-shadow: var(--shadow-card);
+}
+
+.color-swatch {
+  height: 80px;
+  width: 100%;
+}
+
+.color-info {
+  padding: 12px;
+}
+
+.color-name {
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.color-hex {
+  font-family: var(--font-code);
+  font-size: 12px;
+  color: var(--text-sec);
+  margin-bottom: 4px;
+}
+
+.color-desc {
+  font-size: 11px;
+  color: var(--text-tert);
+}
+
+/* Typo Block */
+.typo-block {
+  background: var(--bg-card);
+  padding: 32px;
+  border-radius: var(--radius-card);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.typo-row {
+  display: flex;
+  align-items: baseline;
+  gap: 24px;
+  border-bottom: 1px solid var(--divider);
+  padding-bottom: 24px;
+}
+
+.typo-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.typo-label {
+  width: 80px;
+  flex-shrink: 0;
+  color: var(--text-tert);
+  font-family: var(--font-code);
+  font-size: 12px;
+}
+
+.typo-content code {
+  background: var(--bg-sec);
+  padding: 4px 8px;
+  border-radius: 4px;
+  color: var(--text-main);
+}
+
+/* Buttons */
+.btn-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 16px;
+  border-radius: var(--radius-btn);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--trans-hover);
+  border: none;
+  text-decoration: none;
+}
+
+.btn:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+.btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(37,99,235,0.2);
+}
+
+.btn-secondary {
+  background: var(--bg-card);
+  color: var(--text-main);
+  border: 1px solid var(--border);
+}
+.btn-secondary:hover:not(:disabled) {
+  background: var(--bg-sec);
+  border-color: var(--text-tert);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-sec);
+}
+.btn-ghost:hover:not(:disabled) {
+  background: var(--bg-sec);
+  color: var(--text-main);
+}
+
+.btn-danger {
+  background: var(--error);
+  color: #fff;
+}
+.btn-danger:hover:not(:disabled) {
+  background: #DC2626;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(239,68,68,0.2);
+}
+
+.btn:disabled, .btn-disabled {
+  background: var(--bg-sec);
+  color: var(--text-tert);
+  border-color: var(--border);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* AI Quote Pills & Content */
+.ai-content-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 24px;
+  max-width: 720px;
+  box-shadow: var(--shadow-card);
+}
+
+.quote-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent-light);
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  padding: 2px 6px;
+  border-radius: var(--radius-pill);
+  vertical-align: super;
+  margin: 0 2px;
+  cursor: pointer;
+  transition: all var(--trans-hover);
+  text-decoration: none;
+}
+
+.quote-pill:hover {
+  transform: scale(1.05);
+  background: #FDE68A;
+  color: #D97706;
+}
+
+.quote-source-list {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--divider);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.source-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  background: var(--bg-sec);
+  transition: background var(--trans-base);
+  cursor: pointer;
+}
+
+.source-item:hover {
+  background: #E2E8F0;
+}
+
+.source-icon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+}
+
+.source-info {
+  flex: 1;
+}
+
+.source-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-main);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.source-desc {
+  font-size: 13px;
+  color: var(--text-sec);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Cards */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.kb-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 20px;
+  box-shadow: var(--shadow-card);
+  transition: all var(--trans-hover);
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.kb-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-hover);
+  border-color: #CBD5E1;
+}
+
+.kb-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.kb-card-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-sec);
+}
+
+.kb-card-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-main);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.kb-card-desc {
+  font-size: 13px;
+  color: var(--text-sec);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  flex: 1;
+}
+
+.kb-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+}
+
+.action-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-tert);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: color var(--trans-base), background var(--trans-base);
+}
+
+.action-btn:hover {
+  color: var(--text-main);
+  background: var(--bg-sec);
+}
+
+/* Search Box */
+.search-container {
+  max-width: 480px;
+  position: relative;
+}
+
+.search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  color: var(--text-tert);
+  width: 18px;
+  height: 18px;
+}
+
+.search-kbd {
+  position: absolute;
+  right: 12px;
+  font-size: 12px;
+  font-family: var(--font-code);
+  background: var(--bg-sec);
+  color: var(--text-sec);
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+}
+
+.search-input {
+  width: 100%;
+  height: 44px;
+  padding: 0 48px 0 40px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-input);
+  font-size: 15px;
+  font-family: var(--font-ui);
+  color: var(--text-main);
+  transition: all var(--trans-hover);
+  background: var(--bg-card);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: var(--shadow-focus);
+}
+
+.search-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-modal);
+  padding: 8px;
+  z-index: 10;
+}
+
+.search-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background var(--trans-base);
+  font-size: 14px;
+  color: var(--text-sec);
+}
+
+.search-item:hover {
+  background: var(--bg-sec);
+  color: var(--text-main);
+}
+
+.search-highlight {
+  color: var(--primary);
+  font-weight: 500;
+}
+
+/* Forms */
+.form-group {
+  margin-bottom: 20px;
+  max-width: 480px;
+}
+
+.form-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-main);
+  margin-bottom: 8px;
+}
+
+.form-input {
+  width: 100%;
+  height: 38px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-input);
+  font-size: 14px;
+  font-family: var(--font-ui);
+  color: var(--text-main);
+  transition: all var(--trans-base);
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: var(--shadow-focus);
+}
+
+.form-input.error {
+  border-color: var(--error);
+}
+
+.form-input.error:focus {
+  box-shadow: 0 0 0 3px rgba(239,68,68,0.2);
+}
+
+.form-error-msg {
+  font-size: 12px;
+  color: var(--error);
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+textarea.form-input {
+  height: 100px;
+  padding: 12px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+/* Sidebar Nav Simulation */
+.nav-sidebar {
+  width: 240px;
+  background: var(--bg-sec);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border: 1px solid var(--border);
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-sec);
+  cursor: pointer;
+  transition: all var(--trans-base);
+}
+
+.nav-item svg {
+  width: 18px;
+  height: 18px;
+}
+
+.nav-item:hover:not(.active) {
+  background: rgba(0,0,0,0.04);
+  color: var(--text-main);
+}
+
+.nav-item.active {
+  background: var(--primary-dark);
+  color: #ffffff;
+}
+
+/* Badges */
+.badge-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: var(--radius-badge);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.badge-ai { background: #DBEAFE; color: #1D4ED8; }
+.badge-gray { background: #F1F5F9; color: #475569; }
+.badge-pdf { background: #FEE2E2; color: #B91C1C; }
+.badge-word { background: #DBEAFE; color: #1D4ED8; }
+.badge-web { background: #D1FAE5; color: #047857; }
+.badge-md { background: #EDE9FE; color: #6D28D9; }
+.badge-success { background: #D1FAE5; color: #047857; border: 1px solid #A7F3D0; }
+.badge-warning { background: #FEF3C7; color: #B45309; border: 1px solid #FDE68A; }
+
+/* Layout Section */
+.layout-demo {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-card);
+  height: 500px;
+  display: flex;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+.layout-sidebar {
+  width: 240px;
+  background: var(--bg-sec);
+  border-right: 1px solid var(--border);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.layout-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-main);
+}
+
+.layout-content {
+  flex: 1;
+  padding: 32px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.chat-container {
+  width: 100%;
+  max-width: 720px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.chat-bubble-user {
+  align-self: flex-end;
+  background: #E0F2FE;
+  color: #0369A1;
+  padding: 16px 20px;
+  border-radius: 16px 16px 4px 16px;
+  font-size: 15px;
+  max-width: 80%;
+}
+
+.chat-bubble-ai {
+  align-self: flex-start;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 24px;
+  border-radius: 16px 16px 16px 4px;
+  font-size: 15px;
+  color: var(--text-main);
+  max-width: 100%;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+}
+
+.layout-input-area {
+  padding: 20px 32px;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: center;
+}
+
+.layout-input-box {
+  width: 100%;
+  max-width: 720px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  box-shadow: var(--shadow-card);
+}
+
+/* Grid Layout Demo */
+.grid-layout-demo {
+  background: var(--bg-main);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 32px;
+}
+
+.grid-toolbar {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.empty-card {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-card);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 32px;
+  background: transparent;
+  color: var(--text-sec);
+  cursor: pointer;
+  transition: all var(--trans-hover);
+}
+
+.empty-card:hover {
+  border-color: var(--primary-light);
+  background: #EFF6FF;
+  color: var(--primary);
+}
+
+/* Animations */
+.stagger-item {
+  opacity: 0;
+  transform: translateY(8px);
+  animation: fadeInUp 250ms ease-out forwards;
+}
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.skeleton-box {
+  background: var(--bg-sec);
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton-box::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0,
+    rgba(255, 255, 255, 0.4) 20%,
+    rgba(255, 255, 255, 0.6) 60%,
+    rgba(255, 255, 255, 0)
+  );
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  100% { transform: translateX(100%); }
+}
+
+/* Source Highlight Effect */
+.source-highlight-demo {
+  background: #FEF08A;
+  animation: fadeHighlight 2s ease-out forwards;
+  border-radius: 4px;
+  padding: 0 4px;
+}
+
+@keyframes fadeHighlight {
+  0% { background: #FEF08A; }
+  80% { background: #FEF08A; }
+  100% { background: transparent; }
+}
+
+</style>
+</head>
+<body>
+
+<header class="header-bar">
+  <div class="header-title">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+    KnowBase 设计风格参考
+    <span class="version-badge">v1.0</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- Section 1: Color Palette -->
+  <section>
+    <div class="section-header">
+      <h2 class="section-title"><span class="section-num">01</span> 配色方案 (Color Palette)</h2>
+      <p class="caption">核心品牌色、状态色及文件格式颜色规范，确保高对比度和专业感。</p>
+    </div>
+    
+    <h3 class="h3" style="margin-bottom: 16px;">品牌与界面色彩</h3>
+    <div class="color-grid">
+      <div class="color-card">
+        <div class="color-swatch" style="background: var(--primary);"></div>
+        <div class="color-info">
+          <div class="color-name">Primary / 主色</div>
+          <div class="color-hex">#2563EB</div>
+          <div class="color-desc">按钮、主要交互</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background: var(--primary-dark);"></div>
+        <div class="color-info">
+          <div class="color-name">Primary Dark</div>
+          <div class="color-hex">#1E3A5F</div>
+          <div class="color-desc">侧边栏激活、深色头部</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background: var(--accent);"></div>
+        <div class="color-info">
+          <div class="color-name">Accent / 强调色</div>
+          <div class="color-hex">#F59E0B</div>
+          <div class="color-desc">引用标注文字</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background: var(--accent-light);"></div>
+        <div class="color-info">
+          <div class="color-name">Accent Light</div>
+          <div class="color-hex">#FEF3C7</div>
+          <div class="color-desc">引用标注背景</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background: var(--bg-main); border-bottom: 1px solid var(--border);"></div>
+        <div class="color-info">
+          <div class="color-name">Bg Main / 主背景</div>
+          <div class="color-hex">#F8FAFC</div>
+          <div class="color-desc">页面大面积底色</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background: var(--text-main);"></div>
+        <div class="color-info">
+          <div class="color-name">Text Main / 主文本</div>
+          <div class="color-hex">#1A202C</div>
+          <div class="color-desc">标题、正文 (AAA)</div>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="h3" style="margin-bottom: 16px; margin-top: 32px;">文件格式专属色彩</h3>
+    <div class="color-grid">
+      <div class="color-card">
+        <div class="color-swatch" style="background: var(--fmt-pdf);"></div>
+        <div class="color-info">
+          <div class="color-name">PDF 文档</div>
+          <div class="color-hex">#EF4444</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background: var(--fmt-word);"></div>
+        <div class="color-info">
+          <div class="color-name">Word 文档</div>
+          <div class="color-hex">#2563EB</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background: var(--fmt-web);"></div>
+        <div class="color-info">
+          <div class="color-name">Web 网页</div>
+          <div class="color-hex">#10B981</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background: var(--fmt-md);"></div>
+        <div class="color-info">
+          <div class="color-name">Markdown</div>
+          <div class="color-hex">#8B5CF6</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 2: Typography Scale -->
+  <section>
+    <div class="section-header">
+      <h2 class="section-title"><span class="section-num">02</span> 字体排版 (Typography Scale)</h2>
+      <p class="caption">Inter 搭配 Noto Sans SC，代码采用 JetBrains Mono。</p>
+    </div>
+    
+    <div class="typo-block">
+      <div class="typo-row">
+        <div class="typo-label">H1<br>32/700</div>
+        <div class="typo-content"><h1 class="h1">KnowBase — 你的个人知识搜索引擎</h1></div>
+      </div>
+      <div class="typo-row">
+        <div class="typo-label">H2<br>24/600</div>
+        <div class="typo-content"><h2 class="h2">上传任何资料，问任何问题</h2></div>
+      </div>
+      <div class="typo-row">
+        <div class="typo-label">H3<br>18/600</div>
+        <div class="typo-content"><h3 class="h3">AI 语义问答，有据可查</h3></div>
+      </div>
+      <div class="typo-row">
+        <div class="typo-label">Body<br>15/400</div>
+        <div class="typo-content">
+          <p class="body-text">将散落在各处的文档、网页、PDF 汇聚到一个平台，通过 AI 自动提取内容并建立索引。你提问时，系统从已有资料中检索相关内容生成回答，且每条回答都可溯源到原始文件的具体位置。</p>
+        </div>
+      </div>
+      <div class="typo-row">
+        <div class="typo-label">Caption<br>13/400</div>
+        <div class="typo-content"><p class="caption">上传于 2026-03-20 · PDF · 市场分析报告</p></div>
+      </div>
+      <div class="typo-row">
+        <div class="typo-label">Code<br>13/400</div>
+        <div class="typo-content"><code>const answer = await kb.query("Q4 销售数据是什么？")</code></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 3: Core Components -->
+  <section>
+    <div class="section-header">
+      <h2 class="section-title"><span class="section-num">03</span> 核心组件 (Core Components)</h2>
+    </div>
+
+    <!-- 3a. Buttons -->
+    <h3 class="h3" style="margin-bottom: 16px;">3a. 按钮系统</h3>
+    <div class="btn-row">
+      <button class="btn btn-primary">开始使用</button>
+      <button class="btn btn-primary">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+        上传文件
+      </button>
+      <button class="btn btn-secondary">查看详情</button>
+      <button class="btn btn-secondary">返回</button>
+      <button class="btn btn-ghost">取消</button>
+      <button class="btn btn-danger">删除</button>
+      <button class="btn btn-primary" disabled>禁用状态</button>
+      <button class="btn btn-secondary btn-disabled" disabled>
+        <svg class="spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>
+        处理中...
+      </button>
+    </div>
+
+    <!-- 3b. AI Quote Pills -->
+    <h3 class="h3" style="margin: 40px 0 16px;">3b. AI 引用标注 (核心 UI)</h3>
+    <div class="ai-content-box">
+      <p class="body-text">
+        根据您上传的市场报告数据显示，2025 年中国新能源汽车销量达到 1,560 万辆<span class="quote-pill" title="查看来源">[1]</span>，同比增长 34%<span class="quote-pill" title="查看来源">[2]</span>。其中，比亚迪以 340 万辆的成绩位居榜首<span class="quote-pill" title="查看来源">[1]</span><span class="quote-pill" title="查看来源">[3]</span>，特斯拉中国以 152 万辆位居第二<span class="quote-pill" title="查看来源">[2]</span>。
+      </p>
+      
+      <div class="quote-source-list">
+        <!-- Source 1 -->
+        <div class="source-item">
+          <svg class="source-icon" style="color: var(--fmt-pdf)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+          <div class="source-info">
+            <div class="source-title">
+              2025全球新能源汽车报告.pdf
+              <span class="badge badge-success">高相关 98%</span>
+            </div>
+            <div class="source-desc">...2025年中国市场呈现爆发式增长，全年新能源乘用车批发销量达1560万辆。自主品牌表现亮眼，比亚迪以全年340万辆的压倒性优势稳居全球第一...</div>
+          </div>
+        </div>
+        <!-- Source 2 -->
+        <div class="source-item">
+          <svg class="source-icon" style="color: var(--fmt-web)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+          <div class="source-info">
+            <div class="source-title">
+              乘联会：12月汽车销量快报
+              <span class="badge badge-success">高相关 92%</span>
+            </div>
+            <div class="source-desc">...同比增速达34%。在单品牌销量榜单中，特斯拉中国贡献了152万辆的交付成绩，位列国内市场第二，仅次于领头羊比亚迪...</div>
+          </div>
+        </div>
+        <!-- Source 3 -->
+        <div class="source-item">
+          <svg class="source-icon" style="color: var(--fmt-word)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+          <div class="source-info">
+            <div class="source-title">
+              竞品分析会议纪要.docx
+              <span class="badge badge-warning">中相关 75%</span>
+            </div>
+            <div class="source-desc">...我们在会上确认了比亚迪(340w)与特斯拉(152w)的差距正在拉大，需重点关注其下沉市场策略...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3c. Knowledge Cards -->
+    <h3 class="h3" style="margin: 40px 0 16px;">3c. 知识条目卡片</h3>
+    <div class="card-grid">
+      <!-- Card 1 -->
+      <div class="kb-card">
+        <div class="kb-card-header">
+          <div class="kb-card-icon" style="color: var(--fmt-pdf); background: #FEE2E2;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+          </div>
+          <button class="action-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+          </button>
+        </div>
+        <div class="kb-card-title">产品需求文档(PRD) v2.0 - KnowBase核心功能</div>
+        <div class="kb-card-desc">定义了KnowBase的MVP版本范围，包括文档解析、向量检索和AI问答的核心链路，新增了引用溯源的设计规范。</div>
+        <div class="badge-row" style="margin-top: auto;">
+          <span class="badge badge-ai"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path></svg>产品规范</span>
+          <span class="badge badge-gray">重要</span>
+        </div>
+        <div class="kb-card-footer">
+          <span class="caption">2 小时前 · PDF</span>
+        </div>
+      </div>
+      
+      <!-- Card 2 -->
+      <div class="kb-card">
+        <div class="kb-card-header">
+          <div class="kb-card-icon" style="color: var(--fmt-web); background: #D1FAE5;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+          </div>
+          <button class="action-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+          </button>
+        </div>
+        <div class="kb-card-title">Perplexity UI/UX 深度拆解分析</div>
+        <div class="kb-card-desc">关于为什么侧边栏导航和极简阅读体验对于AI搜索类产品至关重要的竞品研究文章，包含交互细节图解。</div>
+        <div class="badge-row" style="margin-top: auto;">
+          <span class="badge badge-ai"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path></svg>竞品研究</span>
+        </div>
+        <div class="kb-card-footer">
+          <span class="caption">昨天 · 网页</span>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="kb-card">
+        <div class="kb-card-header">
+          <div class="kb-card-icon" style="color: var(--fmt-md); background: #EDE9FE;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><path d="M9 15V9"></path><path d="M15 15v-6"></path><path d="M9 12h6"></path></svg>
+          </div>
+          <button class="action-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+          </button>
+        </div>
+        <div class="kb-card-title">开发周报_W12_2026.md</div>
+        <div class="kb-card-desc">本周主要完成了 RAG 管道的搭建，修复了因 Chunking 策略导致的段落截断问题，并优化了 Prompt 提取逻辑。</div>
+        <div class="badge-row" style="margin-top: auto;">
+          <span class="badge badge-gray">周报</span>
+          <span class="badge badge-gray">技术</span>
+        </div>
+        <div class="kb-card-footer">
+          <span class="caption">2026-03-18 · Markdown</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3d. Search Box -->
+    <h3 class="h3" style="margin: 40px 0 16px;">3d. 全局搜索 (Cmd+K)</h3>
+    <div class="search-container">
+      <div class="search-input-wrapper">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="text" class="search-input" value="设计" placeholder="搜索知识库...">
+        <span class="search-kbd">⌘K</span>
+      </div>
+      <!-- Simulated Dropdown -->
+      <div class="search-dropdown" style="position: relative; top: 8px; box-shadow: var(--shadow-card);">
+        <div class="search-item">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+          <div>KnowBase <span class="search-highlight">设计</span>规范.pdf</div>
+        </div>
+        <div class="search-item">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+          <div>UI/UX <span class="search-highlight">设计</span>趋势 2026</div>
+        </div>
+        <div class="search-item">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+          <div>向 AI 提问：<span class="search-highlight">设计</span>系统的主要构成是什么？</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3e & 3f & 3g Container -->
+    <div style="display: flex; gap: 64px; margin-top: 40px; flex-wrap: wrap;">
+      <!-- Forms -->
+      <div style="flex: 1; min-width: 300px;">
+        <h3 class="h3" style="margin-bottom: 16px;">3e. 表单元素</h3>
+        <div class="form-group">
+          <label class="form-label">知识库名称</label>
+          <input type="text" class="form-input" placeholder="例如：产品知识库">
+        </div>
+        <div class="form-group">
+          <label class="form-label">访问链接 <span style="color: var(--error);">*</span></label>
+          <input type="text" class="form-input error" value="not-a-url">
+          <div class="form-error-msg">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            请输入有效的 URL 地址
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">系统提示词 (Prompt)</label>
+          <textarea class="form-input" placeholder="输入特定的AI角色设定..."></textarea>
+        </div>
+      </div>
+
+      <!-- Navigation & Badges -->
+      <div style="flex: 1; min-width: 300px;">
+        <h3 class="h3" style="margin-bottom: 16px;">3f. 侧边导航栏 (激活态)</h3>
+        <div class="nav-sidebar">
+          <div class="nav-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+            新的问答
+          </div>
+          <div class="nav-item active">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+            知识库
+          </div>
+          <div class="nav-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+            知识图谱
+          </div>
+          <div class="nav-item" style="margin-top: 16px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            设置
+          </div>
+        </div>
+
+        <h3 class="h3" style="margin: 32px 0 16px;">3g. Badge 与标签</h3>
+        <div class="badge-row">
+          <span class="badge badge-ai"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path></svg>AI 生成摘要</span>
+          <span class="badge badge-gray">常规标签</span>
+        </div>
+        <div class="badge-row" style="margin-top: 8px;">
+          <span class="badge badge-pdf">PDF</span>
+          <span class="badge badge-word">Word</span>
+          <span class="badge badge-web">Web</span>
+          <span class="badge badge-md">MD</span>
+        </div>
+        <div class="badge-row" style="margin-top: 8px;">
+          <span class="badge badge-warning">处理中</span>
+          <span class="badge badge-success">已完成</span>
+          <span class="badge" style="background: #FEE2E2; color: #B91C1C;">失败</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 4: Layout Rhythm -->
+  <section>
+    <div class="section-header">
+      <h2 class="section-title"><span class="section-num">04</span> 布局节奏 (Layout Rhythm)</h2>
+      <p class="caption">展示整体空间分配、对齐方式以及空白的运用。</p>
+    </div>
+
+    <h3 class="h3" style="margin-bottom: 16px;">4a. AI 问答界面骨架 (Max Width: 720px 居中阅读区)</h3>
+    <div class="layout-demo">
+      <div class="layout-sidebar">
+        <div style="font-weight: 600; padding: 0 12px 16px;">历史对话</div>
+        <div class="nav-item active" style="margin-bottom: 4px;">Q4 销售数据分析</div>
+        <div class="nav-item" style="margin-bottom: 4px;">KnowBase 设计规范...</div>
+        <div class="nav-item" style="margin-bottom: 4px;">什么是 RAG 架构？</div>
+      </div>
+      <div class="layout-main">
+        <div class="layout-content">
+          <div class="chat-container">
+            <div class="chat-bubble-user">请总结一下我们在设计这套系统时的核心规范是什么？</div>
+            <div class="chat-bubble-ai">
+              基于《KnowBase UI/UX 设计规范》文档，核心规范可以总结为以下几点：<br><br>
+              1. <b>风格模式：</b> 采用 Minimal Single Column 与 Swiss Style，强调干净、留白和几何感<span class="quote-pill">[1]</span>。<br>
+              2. <b>色彩系统：</b> 以深蓝 (#2563EB) 为主色，辅以暖橙 (#F59E0B) 作为强调色，特别是用于引用溯源功能<span class="quote-pill">[2]</span>。<br>
+              3. <b>动效原则：</b> 强调微交互 (100-200ms ease-out)，禁用过度装饰和引起布局偏移的动效<span class="quote-pill">[3]</span>。<br>
+              <br>
+              <div class="skeleton-box" style="height: 12px; width: 60%; margin-bottom: 8px;"></div>
+              <div class="skeleton-box" style="height: 12px; width: 40%;"></div>
+            </div>
+          </div>
+        </div>
+        <div class="layout-input-area">
+          <div class="layout-input-box">
+            <svg style="color:var(--text-tert); flex-shrink:0; margin-bottom: 2px;" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
+            <textarea placeholder="问任何关于知识库的问题..." style="border:none; outline:none; resize:none; flex:1; height: 24px; font-family:var(--font-ui); font-size: 15px; color:var(--text-main);"></textarea>
+            <button class="btn btn-primary" style="height:32px; padding: 0 12px; border-radius: 6px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="h3" style="margin: 40px 0 16px;">4b. 知识库管理网格</h3>
+    <div class="grid-layout-demo">
+      <div class="grid-toolbar">
+        <div style="display: flex; gap: 12px;">
+          <div class="search-input-wrapper" style="width: 240px;">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" class="search-input" style="height: 36px; padding-left: 36px;" placeholder="过滤文件...">
+          </div>
+          <button class="btn btn-secondary" style="height: 36px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+            筛选
+          </button>
+        </div>
+        <button class="btn btn-primary" style="height: 36px;">上传资料</button>
+      </div>
+
+      <div class="card-grid">
+        <div class="kb-card">
+          <div class="kb-card-header">
+            <div class="kb-card-icon" style="color: var(--fmt-pdf); background: #FEE2E2;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+            </div>
+          </div>
+          <div class="kb-card-title">产品需求文档_v1.pdf</div>
+          <div class="badge-row" style="margin-top: auto;">
+            <span class="badge badge-success">已解析</span>
+          </div>
+        </div>
+        <div class="kb-card">
+          <div class="kb-card-header">
+            <div class="kb-card-icon" style="color: var(--fmt-word); background: #DBEAFE;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            </div>
+          </div>
+          <div class="kb-card-title">会议纪要 0320.docx</div>
+          <div class="badge-row" style="margin-top: auto;">
+            <span class="badge badge-success">已解析</span>
+          </div>
+        </div>
+        <!-- Empty State -->
+        <div class="empty-card">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+          <div style="font-weight: 500;">拖拽文件到此处或点击上传</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 5: Motion Design -->
+  <section>
+    <div class="section-header">
+      <h2 class="section-title"><span class="section-num">05</span> 动效基调 (Motion Design)</h2>
+      <p class="caption">微交互与过渡动画展示。注意：全局已配置 `prefers-reduced-motion` 回退。</p>
+    </div>
+
+    <h3 class="h3" style="margin-bottom: 16px;">5a. 列表入场 (Staggered Entrance) & 骨架屏 (Shimmer)</h3>
+    <div style="display: flex; gap: 24px; flex-wrap: wrap;">
+      <div style="flex: 1; min-width: 280px; display: flex; flex-direction: column; gap: 12px;">
+        <div class="source-item stagger-item" style="animation-delay: 50ms;">
+          <div class="skeleton-box" style="width: 24px; height: 24px; border-radius: 4px;"></div>
+          <div style="flex: 1;">
+            <div class="skeleton-box" style="height: 14px; width: 60%; margin-bottom: 8px;"></div>
+            <div class="skeleton-box" style="height: 12px; width: 100%; margin-bottom: 4px;"></div>
+            <div class="skeleton-box" style="height: 12px; width: 80%;"></div>
+          </div>
+        </div>
+        <div class="source-item stagger-item" style="animation-delay: 100ms;">
+          <div class="skeleton-box" style="width: 24px; height: 24px; border-radius: 4px;"></div>
+          <div style="flex: 1;">
+            <div class="skeleton-box" style="height: 14px; width: 50%; margin-bottom: 8px;"></div>
+            <div class="skeleton-box" style="height: 12px; width: 90%; margin-bottom: 4px;"></div>
+            <div class="skeleton-box" style="height: 12px; width: 70%;"></div>
+          </div>
+        </div>
+        <div class="source-item stagger-item" style="animation-delay: 150ms;">
+          <div class="skeleton-box" style="width: 24px; height: 24px; border-radius: 4px;"></div>
+          <div style="flex: 1;">
+            <div class="skeleton-box" style="height: 14px; width: 40%; margin-bottom: 8px;"></div>
+            <div class="skeleton-box" style="height: 12px; width: 85%; margin-bottom: 4px;"></div>
+            <div class="skeleton-box" style="height: 12px; width: 60%;"></div>
+          </div>
+        </div>
+      </div>
+      
+      <div style="flex: 1; min-width: 280px;">
+        <h3 class="h3" style="margin-bottom: 16px;">5b. 溯源高亮 (Source Highlight)</h3>
+        <p class="body-text">
+          当用户点击 <span class="quote-pill">[2]</span> 时，页面滚动到对应原文段落，该段落背景会呈现 <span class="source-highlight-demo">暖黄色高亮渐隐效果</span>，持续 1.5 秒后消失，引导视线而不会留下永久色块干扰阅读。
+        </p>
+        <button class="btn btn-secondary" style="margin-top: 16px;" onclick="
+          const demo = document.querySelector('.source-highlight-demo');
+          demo.style.animation = 'none';
+          demo.offsetHeight; /* trigger reflow */
+          demo.style.animation = null;
+        ">
+          重放高亮动画
+        </button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+</body>
+</html>

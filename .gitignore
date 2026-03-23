@@ -1,0 +1,52 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Build outputs
+.next/
+dist/
+build/
+*.egg-info/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Claude Code
+.claude/
+
+# MCP servers virtual env
+mcp-servers/.venv/
+
+# Uploads & generated data
+项目角色agent/输出物料/*/code/frontend/node_modules/
+项目角色agent/输出物料/*/code/backend/uploads/
+项目角色agent/输出物料/*/code/backend/__pycache__/
+项目角色agent/输出物料/*/test-data/
+项目角色agent/输出物料/*/test-reports/screenshots/
+
+# Docker volumes
+pgdata/
+redisdata/
+
+# Logs
+*.log
+/tmp/
+
+# OS
+.DS_Store
+*.DS_Store

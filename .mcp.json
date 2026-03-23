@@ -1,0 +1,20 @@
+{
+  "mcpServers": {
+    "gemini-text": {
+      "type": "stdio",
+      "command": "/Users/maidong/Desktop/zyc/github/AI-Express/mcp-servers/.venv/bin/python3",
+      "args": ["/Users/maidong/Desktop/zyc/github/AI-Express/mcp-servers/gemini-text/server.py"],
+      "env": {
+        "GEMINI_BASE_URL": "http://127.0.0.1:8045/v1"
+      }
+    },
+    "gemini-image": {
+      "type": "stdio",
+      "command": "/Users/maidong/Desktop/zyc/github/AI-Express/mcp-servers/.venv/bin/python3",
+      "args": ["/Users/maidong/Desktop/zyc/github/AI-Express/mcp-servers/gemini-image/server.py"],
+      "env": {
+        "GEMINI_BASE_URL": "http://127.0.0.1:8045/v1"
+      }
+    }
+  }
+}

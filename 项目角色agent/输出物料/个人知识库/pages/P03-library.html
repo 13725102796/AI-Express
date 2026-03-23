@@ -1,0 +1,2354 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KnowBase - 知识库</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;600;700&display=swap');
+
+:root {
+  /* Colors - Core */
+  --primary: #2563EB;
+  --primary-light: #60A5FA;
+  --primary-dark: #1E3A5F;
+  --accent: #F59E0B;
+  --accent-light: #FEF3C7;
+  --success: #10B981;
+  --error: #EF4444;
+
+  /* Colors - Background & Surface */
+  --bg-main: #F8FAFC;
+  --bg-sec: #F1F5F9;
+  --bg-card: #FFFFFF;
+
+  /* Colors - Text */
+  --text-main: #1A202C;
+  --text-sec: #64748B;
+  --text-tert: #94A3B8;
+
+  /* Colors - Border */
+  --border: #E2E8F0;
+  --divider: #F1F5F9;
+
+  /* Colors - File Formats */
+  --fmt-pdf: #EF4444;
+  --fmt-word: #2563EB;
+  --fmt-web: #10B981;
+  --fmt-md: #8B5CF6;
+  --fmt-txt: #64748B;
+
+  /* Typography */
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Noto Sans SC', 'PingFang SC', sans-serif;
+  --font-code: 'JetBrains Mono', monospace;
+
+  /* Radii */
+  --radius-btn: 8px;
+  --radius-input: 8px;
+  --radius-card: 12px;
+  --radius-modal: 16px;
+  --radius-badge: 6px;
+  --radius-pill: 9999px;
+  --radius-round: 50%;
+
+  /* Shadows */
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-card-hover: 0 4px 12px rgba(0,0,0,0.12), 0 2px 4px rgba(0,0,0,0.08);
+  --shadow-modal: 0 16px 48px rgba(0,0,0,0.16);
+  --shadow-focus: 0 0 0 3px rgba(37,99,235,0.2);
+
+  /* Transitions */
+  --trans-base: 150ms ease-out;
+  --trans-hover: 200ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-ui);
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ========== AppShell ========== */
+.app-shell {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Header */
+.header-bar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 64px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 32px;
+  z-index: 100;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+}
+
+.header-title {
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 240px;
+  background: var(--bg-sec);
+  border-right: 1px solid var(--border);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 80px;
+  flex-shrink: 0;
+  overflow-y: auto;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-sec);
+  cursor: pointer;
+  transition: all var(--trans-base);
+  text-decoration: none;
+}
+
+.nav-item svg { width: 18px; height: 18px; }
+
+.nav-item:hover:not(.active) {
+  background: rgba(0,0,0,0.04);
+  color: var(--text-main);
+}
+
+.nav-item.active {
+  background: var(--primary-dark);
+  color: #ffffff;
+}
+
+/* Main content */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding-top: 64px;
+  overflow: hidden;
+  position: relative;
+}
+
+.content-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 32px 48px;
+}
+
+/* ========== Toolbar ========== */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Tabs */
+.tab-bar {
+  display: flex;
+  gap: 4px;
+  background: var(--bg-sec);
+  border-radius: var(--radius-btn);
+  padding: 4px;
+}
+
+.tab-item {
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-sec);
+  cursor: pointer;
+  transition: all var(--trans-base);
+  border: none;
+  background: transparent;
+  font-family: var(--font-ui);
+  white-space: nowrap;
+}
+
+.tab-item:hover:not(.active) { color: var(--text-main); }
+
+.tab-item.active {
+  background: var(--bg-card);
+  color: var(--text-main);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+}
+
+/* Select / Dropdown */
+.select-wrap {
+  position: relative;
+}
+
+.select-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: var(--radius-btn);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--trans-hover);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-main);
+  font-family: var(--font-ui);
+}
+
+.select-btn:hover { background: var(--bg-sec); border-color: var(--text-tert); }
+
+.select-btn:focus-visible { outline: none; box-shadow: var(--shadow-focus); }
+
+.select-btn svg { width: 14px; height: 14px; color: var(--text-tert); }
+
+.select-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 160px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-input);
+  box-shadow: var(--shadow-modal);
+  padding: 4px;
+  z-index: 50;
+  display: none;
+}
+
+.select-dropdown.open { display: block; }
+
+.select-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background var(--trans-base);
+  color: var(--text-sec);
+}
+
+.select-option:hover { background: var(--bg-sec); color: var(--text-main); }
+.select-option.active { color: var(--primary); font-weight: 500; }
+
+/* View Toggle */
+.view-toggle {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-btn);
+  overflow: hidden;
+}
+
+.view-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 34px;
+  border: none;
+  background: var(--bg-card);
+  color: var(--text-tert);
+  cursor: pointer;
+  transition: all var(--trans-base);
+}
+
+.view-toggle-btn:not(:last-child) { border-right: 1px solid var(--border); }
+
+.view-toggle-btn:hover:not(.active) { background: var(--bg-sec); color: var(--text-main); }
+
+.view-toggle-btn.active { background: var(--primary); color: #fff; }
+
+.view-toggle-btn:focus-visible { outline: none; box-shadow: var(--shadow-focus); z-index: 1; }
+
+.view-toggle-btn svg { width: 16px; height: 16px; }
+
+/* ========== Tag Filter Chips ========== */
+.chip-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-sec);
+  cursor: pointer;
+  transition: all var(--trans-base);
+  font-family: var(--font-ui);
+}
+
+.chip:hover:not(.active) { border-color: var(--text-tert); color: var(--text-main); }
+
+.chip.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+.chip .chip-count {
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+/* ========== Buttons (from demo.html) ========== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 16px;
+  border-radius: var(--radius-btn);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--trans-hover);
+  border: none;
+  text-decoration: none;
+  font-family: var(--font-ui);
+}
+
+.btn:focus-visible { outline: none; box-shadow: var(--shadow-focus); }
+
+.btn svg { width: 16px; height: 16px; }
+
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover:not(:disabled) { background: var(--primary-dark); transform: translateY(-1px); box-shadow: 0 4px 6px rgba(37,99,235,0.2); }
+
+.btn-secondary { background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border); }
+.btn-secondary:hover:not(:disabled) { background: var(--bg-sec); border-color: var(--text-tert); }
+
+.btn-ghost { background: transparent; color: var(--text-sec); }
+.btn-ghost:hover:not(:disabled) { background: var(--bg-sec); color: var(--text-main); }
+
+.btn-danger { background: var(--error); color: #fff; }
+.btn-danger:hover:not(:disabled) { background: #DC2626; }
+
+.btn:disabled { background: var(--bg-sec); color: var(--text-tert); border-color: var(--border); cursor: not-allowed; }
+
+/* ========== Badges (from demo.html) ========== */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: var(--radius-badge);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.badge-ai { background: #DBEAFE; color: #1D4ED8; }
+.badge-gray { background: #F1F5F9; color: #475569; }
+.badge-pdf { background: #FEE2E2; color: #B91C1C; }
+.badge-word { background: #DBEAFE; color: #1D4ED8; }
+.badge-web { background: #D1FAE5; color: #047857; }
+.badge-md { background: #EDE9FE; color: #6D28D9; }
+
+/* ========== KB Card (from demo.html) ========== */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.kb-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 20px;
+  box-shadow: var(--shadow-card);
+  transition: all var(--trans-hover);
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.kb-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-hover);
+  border-color: #CBD5E1;
+}
+
+.kb-card:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+.kb-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.kb-card-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.kb-card-icon.fmt-pdf { background: #FEE2E2; color: var(--fmt-pdf); }
+.kb-card-icon.fmt-word { background: #DBEAFE; color: var(--fmt-word); }
+.kb-card-icon.fmt-web { background: #D1FAE5; color: var(--fmt-web); }
+.kb-card-icon.fmt-md { background: #EDE9FE; color: var(--fmt-md); }
+
+.kb-card-icon svg { width: 18px; height: 18px; }
+
+.kb-card-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-main);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.kb-card-desc {
+  font-size: 13px;
+  color: var(--text-sec);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  flex: 1;
+}
+
+.kb-card-tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.kb-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+}
+
+.kb-card-meta {
+  font-size: 12px;
+  color: var(--text-tert);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.kb-card-checkbox {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: 2px solid var(--border);
+  background: var(--bg-card);
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--trans-base);
+}
+
+.batch-mode .kb-card-checkbox { display: flex; }
+
+.kb-card-checkbox.checked {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+/* More actions button */
+.action-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-tert);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: color var(--trans-base), background var(--trans-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-btn:hover { color: var(--text-main); background: var(--bg-sec); }
+.action-btn:focus-visible { outline: none; box-shadow: var(--shadow-focus); }
+
+.action-btn svg { width: 16px; height: 16px; }
+
+/* Context menu */
+.context-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  min-width: 160px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-input);
+  box-shadow: var(--shadow-modal);
+  padding: 4px;
+  z-index: 50;
+  display: none;
+}
+
+.context-menu.open { display: block; }
+
+.context-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background var(--trans-base);
+  color: var(--text-sec);
+  border: none;
+  background: none;
+  width: 100%;
+  font-family: var(--font-ui);
+  text-align: left;
+}
+
+.context-menu-item:hover { background: var(--bg-sec); color: var(--text-main); }
+.context-menu-item.danger { color: var(--error); }
+.context-menu-item.danger:hover { background: #FEF2F2; }
+.context-menu-item svg { width: 14px; height: 14px; }
+
+/* ========== List View ========== */
+.list-view { display: none; }
+.list-view.active { display: block; }
+.card-view.active { display: grid; }
+
+.list-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.list-table th {
+  text-align: left;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-tert);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-sec);
+}
+
+.list-table th:first-child { border-radius: var(--radius-btn) 0 0 0; }
+.list-table th:last-child { border-radius: 0 var(--radius-btn) 0 0; }
+
+.list-row {
+  cursor: pointer;
+  transition: background var(--trans-base);
+}
+
+.list-row:hover { background: var(--bg-sec); }
+.list-row:focus-visible { outline: none; box-shadow: inset var(--shadow-focus); }
+
+.list-row td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--divider);
+  font-size: 14px;
+  vertical-align: middle;
+}
+
+.list-row-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.list-row-title .kb-card-icon { width: 28px; height: 28px; }
+.list-row-title .kb-card-icon svg { width: 14px; height: 14px; }
+
+.list-row-name {
+  font-weight: 500;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 360px;
+}
+
+.list-row-tags { display: flex; gap: 4px; flex-wrap: wrap; }
+
+.list-row-meta {
+  font-size: 13px;
+  color: var(--text-sec);
+  white-space: nowrap;
+}
+
+.list-row-actions {
+  position: relative;
+}
+
+/* ========== Batch Bar ========== */
+.batch-bar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: var(--primary-dark);
+  color: #fff;
+  padding: 10px 24px;
+  display: none;
+  align-items: center;
+  gap: 16px;
+  border-radius: var(--radius-btn);
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+.batch-bar.active { display: flex; }
+
+.batch-bar .batch-count { font-weight: 600; }
+
+.batch-bar .btn {
+  height: 30px;
+  font-size: 13px;
+  padding: 0 12px;
+}
+
+.batch-bar .btn-batch-cancel {
+  background: transparent;
+  color: rgba(255,255,255,0.8);
+  border: 1px solid rgba(255,255,255,0.3);
+  margin-left: auto;
+}
+.batch-bar .btn-batch-cancel:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+.batch-bar .btn-batch-danger {
+  background: var(--error);
+  color: #fff;
+}
+
+.batch-bar .btn-batch-move {
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+}
+
+/* ========== Drag Overlay ========== */
+.drag-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(37, 99, 235, 0.08);
+  backdrop-filter: blur(2px);
+  z-index: 200;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.drag-overlay.active {
+  display: flex;
+  pointer-events: auto;
+}
+
+.drag-overlay-inner {
+  background: var(--bg-card);
+  border: 2px dashed var(--primary);
+  border-radius: var(--radius-modal);
+  padding: 48px 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  box-shadow: var(--shadow-modal);
+}
+
+.drag-overlay-inner svg { width: 48px; height: 48px; color: var(--primary); }
+
+.drag-overlay-inner .drag-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.drag-overlay-inner .drag-desc {
+  font-size: 14px;
+  color: var(--text-sec);
+}
+
+/* ========== States ========== */
+/* Empty State */
+.state-empty {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 32px;
+  text-align: center;
+  gap: 16px;
+}
+
+.state-empty.active { display: flex; }
+
+.state-empty svg { width: 80px; height: 80px; color: var(--text-tert); opacity: 0.5; }
+
+.state-empty .state-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.state-empty .state-desc {
+  font-size: 14px;
+  color: var(--text-sec);
+  max-width: 360px;
+}
+
+/* Loading Skeleton */
+.state-loading { display: none; }
+.state-loading.active { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+
+.skeleton-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.skeleton-box {
+  background: var(--bg-sec);
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton-box::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(90deg, rgba(255,255,255,0) 0, rgba(255,255,255,0.4) 20%, rgba(255,255,255,0.6) 60%, rgba(255,255,255,0));
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer { 100% { transform: translateX(100%); } }
+
+/* Filter No Result */
+.state-no-result {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 32px;
+  text-align: center;
+  gap: 12px;
+}
+
+.state-no-result.active { display: flex; }
+
+.state-no-result svg { width: 56px; height: 56px; color: var(--text-tert); opacity: 0.4; }
+
+/* Error State */
+.state-error {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 32px;
+  text-align: center;
+  gap: 16px;
+}
+
+.state-error.active { display: flex; }
+
+.state-error svg { width: 56px; height: 56px; color: var(--error); opacity: 0.6; }
+
+/* ========== Toast ========== */
+.toast {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: var(--primary-dark);
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: var(--radius-btn);
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: var(--shadow-modal);
+  z-index: 300;
+  opacity: 0;
+  transition: all 300ms ease;
+  pointer-events: none;
+}
+
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+/* ========== State Switcher (debug bar) ========== */
+.state-switcher {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+  padding: 12px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-btn);
+}
+
+.state-switcher .state-sw-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-tert);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-right: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.state-sw-btn {
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-sec);
+  cursor: pointer;
+  transition: all var(--trans-base);
+  font-family: var(--font-ui);
+}
+
+.state-sw-btn:hover { border-color: var(--text-tert); color: var(--text-main); }
+
+.state-sw-btn.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+/* ========== Animations ========== */
+.stagger-item {
+  opacity: 0;
+  transform: translateY(8px);
+  animation: fadeInUp 250ms ease-out forwards;
+}
+
+@keyframes fadeInUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Search box in toolbar */
+.search-container {
+  position: relative;
+  max-width: 240px;
+}
+
+.search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 10px;
+  color: var(--text-tert);
+  width: 16px;
+  height: 16px;
+}
+
+.search-input {
+  width: 100%;
+  height: 36px;
+  padding: 0 12px 0 34px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-input);
+  font-size: 13px;
+  font-family: var(--font-ui);
+  color: var(--text-main);
+  transition: all var(--trans-hover);
+  background: var(--bg-card);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: var(--shadow-focus);
+}
+
+/* Hidden utility */
+.hidden { display: none !important; }
+
+/* ========== Delete Confirm Modal ========== */
+.confirm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 400;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+.confirm-overlay.active { display: flex; }
+
+.confirm-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-modal);
+  padding: 32px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: var(--shadow-modal);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  text-align: center;
+}
+
+.confirm-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-round);
+  background: #FEE2E2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--error);
+}
+.confirm-icon svg { width: 24px; height: 24px; }
+
+.confirm-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.confirm-desc {
+  font-size: 14px;
+  color: var(--text-sec);
+  line-height: 1.5;
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+  width: 100%;
+}
+
+.confirm-actions .btn { flex: 1; }
+
+/* ========== List View Checkbox ========== */
+.list-row-checkbox {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: 2px solid var(--border);
+  background: var(--bg-card);
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--trans-base);
+  flex-shrink: 0;
+}
+
+.batch-mode .list-row-checkbox { display: flex; }
+
+.list-row-checkbox.checked {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+/* ========== Infinite Scroll Sentinel ========== */
+.scroll-sentinel {
+  height: 1px;
+  width: 100%;
+}
+
+/* ========== Hamburger Button (hidden on desktop) ========== */
+.hamburger-btn {
+  display: none;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: var(--radius-btn);
+  background: transparent;
+  border: none;
+  color: var(--text-sec);
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.hamburger-btn:hover {
+  background: var(--bg-sec);
+  color: var(--text-main);
+}
+
+.hamburger-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+/* ========================================
+   Responsive: max-width 768px
+   ======================================== */
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    top: 64px;
+    left: 0;
+    bottom: 0;
+    z-index: 90;
+    transform: translateX(-100%);
+    transition: transform 250ms ease;
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+    box-shadow: 4px 0 16px rgba(0,0,0,0.1);
+  }
+
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 64px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.3);
+    z-index: 89;
+  }
+
+  .sidebar-overlay.visible {
+    display: block;
+  }
+
+  .hamburger-btn {
+    display: inline-flex;
+  }
+
+  .main-content {
+    margin-left: 0;
+  }
+
+  .search-container {
+    max-width: none;
+    flex: 1;
+  }
+
+  .card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .state-loading.active {
+    grid-template-columns: 1fr;
+  }
+
+  .toolbar {
+    flex-wrap: wrap;
+  }
+
+  .toolbar-left {
+    flex-wrap: wrap;
+  }
+
+  .batch-bar {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .content-scroll {
+    padding: 16px;
+  }
+
+  .header-bar {
+    padding: 0 16px;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== Header Bar ===== -->
+<header class="header-bar">
+  <div class="header-title">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--primary)"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+    KnowBase
+  </div>
+
+  <button class="hamburger-btn" id="hamburgerBtn" aria-label="打开侧边栏">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </button>
+
+  <div class="header-right">
+    <div class="search-container">
+      <div class="search-input-wrapper">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input class="search-input" type="text" placeholder="搜索知识库..." />
+      </div>
+    </div>
+    <div style="width:32px;height:32px;border-radius:var(--radius-round);background:var(--primary-light);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:14px;cursor:pointer;" title="个人设置">K</div>
+  </div>
+</header>
+
+<div class="app-shell">
+  <!-- ===== Sidebar Overlay (mobile) ===== -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- ===== Sidebar ===== -->
+  <nav class="sidebar" id="sidebar" aria-label="主导航">
+    <a class="nav-item" href="#">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      AI 问答
+    </a>
+    <a class="nav-item active" href="#" aria-current="page">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      知识库
+    </a>
+    <a class="nav-item" href="#">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      搜索
+    </a>
+    <a class="nav-item" href="#">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+      知识空间
+    </a>
+    <a class="nav-item" href="#">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      设置
+    </a>
+  </nav>
+
+  <!-- ===== Main Content ===== -->
+  <main class="main-content" id="mainContent">
+    <div class="content-scroll" id="contentScroll">
+
+      <!-- State Switcher Bar -->
+      <div class="state-switcher">
+        <span class="state-sw-label">状态切换</span>
+        <button class="state-sw-btn active" data-state="normal">正常</button>
+        <button class="state-sw-btn" data-state="empty">空状态</button>
+        <button class="state-sw-btn" data-state="loading">加载中</button>
+        <button class="state-sw-btn" data-state="no-result">筛选无结果</button>
+        <button class="state-sw-btn" data-state="drag">文件拖入</button>
+        <button class="state-sw-btn" data-state="batch">批量选择</button>
+        <button class="state-sw-btn" data-state="error">加载失败</button>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <div class="tab-bar">
+            <button class="tab-item active" data-space="all">全部</button>
+            <button class="tab-item" data-space="Q1 竞品分析项目">Q1 竞品分析</button>
+            <button class="tab-item" data-space="技术学习">技术学习</button>
+            <button class="tab-item" data-space="产品方法论">产品方法论</button>
+          </div>
+
+          <div class="select-wrap" id="formatFilter">
+            <button class="select-btn" aria-haspopup="listbox" aria-expanded="false">
+              全部格式
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <div class="select-dropdown" role="listbox">
+              <div class="select-option active" data-format="all">全部格式</div>
+              <div class="select-option" data-format="pdf">
+                <span style="width:8px;height:8px;border-radius:50%;background:var(--fmt-pdf);flex-shrink:0;display:inline-block"></span> PDF
+              </div>
+              <div class="select-option" data-format="word">
+                <span style="width:8px;height:8px;border-radius:50%;background:var(--fmt-word);flex-shrink:0;display:inline-block"></span> Word
+              </div>
+              <div class="select-option" data-format="web">
+                <span style="width:8px;height:8px;border-radius:50%;background:var(--fmt-web);flex-shrink:0;display:inline-block"></span> 网页
+              </div>
+              <div class="select-option" data-format="markdown">
+                <span style="width:8px;height:8px;border-radius:50%;background:var(--fmt-md);flex-shrink:0;display:inline-block"></span> Markdown
+              </div>
+            </div>
+          </div>
+
+          <div class="select-wrap" id="sortFilter">
+            <button class="select-btn" aria-haspopup="listbox" aria-expanded="false">
+              最近上传
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <div class="select-dropdown" role="listbox">
+              <div class="select-option active" data-sort="newest">最近上传</div>
+              <div class="select-option" data-sort="oldest">最早上传</div>
+              <div class="select-option" data-sort="alpha">标题 A-Z</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="toolbar-right">
+          <div class="view-toggle" role="radiogroup" aria-label="视图切换">
+            <button class="view-toggle-btn active" data-view="card" role="radio" aria-checked="true" aria-label="卡片视图">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+            </button>
+            <button class="view-toggle-btn" data-view="list" role="radio" aria-checked="false" aria-label="列表视图">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+            </button>
+          </div>
+
+          <button class="btn btn-primary" id="uploadBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            上传
+          </button>
+        </div>
+      </div>
+
+      <!-- Tag Chip Group -->
+      <div class="chip-group" id="chipGroup">
+        <button class="chip active" data-tag="all">全部</button>
+        <button class="chip" data-tag="竞品分析">竞品分析 <span class="chip-count">1</span></button>
+        <button class="chip" data-tag="RAG">RAG <span class="chip-count">1</span></button>
+        <button class="chip" data-tag="用户调研">用户调研 <span class="chip-count">1</span></button>
+        <button class="chip" data-tag="AI Agent">AI Agent <span class="chip-count">1</span></button>
+        <button class="chip" data-tag="产品路线图">产品路线图 <span class="chip-count">1</span></button>
+        <button class="chip" data-tag="财务分析">财务分析 <span class="chip-count">1</span></button>
+        <button class="chip" data-tag="LLM">LLM <span class="chip-count">1</span></button>
+        <button class="chip" data-tag="知识管理">知识管理 <span class="chip-count">2</span></button>
+      </div>
+
+      <!-- Batch Bar -->
+      <div class="batch-bar" id="batchBar">
+        <span>已选择 <span class="batch-count" id="batchCount">0</span> 项</span>
+        <button class="btn btn-batch-danger">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          删除
+        </button>
+        <button class="btn btn-batch-move">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          移动到空间
+        </button>
+        <button class="btn btn-batch-cancel" id="batchCancel">取消</button>
+      </div>
+
+      <!-- ===== Normal: Card View ===== -->
+      <div class="card-grid card-view active" id="cardView">
+        <!-- ki-001 -->
+        <div class="kb-card stagger-item" tabindex="0" data-id="ki-001" data-format="pdf" data-tags="财务分析,Q4,营收" data-space="Q1 竞品分析项目" style="animation-delay:0ms">
+          <div class="kb-card-checkbox" data-id="ki-001"></div>
+          <div class="kb-card-header">
+            <div class="kb-card-icon fmt-pdf">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <div class="list-row-actions">
+              <button class="action-btn more-btn" aria-label="更多操作">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+              </button>
+              <div class="context-menu">
+                <button class="context-menu-item" data-action="edit-tags"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> 编辑标签</button>
+                <button class="context-menu-item" data-action="move"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> 移动到空间</button>
+                <button class="context-menu-item danger" data-action="delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> 删除</button>
+              </div>
+            </div>
+          </div>
+          <div class="kb-card-title">2025年Q4财务分析报告</div>
+          <div class="kb-card-desc">本报告详细分析了 2025 年第四季度各产品线的营收表现、成本结构和盈利能力。Q4 总营收达 3.13 亿元，同比增长 18.5%。</div>
+          <div class="kb-card-tags">
+            <span class="badge badge-ai"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:10px;height:10px"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg> 财务分析</span>
+            <span class="badge badge-ai">Q4</span>
+            <span class="badge badge-ai">营收</span>
+          </div>
+          <div class="kb-card-footer">
+            <span class="kb-card-meta"><span class="badge badge-pdf">PDF</span> 3.2MB &middot; 28页</span>
+            <span class="kb-card-meta">2026-03-18</span>
+          </div>
+        </div>
+
+        <!-- ki-002 -->
+        <div class="kb-card stagger-item" tabindex="0" data-id="ki-002" data-format="web" data-tags="AI Agent,行业趋势,2026" data-space="技术学习" style="animation-delay:40ms">
+          <div class="kb-card-checkbox" data-id="ki-002"></div>
+          <div class="kb-card-header">
+            <div class="kb-card-icon fmt-web">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            </div>
+            <div class="list-row-actions">
+              <button class="action-btn more-btn" aria-label="更多操作">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+              </button>
+              <div class="context-menu">
+                <button class="context-menu-item" data-action="edit-tags"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> 编辑标签</button>
+                <button class="context-menu-item" data-action="move"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> 移动到空间</button>
+                <button class="context-menu-item danger" data-action="delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> 删除</button>
+              </div>
+            </div>
+          </div>
+          <div class="kb-card-title">深度解读：2026年AI Agent行业趋势报告</div>
+          <div class="kb-card-desc">本文从技术演进、商业落地和竞争格局三个维度分析了 AI Agent 赛道在 2026 年的关键趋势。</div>
+          <div class="kb-card-tags">
+            <span class="badge badge-ai">AI Agent</span>
+            <span class="badge badge-ai">行业趋势</span>
+            <span class="badge badge-ai">2026</span>
+          </div>
+          <div class="kb-card-footer">
+            <span class="kb-card-meta"><span class="badge badge-web">网页</span></span>
+            <span class="kb-card-meta">2026-03-17</span>
+          </div>
+        </div>
+
+        <!-- ki-003 -->
+        <div class="kb-card stagger-item" tabindex="0" data-id="ki-003" data-format="word" data-tags="竞品分析,知识管理,Notion" data-space="Q1 竞品分析项目" style="animation-delay:80ms">
+          <div class="kb-card-checkbox" data-id="ki-003"></div>
+          <div class="kb-card-header">
+            <div class="kb-card-icon fmt-word">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            </div>
+            <div class="list-row-actions">
+              <button class="action-btn more-btn" aria-label="更多操作">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+              </button>
+              <div class="context-menu">
+                <button class="context-menu-item" data-action="edit-tags"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> 编辑标签</button>
+                <button class="context-menu-item" data-action="move"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> 移动到空间</button>
+                <button class="context-menu-item danger" data-action="delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> 删除</button>
+              </div>
+            </div>
+          </div>
+          <div class="kb-card-title">竞品功能对比矩阵 - Notion AI vs Mem vs Recall</div>
+          <div class="kb-card-desc">系统对比了 Notion AI、Mem.ai 和 Recall 三款知识管理产品在 AI 问答、文档解析、协作能力和定价策略四个维度的差异。</div>
+          <div class="kb-card-tags">
+            <span class="badge badge-ai">竞品分析</span>
+            <span class="badge badge-ai">知识管理</span>
+            <span class="badge badge-ai">Notion</span>
+          </div>
+          <div class="kb-card-footer">
+            <span class="kb-card-meta"><span class="badge badge-word">Word</span> 1.8MB &middot; 15页</span>
+            <span class="kb-card-meta">2026-03-16</span>
+          </div>
+        </div>
+
+        <!-- ki-004 -->
+        <div class="kb-card stagger-item" tabindex="0" data-id="ki-004" data-format="markdown" data-tags="RAG,技术实践,LLM" data-space="技术学习" style="animation-delay:120ms">
+          <div class="kb-card-checkbox" data-id="ki-004"></div>
+          <div class="kb-card-header">
+            <div class="kb-card-icon fmt-md">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15l2 2 4-4"/></svg>
+            </div>
+            <div class="list-row-actions">
+              <button class="action-btn more-btn" aria-label="更多操作">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+              </button>
+              <div class="context-menu">
+                <button class="context-menu-item" data-action="edit-tags"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> 编辑标签</button>
+                <button class="context-menu-item" data-action="move"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> 移动到空间</button>
+                <button class="context-menu-item danger" data-action="delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> 删除</button>
+              </div>
+            </div>
+          </div>
+          <div class="kb-card-title">RAG 系统优化实践：从 Naive RAG 到 Advanced RAG</div>
+          <div class="kb-card-desc">总结了 RAG 系统从基础检索增强生成到高级 RAG 的技术演进路径，包括查询改写、混合检索、重排序等核心优化策略。</div>
+          <div class="kb-card-tags">
+            <span class="badge badge-ai">RAG</span>
+            <span class="badge badge-ai">技术实践</span>
+            <span class="badge badge-ai">LLM</span>
+          </div>
+          <div class="kb-card-footer">
+            <span class="kb-card-meta"><span class="badge badge-md">Markdown</span> 45KB</span>
+            <span class="kb-card-meta">2026-03-15</span>
+          </div>
+        </div>
+
+        <!-- ki-005 -->
+        <div class="kb-card stagger-item" tabindex="0" data-id="ki-005" data-format="pdf" data-tags="用户调研,访谈,知识管理" data-space="产品方法论" style="animation-delay:160ms">
+          <div class="kb-card-checkbox" data-id="ki-005"></div>
+          <div class="kb-card-header">
+            <div class="kb-card-icon fmt-pdf">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <div class="list-row-actions">
+              <button class="action-btn more-btn" aria-label="更多操作">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+              </button>
+              <div class="context-menu">
+                <button class="context-menu-item" data-action="edit-tags"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> 编辑标签</button>
+                <button class="context-menu-item" data-action="move"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> 移动到空间</button>
+                <button class="context-menu-item danger" data-action="delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> 删除</button>
+              </div>
+            </div>
+          </div>
+          <div class="kb-card-title">用户访谈记录 - 知识管理工具使用习惯调研</div>
+          <div class="kb-card-desc">涵盖 8 位目标用户的深度访谈记录。核心发现：85% 的受访者表示资料散落在 3 个以上平台，平均每天花 30 分钟查找资料。</div>
+          <div class="kb-card-tags">
+            <span class="badge badge-ai">用户调研</span>
+            <span class="badge badge-ai">访谈</span>
+            <span class="badge badge-ai">知识管理</span>
+          </div>
+          <div class="kb-card-footer">
+            <span class="kb-card-meta"><span class="badge badge-pdf">PDF</span> 2.1MB &middot; 32页</span>
+            <span class="kb-card-meta">2026-03-14</span>
+          </div>
+        </div>
+
+        <!-- ki-006 -->
+        <div class="kb-card stagger-item" tabindex="0" data-id="ki-006" data-format="web" data-tags="Embedding,模型评测,向量检索" data-space="技术学习" style="animation-delay:200ms">
+          <div class="kb-card-checkbox" data-id="ki-006"></div>
+          <div class="kb-card-header">
+            <div class="kb-card-icon fmt-web">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            </div>
+            <div class="list-row-actions">
+              <button class="action-btn more-btn" aria-label="更多操作">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+              </button>
+              <div class="context-menu">
+                <button class="context-menu-item" data-action="edit-tags"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> 编辑标签</button>
+                <button class="context-menu-item" data-action="move"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> 移动到空间</button>
+                <button class="context-menu-item danger" data-action="delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> 删除</button>
+              </div>
+            </div>
+          </div>
+          <div class="kb-card-title">Embedding 模型性能评测：BGE-M3 vs text-embedding-3 vs Cohere</div>
+          <div class="kb-card-desc">在 MTEB 基准测试和真实业务场景下对比了三款主流 Embedding 模型的检索精度、推理速度和多语言能力。</div>
+          <div class="kb-card-tags">
+            <span class="badge badge-ai">Embedding</span>
+            <span class="badge badge-ai">模型评测</span>
+            <span class="badge badge-ai">向量检索</span>
+          </div>
+          <div class="kb-card-footer">
+            <span class="kb-card-meta"><span class="badge badge-web">网页</span></span>
+            <span class="kb-card-meta">2026-03-13</span>
+          </div>
+        </div>
+
+        <!-- ki-007 -->
+        <div class="kb-card stagger-item" tabindex="0" data-id="ki-007" data-format="markdown" data-tags="产品路线图,规划,MVP" data-space="产品方法论" style="animation-delay:240ms">
+          <div class="kb-card-checkbox" data-id="ki-007"></div>
+          <div class="kb-card-header">
+            <div class="kb-card-icon fmt-md">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15l2 2 4-4"/></svg>
+            </div>
+            <div class="list-row-actions">
+              <button class="action-btn more-btn" aria-label="更多操作">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+              </button>
+              <div class="context-menu">
+                <button class="context-menu-item" data-action="edit-tags"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> 编辑标签</button>
+                <button class="context-menu-item" data-action="move"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> 移动到空间</button>
+                <button class="context-menu-item danger" data-action="delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> 删除</button>
+              </div>
+            </div>
+          </div>
+          <div class="kb-card-title">2026年3月产品路线图规划</div>
+          <div class="kb-card-desc">Q1 核心目标：完成 MVP 上线并获取首批 500 名种子用户。分三个里程碑：3月底完成核心功能开发。</div>
+          <div class="kb-card-tags">
+            <span class="badge badge-ai">产品路线图</span>
+            <span class="badge badge-ai">规划</span>
+            <span class="badge badge-ai">MVP</span>
+          </div>
+          <div class="kb-card-footer">
+            <span class="kb-card-meta"><span class="badge badge-md">Markdown</span> 28KB</span>
+            <span class="kb-card-meta">2026-03-12</span>
+          </div>
+        </div>
+
+        <!-- ki-008 -->
+        <div class="kb-card stagger-item" tabindex="0" data-id="ki-008" data-format="word" data-tags="会议纪要,销售,复盘" data-space="Q1 竞品分析项目" style="animation-delay:280ms">
+          <div class="kb-card-checkbox" data-id="ki-008"></div>
+          <div class="kb-card-header">
+            <div class="kb-card-icon fmt-word">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            </div>
+            <div class="list-row-actions">
+              <button class="action-btn more-btn" aria-label="更多操作">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+              </button>
+              <div class="context-menu">
+                <button class="context-menu-item" data-action="edit-tags"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> 编辑标签</button>
+                <button class="context-menu-item" data-action="move"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> 移动到空间</button>
+                <button class="context-menu-item danger" data-action="delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> 删除</button>
+              </div>
+            </div>
+          </div>
+          <div class="kb-card-title">Q4销售复盘会议纪要</div>
+          <div class="kb-card-desc">Q4 新签约大客户 15 个，客单价提升 15.8%，但北区销售团队人均产能低于预期 12%，需加强培训。</div>
+          <div class="kb-card-tags">
+            <span class="badge badge-ai">会议纪要</span>
+            <span class="badge badge-ai">销售</span>
+            <span class="badge badge-ai">复盘</span>
+          </div>
+          <div class="kb-card-footer">
+            <span class="kb-card-meta"><span class="badge badge-word">Word</span> 890KB &middot; 8页</span>
+            <span class="kb-card-meta">2026-03-10</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== Normal: List View ===== -->
+      <div class="list-view" id="listView">
+        <table class="list-table">
+          <thead>
+            <tr>
+              <th class="list-th-checkbox" style="width:36px;display:none;"></th>
+              <th style="width:45%">标题</th>
+              <th style="width:20%">标签</th>
+              <th style="width:12%">上传时间</th>
+              <th style="width:10%">大小</th>
+              <th style="width:5%"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="list-row" tabindex="0" data-id="ki-001" data-format="pdf" data-tags="财务分析,Q4,营收" data-space="Q1 竞品分析项目">
+              <td class="list-td-checkbox" style="display:none;"><div class="list-row-checkbox" data-id="ki-001"></div></td>
+              <td><div class="list-row-title"><div class="kb-card-icon fmt-pdf"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><span class="list-row-name">2025年Q4财务分析报告</span></div></td>
+              <td><div class="list-row-tags"><span class="badge badge-ai">财务分析</span><span class="badge badge-ai">Q4</span></div></td>
+              <td><span class="list-row-meta">2026-03-18</span></td>
+              <td><span class="list-row-meta">3.2MB</span></td>
+              <td><div class="list-row-actions"><button class="action-btn more-btn" aria-label="更多操作"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></button><div class="context-menu"><button class="context-menu-item" data-action="edit-tags"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> 编辑标签</button><button class="context-menu-item" data-action="move"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> 移动到空间</button><button class="context-menu-item danger" data-action="delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> 删除</button></div></div></td>
+            </tr>
+            <tr class="list-row" tabindex="0" data-id="ki-002" data-format="web" data-tags="AI Agent,行业趋势,2026" data-space="技术学习">
+              <td class="list-td-checkbox" style="display:none;"><div class="list-row-checkbox" data-id="ki-002"></div></td>
+              <td><div class="list-row-title"><div class="kb-card-icon fmt-web"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div><span class="list-row-name">深度解读：2026年AI Agent行业趋势报告</span></div></td>
+              <td><div class="list-row-tags"><span class="badge badge-ai">AI Agent</span><span class="badge badge-ai">行业趋势</span></div></td>
+              <td><span class="list-row-meta">2026-03-17</span></td>
+              <td><span class="list-row-meta">-</span></td>
+              <td><div class="list-row-actions"><button class="action-btn more-btn" aria-label="更多操作"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></button><div class="context-menu"><button class="context-menu-item" data-action="edit-tags"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> 编辑标签</button><button class="context-menu-item" data-action="move"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> 移动到空间</button><button class="context-menu-item danger" data-action="delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> 删除</button></div></div></td>
+            </tr>
+            <tr class="list-row" tabindex="0" data-id="ki-003" data-format="word" data-tags="竞品分析,知识管理,Notion" data-space="Q1 竞品分析项目">
+              <td class="list-td-checkbox" style="display:none;"><div class="list-row-checkbox" data-id="ki-003"></div></td>
+              <td><div class="list-row-title"><div class="kb-card-icon fmt-word"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div><span class="list-row-name">竞品功能对比矩阵 - Notion AI vs Mem vs Recall</span></div></td>
+              <td><div class="list-row-tags"><span class="badge badge-ai">竞品分析</span><span class="badge badge-ai">知识管理</span></div></td>
+              <td><span class="list-row-meta">2026-03-16</span></td>
+              <td><span class="list-row-meta">1.8MB</span></td>
+              <td><div class="list-row-actions"><button class="action-btn more-btn" aria-label="更多操作"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></button><div class="context-menu"><button class="context-menu-item" data-action="edit-tags"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> 编辑标签</button><button class="context-menu-item" data-action="move"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> 移动到空间</button><button class="context-menu-item danger" data-action="delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> 删除</button></div></div></td>
+            </tr>
+            <tr class="list-row" tabindex="0" data-id="ki-004" data-format="markdown" data-tags="RAG,技术实践,LLM" data-space="技术学习">
+              <td class="list-td-checkbox" style="display:none;"><div class="list-row-checkbox" data-id="ki-004"></div></td>
+              <td><div class="list-row-title"><div class="kb-card-icon fmt-md"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15l2 2 4-4"/></svg></div><span class="list-row-name">RAG 系统优化实践：从 Naive RAG 到 Advanced RAG</span></div></td>
+              <td><div class="list-row-tags"><span class="badge badge-ai">RAG</span><span class="badge badge-ai">技术实践</span></div></td>
+              <td><span class="list-row-meta">2026-03-15</span></td>
+              <td><span class="list-row-meta">45KB</span></td>
+              <td><div class="list-row-actions"><button class="action-btn more-btn" aria-label="更多操作"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></button><div class="context-menu"><button class="context-menu-item" data-action="edit-tags"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> 编辑标签</button><button class="context-menu-item" data-action="move"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> 移动到空间</button><button class="context-menu-item danger" data-action="delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> 删除</button></div></div></td>
+            </tr>
+            <tr class="list-row" tabindex="0" data-id="ki-005" data-format="pdf" data-tags="用户调研,访谈,知识管理" data-space="产品方法论">
+              <td class="list-td-checkbox" style="display:none;"><div class="list-row-checkbox" data-id="ki-005"></div></td>
+              <td><div class="list-row-title"><div class="kb-card-icon fmt-pdf"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><span class="list-row-name">用户访谈记录 - 知识管理工具使用习惯调研</span></div></td>
+              <td><div class="list-row-tags"><span class="badge badge-ai">用户调研</span><span class="badge badge-ai">访谈</span></div></td>
+              <td><span class="list-row-meta">2026-03-14</span></td>
+              <td><span class="list-row-meta">2.1MB</span></td>
+              <td><div class="list-row-actions"><button class="action-btn more-btn" aria-label="更多操作"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></button><div class="context-menu"><button class="context-menu-item" data-action="edit-tags"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> 编辑标签</button><button class="context-menu-item" data-action="move"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> 移动到空间</button><button class="context-menu-item danger" data-action="delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> 删除</button></div></div></td>
+            </tr>
+            <tr class="list-row" tabindex="0" data-id="ki-006" data-format="web" data-tags="Embedding,模型评测,向量检索" data-space="技术学习">
+              <td class="list-td-checkbox" style="display:none;"><div class="list-row-checkbox" data-id="ki-006"></div></td>
+              <td><div class="list-row-title"><div class="kb-card-icon fmt-web"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div><span class="list-row-name">Embedding 模型性能评测：BGE-M3 vs text-embedding-3 vs Cohere</span></div></td>
+              <td><div class="list-row-tags"><span class="badge badge-ai">Embedding</span><span class="badge badge-ai">模型评测</span></div></td>
+              <td><span class="list-row-meta">2026-03-13</span></td>
+              <td><span class="list-row-meta">-</span></td>
+              <td><div class="list-row-actions"><button class="action-btn more-btn" aria-label="更多操作"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></button><div class="context-menu"><button class="context-menu-item" data-action="edit-tags"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> 编辑标签</button><button class="context-menu-item" data-action="move"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> 移动到空间</button><button class="context-menu-item danger" data-action="delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> 删除</button></div></div></td>
+            </tr>
+            <tr class="list-row" tabindex="0" data-id="ki-007" data-format="markdown" data-tags="产品路线图,规划,MVP" data-space="产品方法论">
+              <td class="list-td-checkbox" style="display:none;"><div class="list-row-checkbox" data-id="ki-007"></div></td>
+              <td><div class="list-row-title"><div class="kb-card-icon fmt-md"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15l2 2 4-4"/></svg></div><span class="list-row-name">2026年3月产品路线图规划</span></div></td>
+              <td><div class="list-row-tags"><span class="badge badge-ai">产品路线图</span><span class="badge badge-ai">规划</span></div></td>
+              <td><span class="list-row-meta">2026-03-12</span></td>
+              <td><span class="list-row-meta">28KB</span></td>
+              <td><div class="list-row-actions"><button class="action-btn more-btn" aria-label="更多操作"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></button><div class="context-menu"><button class="context-menu-item" data-action="edit-tags"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> 编辑标签</button><button class="context-menu-item" data-action="move"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> 移动到空间</button><button class="context-menu-item danger" data-action="delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> 删除</button></div></div></td>
+            </tr>
+            <tr class="list-row" tabindex="0" data-id="ki-008" data-format="word" data-tags="会议纪要,销售,复盘" data-space="Q1 竞品分析项目">
+              <td class="list-td-checkbox" style="display:none;"><div class="list-row-checkbox" data-id="ki-008"></div></td>
+              <td><div class="list-row-title"><div class="kb-card-icon fmt-word"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div><span class="list-row-name">Q4销售复盘会议纪要</span></div></td>
+              <td><div class="list-row-tags"><span class="badge badge-ai">会议纪要</span><span class="badge badge-ai">销售</span></div></td>
+              <td><span class="list-row-meta">2026-03-10</span></td>
+              <td><span class="list-row-meta">890KB</span></td>
+              <td><div class="list-row-actions"><button class="action-btn more-btn" aria-label="更多操作"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></button><div class="context-menu"><button class="context-menu-item" data-action="edit-tags"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> 编辑标签</button><button class="context-menu-item" data-action="move"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> 移动到空间</button><button class="context-menu-item danger" data-action="delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> 删除</button></div></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Infinite scroll sentinel -->
+      <div class="scroll-sentinel" id="scrollSentinel"></div>
+
+      <!-- ===== Loading State ===== -->
+      <div class="state-loading" id="stateLoading">
+        <div class="skeleton-card"><div class="skeleton-box" style="width:32px;height:32px;border-radius:8px"></div><div class="skeleton-box" style="height:16px;width:80%"></div><div class="skeleton-box" style="height:12px;width:100%"></div><div class="skeleton-box" style="height:12px;width:60%"></div><div style="display:flex;gap:6px"><div class="skeleton-box" style="height:20px;width:56px;border-radius:var(--radius-badge)"></div><div class="skeleton-box" style="height:20px;width:44px;border-radius:var(--radius-badge)"></div></div></div>
+        <div class="skeleton-card"><div class="skeleton-box" style="width:32px;height:32px;border-radius:8px"></div><div class="skeleton-box" style="height:16px;width:70%"></div><div class="skeleton-box" style="height:12px;width:90%"></div><div class="skeleton-box" style="height:12px;width:50%"></div><div style="display:flex;gap:6px"><div class="skeleton-box" style="height:20px;width:48px;border-radius:var(--radius-badge)"></div><div class="skeleton-box" style="height:20px;width:60px;border-radius:var(--radius-badge)"></div></div></div>
+        <div class="skeleton-card"><div class="skeleton-box" style="width:32px;height:32px;border-radius:8px"></div><div class="skeleton-box" style="height:16px;width:90%"></div><div class="skeleton-box" style="height:12px;width:85%"></div><div class="skeleton-box" style="height:12px;width:40%"></div><div style="display:flex;gap:6px"><div class="skeleton-box" style="height:20px;width:52px;border-radius:var(--radius-badge)"></div><div class="skeleton-box" style="height:20px;width:40px;border-radius:var(--radius-badge)"></div></div></div>
+        <div class="skeleton-card"><div class="skeleton-box" style="width:32px;height:32px;border-radius:8px"></div><div class="skeleton-box" style="height:16px;width:65%"></div><div class="skeleton-box" style="height:12px;width:95%"></div><div class="skeleton-box" style="height:12px;width:55%"></div><div style="display:flex;gap:6px"><div class="skeleton-box" style="height:20px;width:64px;border-radius:var(--radius-badge)"></div><div class="skeleton-box" style="height:20px;width:48px;border-radius:var(--radius-badge)"></div></div></div>
+        <div class="skeleton-card"><div class="skeleton-box" style="width:32px;height:32px;border-radius:8px"></div><div class="skeleton-box" style="height:16px;width:75%"></div><div class="skeleton-box" style="height:12px;width:80%"></div><div class="skeleton-box" style="height:12px;width:45%"></div><div style="display:flex;gap:6px"><div class="skeleton-box" style="height:20px;width:50px;border-radius:var(--radius-badge)"></div><div class="skeleton-box" style="height:20px;width:56px;border-radius:var(--radius-badge)"></div></div></div>
+        <div class="skeleton-card"><div class="skeleton-box" style="width:32px;height:32px;border-radius:8px"></div><div class="skeleton-box" style="height:16px;width:85%"></div><div class="skeleton-box" style="height:12px;width:75%"></div><div class="skeleton-box" style="height:12px;width:50%"></div><div style="display:flex;gap:6px"><div class="skeleton-box" style="height:20px;width:44px;border-radius:var(--radius-badge)"></div><div class="skeleton-box" style="height:20px;width:52px;border-radius:var(--radius-badge)"></div></div></div>
+      </div>
+
+      <!-- ===== Empty State ===== -->
+      <div class="state-empty" id="stateEmpty">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+        <div class="state-title">上传你的第一份资料</div>
+        <div class="state-desc">支持 PDF、Word、Markdown 文件和网页链接，AI 将自动解析内容并生成标签</div>
+        <button class="btn btn-primary" style="margin-top:8px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          上传资料
+        </button>
+      </div>
+
+      <!-- ===== No Result State ===== -->
+      <div class="state-no-result" id="stateNoResult">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+        <div class="state-title" style="font-size:16px;font-weight:600;color:var(--text-main)">当前筛选无结果</div>
+        <div class="state-desc" style="font-size:14px;color:var(--text-sec)">试试调整筛选条件或清除筛选</div>
+        <button class="btn btn-secondary" id="clearFilterBtn" style="margin-top:4px">清除筛选</button>
+      </div>
+
+      <!-- ===== Error State ===== -->
+      <div class="state-error" id="stateError">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <div class="state-title" style="font-size:16px;font-weight:600;color:var(--text-main)">加载失败</div>
+        <div class="state-desc" style="font-size:14px;color:var(--text-sec)">请检查网络连接后重试</div>
+        <button class="btn btn-primary" id="retryBtn" style="margin-top:4px">重试</button>
+      </div>
+
+    </div><!-- /content-scroll -->
+  </main>
+</div><!-- /app-shell -->
+
+<!-- ===== Drag Overlay ===== -->
+<div class="drag-overlay" id="dragOverlay">
+  <div class="drag-overlay-inner">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+    <div class="drag-title">释放文件以上传到知识库</div>
+    <div class="drag-desc">支持 PDF、Word、Markdown 文件</div>
+  </div>
+</div>
+
+<!-- ===== Delete Confirm Modal ===== -->
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-card">
+    <div class="confirm-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    </div>
+    <div class="confirm-title" id="confirmTitle">确认删除</div>
+    <div class="confirm-desc" id="confirmDesc">此操作不可撤销，删除后数据将无法恢复。</div>
+    <div class="confirm-actions">
+      <button class="btn btn-secondary" id="confirmCancelBtn">取消</button>
+      <button class="btn btn-danger" id="confirmOkBtn">确认删除</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Toast ===== -->
+<div class="toast" id="toast"></div>
+
+<script>
+(function() {
+  'use strict';
+
+  /* ========== Helpers ========== */
+  var $ = function(s, ctx) { return (ctx || document).querySelector(s); };
+  var $$ = function(s, ctx) { return Array.from((ctx || document).querySelectorAll(s)); };
+
+  function showToast(msg, duration) {
+    duration = duration || 2000;
+    var t = $('#toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(function() { t.classList.remove('show'); }, duration);
+  }
+
+  /* ========== Mobile Sidebar Toggle ========== */
+  var hamburgerBtn = $('#hamburgerBtn');
+  var sidebar = $('#sidebar');
+  var sidebarOverlay = $('#sidebarOverlay');
+
+  hamburgerBtn.addEventListener('click', function() {
+    sidebar.classList.toggle('open');
+    sidebarOverlay.classList.toggle('visible');
+  });
+
+  sidebarOverlay.addEventListener('click', function() {
+    sidebar.classList.remove('open');
+    sidebarOverlay.classList.remove('visible');
+  });
+
+  /* ========== Delete Confirm Modal ========== */
+  var pendingDeleteCallback = null;
+
+  function showConfirm(title, desc, onConfirm) {
+    $('#confirmTitle').textContent = title;
+    $('#confirmDesc').textContent = desc;
+    pendingDeleteCallback = onConfirm;
+    $('#confirmOverlay').classList.add('active');
+  }
+
+  function hideConfirm() {
+    $('#confirmOverlay').classList.remove('active');
+    pendingDeleteCallback = null;
+  }
+
+  $('#confirmCancelBtn').addEventListener('click', function() { hideConfirm(); });
+
+  $('#confirmOkBtn').addEventListener('click', function() {
+    if (pendingDeleteCallback) pendingDeleteCallback();
+    hideConfirm();
+  });
+
+  $('#confirmOverlay').addEventListener('click', function(e) {
+    if (e.target === $('#confirmOverlay')) hideConfirm();
+  });
+
+  /* ========== State Machine ========== */
+  var currentState = 'normal';
+  var currentView = 'card';
+  var activeFormat = 'all';
+  var activeSpace = 'all';
+  var activeSort = 'newest';
+  var activeTags = new Set();
+  var batchMode = false;
+  var selectedIds = new Set();
+
+  var stateElements = {
+    normal: ['cardView', 'listView'],
+    empty: ['stateEmpty'],
+    loading: ['stateLoading'],
+    'no-result': ['stateNoResult'],
+    drag: ['cardView', 'listView'],
+    batch: ['cardView', 'listView'],
+    error: ['stateError']
+  };
+
+  function switchState(state) {
+    currentState = state;
+
+    // Hide all state containers
+    ['cardView', 'listView', 'stateLoading', 'stateEmpty', 'stateNoResult', 'stateError'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) {
+        el.classList.remove('active');
+        if (el.id === 'cardView') el.style.display = 'none';
+        if (el.id === 'listView') el.style.display = 'none';
+      }
+    });
+
+    // Show relevant
+    var toShow = stateElements[state] || [];
+    toShow.forEach(function(id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      if (id === 'cardView' && currentView === 'card') { el.style.display = ''; el.classList.add('active'); }
+      else if (id === 'listView' && currentView === 'list') { el.style.display = ''; el.classList.add('active'); }
+      else if (id !== 'cardView' && id !== 'listView') { el.classList.add('active'); }
+    });
+
+    // Batch mode
+    batchMode = (state === 'batch');
+    var contentScroll = $('#contentScroll');
+    if (batchMode) {
+      contentScroll.classList.add('batch-mode');
+      $$('.kb-card-checkbox').forEach(function(c) { c.style.display = 'flex'; });
+      // Show list checkboxes
+      $$('.list-th-checkbox').forEach(function(th) { th.style.display = ''; });
+      $$('.list-td-checkbox').forEach(function(td) { td.style.display = ''; });
+      $$('.list-row-checkbox').forEach(function(c) { c.style.display = 'flex'; });
+      $('#batchBar').classList.add('active');
+    } else {
+      contentScroll.classList.remove('batch-mode');
+      $$('.kb-card-checkbox').forEach(function(c) { c.style.display = ''; c.classList.remove('checked'); c.innerHTML = ''; });
+      $$('.list-row-checkbox').forEach(function(c) { c.style.display = ''; c.classList.remove('checked'); c.innerHTML = ''; });
+      $$('.list-th-checkbox').forEach(function(th) { th.style.display = 'none'; });
+      $$('.list-td-checkbox').forEach(function(td) { td.style.display = 'none'; });
+      $('#batchBar').classList.remove('active');
+      selectedIds.clear();
+      updateBatchCount();
+    }
+
+    // Drag overlay
+    if (state === 'drag') {
+      $('#dragOverlay').classList.add('active');
+    } else {
+      $('#dragOverlay').classList.remove('active');
+    }
+
+    // Update state switcher buttons
+    $$('.state-sw-btn').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.state === state);
+    });
+  }
+
+  function updateBatchCount() {
+    $('#batchCount').textContent = selectedIds.size;
+  }
+
+  /* ========== State Switcher ========== */
+  $$('.state-sw-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      switchState(btn.dataset.state);
+    });
+  });
+
+  /* ========== View Toggle ========== */
+  $$('.view-toggle-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      currentView = btn.dataset.view;
+      $$('.view-toggle-btn').forEach(function(b) {
+        var isActive = b === btn;
+        b.classList.toggle('active', isActive);
+        b.setAttribute('aria-checked', isActive);
+      });
+      if (currentState === 'normal' || currentState === 'batch' || currentState === 'drag') {
+        switchState(currentState);
+      }
+    });
+  });
+
+  /* ========== Space Tabs ========== */
+  $$('.tab-item').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      $$('.tab-item').forEach(function(t) { t.classList.remove('active'); });
+      tab.classList.add('active');
+      activeSpace = tab.dataset.space;
+      applyFilters();
+    });
+  });
+
+  /* ========== Format Filter ========== */
+  (function() {
+    var wrap = $('#formatFilter');
+    var btn = $('button', wrap);
+    var dropdown = $('.select-dropdown', wrap);
+
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var isOpen = dropdown.classList.contains('open');
+      closeAllDropdowns();
+      if (!isOpen) dropdown.classList.add('open');
+    });
+
+    $$('.select-option', dropdown).forEach(function(opt) {
+      opt.addEventListener('click', function() {
+        activeFormat = opt.dataset.format;
+        $$('.select-option', dropdown).forEach(function(o) { o.classList.toggle('active', o === opt); });
+        btn.childNodes[0].textContent = opt.textContent.trim() + ' ';
+        dropdown.classList.remove('open');
+        applyFilters();
+      });
+    });
+  })();
+
+  /* ========== Sort Filter ========== */
+  (function() {
+    var wrap = $('#sortFilter');
+    var btn = $('button', wrap);
+    var dropdown = $('.select-dropdown', wrap);
+
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var isOpen = dropdown.classList.contains('open');
+      closeAllDropdowns();
+      if (!isOpen) dropdown.classList.add('open');
+    });
+
+    $$('.select-option', dropdown).forEach(function(opt) {
+      opt.addEventListener('click', function() {
+        activeSort = opt.dataset.sort;
+        $$('.select-option', dropdown).forEach(function(o) { o.classList.toggle('active', o === opt); });
+        btn.childNodes[0].textContent = opt.textContent.trim() + ' ';
+        dropdown.classList.remove('open');
+        applySorting();
+      });
+    });
+  })();
+
+  /* ========== Sorting Logic ========== */
+  function getDateFromCard(el) {
+    var metaEls = $$('.kb-card-meta', el);
+    var dateStr = metaEls.length > 0 ? metaEls[metaEls.length - 1].textContent.trim() : '';
+    return dateStr;
+  }
+
+  function getTitleFromCard(el) {
+    var titleEl = $('.kb-card-title', el);
+    return titleEl ? titleEl.textContent.trim() : '';
+  }
+
+  function getDateFromRow(el) {
+    var metaEls = $$('.list-row-meta', el);
+    // The first meta in list rows is the date
+    return metaEls.length > 0 ? metaEls[0].textContent.trim() : '';
+  }
+
+  function getTitleFromRow(el) {
+    var nameEl = $('.list-row-name', el);
+    return nameEl ? nameEl.textContent.trim() : '';
+  }
+
+  function applySorting() {
+    // Sort cards
+    var cardView = $('#cardView');
+    var cards = $$('.kb-card', cardView);
+    cards.sort(function(a, b) {
+      if (activeSort === 'newest') {
+        return getDateFromCard(b).localeCompare(getDateFromCard(a));
+      } else if (activeSort === 'oldest') {
+        return getDateFromCard(a).localeCompare(getDateFromCard(b));
+      } else if (activeSort === 'alpha') {
+        return getTitleFromCard(a).localeCompare(getTitleFromCard(b), 'zh-CN');
+      }
+      return 0;
+    });
+    cards.forEach(function(card) { cardView.appendChild(card); });
+
+    // Sort list rows
+    var tbody = $('#listView tbody');
+    var rows = $$('.list-row', tbody);
+    rows.sort(function(a, b) {
+      if (activeSort === 'newest') {
+        return getDateFromRow(b).localeCompare(getDateFromRow(a));
+      } else if (activeSort === 'oldest') {
+        return getDateFromRow(a).localeCompare(getDateFromRow(b));
+      } else if (activeSort === 'alpha') {
+        return getTitleFromRow(a).localeCompare(getTitleFromRow(b), 'zh-CN');
+      }
+      return 0;
+    });
+    rows.forEach(function(row) { tbody.appendChild(row); });
+
+    showToast('排序方式已切换为: ' + (activeSort === 'newest' ? '最近上传' : activeSort === 'oldest' ? '最早上传' : '标题 A-Z'));
+  }
+
+  /* ========== Tag Chips ========== */
+  $$('#chipGroup .chip').forEach(function(chip) {
+    chip.addEventListener('click', function() {
+      var tag = chip.dataset.tag;
+      if (tag === 'all') {
+        activeTags.clear();
+        $$('#chipGroup .chip').forEach(function(c) { c.classList.remove('active'); });
+        chip.classList.add('active');
+      } else {
+        $('#chipGroup .chip[data-tag="all"]').classList.remove('active');
+        chip.classList.toggle('active');
+        if (chip.classList.contains('active')) {
+          activeTags.add(tag);
+        } else {
+          activeTags.delete(tag);
+        }
+        if (activeTags.size === 0) {
+          $('#chipGroup .chip[data-tag="all"]').classList.add('active');
+        }
+      }
+      applyFilters();
+    });
+  });
+
+  /* ========== Filter Logic ========== */
+  function applyFilters() {
+    if (currentState !== 'normal' && currentState !== 'batch') return;
+
+    var visibleCount = 0;
+
+    // Cards
+    $$('#cardView .kb-card').forEach(function(card) {
+      var fmt = card.dataset.format;
+      var tags = card.dataset.tags.split(',');
+      var space = card.dataset.space;
+
+      var show = true;
+      if (activeFormat !== 'all' && fmt !== activeFormat) show = false;
+      if (activeSpace !== 'all' && space !== activeSpace) show = false;
+      if (activeTags.size > 0) {
+        var hasMatch = false;
+        activeTags.forEach(function(t) { if (tags.indexOf(t) >= 0) hasMatch = true; });
+        if (!hasMatch) show = false;
+      }
+
+      card.style.display = show ? '' : 'none';
+      if (show) visibleCount++;
+    });
+
+    // List rows
+    $$('#listView .list-row').forEach(function(row) {
+      var fmt = row.dataset.format;
+      var tags = row.dataset.tags.split(',');
+      var space = row.dataset.space;
+
+      var show = true;
+      if (activeFormat !== 'all' && fmt !== activeFormat) show = false;
+      if (activeSpace !== 'all' && space !== activeSpace) show = false;
+      if (activeTags.size > 0) {
+        var hasMatch = false;
+        activeTags.forEach(function(t) { if (tags.indexOf(t) >= 0) hasMatch = true; });
+        if (!hasMatch) show = false;
+      }
+
+      row.style.display = show ? '' : 'none';
+    });
+
+    if (visibleCount === 0 && (activeFormat !== 'all' || activeSpace !== 'all' || activeTags.size > 0)) {
+      switchState('no-result');
+    }
+  }
+
+  /* ========== Clear Filter ========== */
+  $('#clearFilterBtn').addEventListener('click', function() {
+    activeFormat = 'all';
+    activeSpace = 'all';
+    activeTags.clear();
+
+    $$('.tab-item').forEach(function(t, i) { t.classList.toggle('active', i === 0); });
+    $$('#chipGroup .chip').forEach(function(c) { c.classList.toggle('active', c.dataset.tag === 'all'); });
+    $$('#formatFilter .select-option').forEach(function(o, i) { o.classList.toggle('active', i === 0); });
+    $('#formatFilter .select-btn').childNodes[0].textContent = '全部格式 ';
+
+    switchState('normal');
+    applyFilters();
+  });
+
+  /* ========== Retry ========== */
+  $('#retryBtn').addEventListener('click', function() {
+    switchState('loading');
+    setTimeout(function() { switchState('normal'); }, 1500);
+  });
+
+  /* ========== Card / Row Click ========== */
+  function handleItemClick(e, id) {
+    // Don't navigate if clicking action button, checkbox, or list checkbox
+    if (e.target.closest('.action-btn') || e.target.closest('.context-menu') || e.target.closest('.kb-card-checkbox') || e.target.closest('.list-row-checkbox')) return;
+
+    if (batchMode) {
+      toggleSelection(id);
+      return;
+    }
+
+    showToast('正在跳转到详情页: ' + id);
+  }
+
+  $$('.kb-card').forEach(function(card) {
+    card.addEventListener('click', function(e) { handleItemClick(e, card.dataset.id); });
+    card.addEventListener('keydown', function(e) { if (e.key === 'Enter') handleItemClick(e, card.dataset.id); });
+  });
+
+  $$('.list-row').forEach(function(row) {
+    row.addEventListener('click', function(e) { handleItemClick(e, row.dataset.id); });
+    row.addEventListener('keydown', function(e) { if (e.key === 'Enter') handleItemClick(e, row.dataset.id); });
+  });
+
+  /* ========== Batch Selection ========== */
+  var checkSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="width:12px;height:12px"><polyline points="20 6 9 17 4 12"/></svg>';
+
+  function toggleSelection(id) {
+    if (selectedIds.has(id)) {
+      selectedIds.delete(id);
+    } else {
+      selectedIds.add(id);
+    }
+    var isSelected = selectedIds.has(id);
+    // Update card checkbox visual
+    $$('.kb-card-checkbox[data-id="' + id + '"]').forEach(function(cb) {
+      cb.classList.toggle('checked', isSelected);
+      cb.innerHTML = isSelected ? checkSvg : '';
+    });
+    // Update list row checkbox visual
+    $$('.list-row-checkbox[data-id="' + id + '"]').forEach(function(cb) {
+      cb.classList.toggle('checked', isSelected);
+      cb.innerHTML = isSelected ? checkSvg : '';
+    });
+    updateBatchCount();
+  }
+
+  $$('.kb-card-checkbox').forEach(function(cb) {
+    cb.addEventListener('click', function(e) {
+      e.stopPropagation();
+      toggleSelection(cb.dataset.id);
+    });
+  });
+
+  $$('.list-row-checkbox').forEach(function(cb) {
+    cb.addEventListener('click', function(e) {
+      e.stopPropagation();
+      toggleSelection(cb.dataset.id);
+    });
+  });
+
+  $('#batchCancel').addEventListener('click', function() {
+    switchState('normal');
+  });
+
+  /* ========== Batch Bar Buttons ========== */
+  $('.btn-batch-danger').addEventListener('click', function() {
+    if (selectedIds.size === 0) {
+      showToast('请先选择要删除的项目');
+      return;
+    }
+    var count = selectedIds.size;
+    showConfirm(
+      '确认批量删除',
+      '即将删除 ' + count + ' 个知识条目，此操作不可撤销。',
+      function() {
+        showToast('已删除 ' + count + ' 个条目（模拟）');
+        selectedIds.clear();
+        updateBatchCount();
+      }
+    );
+  });
+
+  $('.btn-batch-move').addEventListener('click', function() {
+    if (selectedIds.size === 0) {
+      showToast('请先选择要移动的项目');
+      return;
+    }
+    showToast('移动 ' + selectedIds.size + ' 个条目到空间（模拟）');
+  });
+
+  /* ========== More/Context Menu ========== */
+  $$('.more-btn').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var menu = btn.nextElementSibling;
+      var wasOpen = menu.classList.contains('open');
+      closeAllDropdowns();
+      if (!wasOpen) menu.classList.add('open');
+    });
+  });
+
+  $$('.context-menu-item').forEach(function(item) {
+    item.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var action = item.dataset.action;
+      var card = item.closest('.kb-card') || item.closest('.list-row');
+      var itemId = card ? card.dataset.id : '';
+      var itemTitle = '';
+      if (card) {
+        var titleEl = card.querySelector('.kb-card-title') || card.querySelector('.list-row-name');
+        if (titleEl) itemTitle = titleEl.textContent.trim();
+      }
+      closeAllDropdowns();
+      if (action === 'delete') {
+        showConfirm(
+          '确认删除',
+          '确定要删除「' + (itemTitle || itemId) + '」吗？此操作不可撤销。',
+          function() {
+            showToast('已删除: ' + (itemTitle || itemId) + '（模拟）');
+          }
+        );
+      } else if (action === 'move') {
+        showToast('移动到空间（模拟）');
+      } else if (action === 'edit-tags') {
+        showToast('编辑标签（模拟）');
+      }
+    });
+  });
+
+  /* ========== Close Dropdowns on Outside Click ========== */
+  function closeAllDropdowns() {
+    $$('.select-dropdown, .context-menu').forEach(function(d) { d.classList.remove('open'); });
+  }
+
+  document.addEventListener('click', function() { closeAllDropdowns(); });
+
+  /* ========== Drag & Drop ========== */
+  var dragCounter = 0;
+
+  document.addEventListener('dragenter', function(e) {
+    e.preventDefault();
+    dragCounter++;
+    if (dragCounter === 1 && currentState !== 'drag') {
+      $('#dragOverlay').classList.add('active');
+    }
+  });
+
+  document.addEventListener('dragleave', function(e) {
+    e.preventDefault();
+    dragCounter--;
+    if (dragCounter <= 0) {
+      dragCounter = 0;
+      $('#dragOverlay').classList.remove('active');
+    }
+  });
+
+  document.addEventListener('dragover', function(e) {
+    e.preventDefault();
+  });
+
+  document.addEventListener('drop', function(e) {
+    e.preventDefault();
+    dragCounter = 0;
+    $('#dragOverlay').classList.remove('active');
+    if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      showToast('已接收 ' + e.dataTransfer.files.length + ' 个文件，开始上传...（模拟）');
+    }
+  });
+
+  /* ========== Upload Button ========== */
+  $('#uploadBtn').addEventListener('click', function() {
+    showToast('打开上传弹窗（模拟跳转到 P-06）');
+  });
+
+  /* ========== Infinite Scroll (IntersectionObserver) ========== */
+  var scrollLoadCount = 0;
+  var maxScrollLoads = 3;
+
+  var sentinel = $('#scrollSentinel');
+  if (sentinel && 'IntersectionObserver' in window) {
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting && currentState === 'normal' && scrollLoadCount < maxScrollLoads) {
+          scrollLoadCount++;
+          appendCloneCards();
+        }
+      });
+    }, { root: $('#contentScroll'), rootMargin: '200px' });
+    observer.observe(sentinel);
+  }
+
+  function appendCloneCards() {
+    var cardView = $('#cardView');
+    var existingCards = $$('.kb-card', cardView);
+    if (existingCards.length === 0) return;
+
+    // Clone 2 cards from the beginning
+    for (var i = 0; i < 2 && i < existingCards.length; i++) {
+      var clone = existingCards[i].cloneNode(true);
+      var newId = existingCards[i].dataset.id + '-clone-' + scrollLoadCount + '-' + i;
+      clone.dataset.id = newId;
+      clone.style.animationDelay = (i * 40) + 'ms';
+      clone.classList.add('stagger-item');
+
+      // Update checkbox data-id
+      var cb = clone.querySelector('.kb-card-checkbox');
+      if (cb) { cb.dataset.id = newId; cb.classList.remove('checked'); cb.innerHTML = ''; }
+
+      // Rebind events
+      clone.addEventListener('click', (function(id) {
+        return function(e) { handleItemClick(e, id); };
+      })(newId));
+
+      // Rebind more-btn
+      var moreBtn = clone.querySelector('.more-btn');
+      if (moreBtn) {
+        moreBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          var menu = this.nextElementSibling;
+          var wasOpen = menu.classList.contains('open');
+          closeAllDropdowns();
+          if (!wasOpen) menu.classList.add('open');
+        });
+      }
+
+      // Rebind context menu items
+      clone.querySelectorAll('.context-menu-item').forEach(function(menuItem) {
+        menuItem.addEventListener('click', function(e) {
+          e.stopPropagation();
+          var action = menuItem.dataset.action;
+          closeAllDropdowns();
+          if (action === 'delete') {
+            var titleEl = clone.querySelector('.kb-card-title');
+            var title = titleEl ? titleEl.textContent.trim() : newId;
+            showConfirm('确认删除', '确定要删除「' + title + '」吗？此操作不可撤销。', function() {
+              showToast('已删除: ' + title + '（模拟）');
+            });
+          } else if (action === 'move') {
+            showToast('移动到空间（模拟）');
+          } else if (action === 'edit-tags') {
+            showToast('编辑标签（模拟）');
+          }
+        });
+      });
+
+      // Rebind checkbox
+      if (cb) {
+        cb.addEventListener('click', function(e) {
+          e.stopPropagation();
+          toggleSelection(this.dataset.id);
+        });
+      }
+
+      cardView.appendChild(clone);
+    }
+
+    showToast('加载了 2 条新内容');
+  }
+
+  /* ========== Init ========== */
+  switchState('normal');
+
+})();
+</script>
+</body>
+</html>

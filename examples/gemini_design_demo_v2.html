@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Express | AI驱动开发最佳实践知识库</title>
+    <style>
+        :root {
+            --bg-base: #030712;
+            --bg-surface: #111827;
+            --primary: #00f0ff;
+            --secondary: #7000ff;
+            --text-main: #f9fafb;
+            --text-muted: #9ca3af;
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+            background-image:
+                radial-gradient(circle at 15% 50%, rgba(112, 0, 255, 0.08), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(0, 240, 255, 0.08), transparent 25%);
+            background-attachment: fixed;
+        }
+        .bg-grid {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-size: 40px 40px;
+            background-image: linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            z-index: -1;
+            -webkit-mask-image: linear-gradient(to bottom, transparent 10%, black 50%, transparent 90%);
+        }
+        nav {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 1.5rem 5%; border-bottom: 1px solid var(--border-color);
+            backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 100;
+        }
+        .logo {
+            font-size: 1.5rem; font-weight: 800; letter-spacing: -0.5px;
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .logo span {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .hero {
+            min-height: 80vh; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; text-align: center;
+            padding: 0 5%; position: relative;
+        }
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 5rem); font-weight: 800; line-height: 1.1;
+            margin-bottom: 1.5rem; opacity: 0; animation: fadeInUp 0.8s ease forwards 0.2s;
+        }
+        .hero h1 .highlight { position: relative; display: inline-block; }
+        .hero h1 .highlight::after {
+            content: ''; position: absolute; bottom: 10%; left: 0;
+            width: 100%; height: 30%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            opacity: 0.3; z-index: -1; filter: blur(8px);
+        }
+        .hero p {
+            font-size: 1.25rem; color: var(--text-muted); max-width: 600px;
+            margin-bottom: 2.5rem; opacity: 0; animation: fadeInUp 0.8s ease forwards 0.4s;
+        }
+        .btn-group { display: flex; gap: 1rem; opacity: 0; animation: fadeInUp 0.8s ease forwards 0.6s; }
+        .btn {
+            padding: 0.875rem 2rem; border-radius: 4px; font-weight: 600;
+            font-size: 1rem; cursor: pointer; transition: all 0.3s ease;
+            text-decoration: none; position: relative; overflow: hidden; border: none;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, #0099ff 100%);
+            color: #000; box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+        }
+        .btn-primary:hover { box-shadow: 0 0 30px rgba(0, 240, 255, 0.6); transform: translateY(-2px); }
+        .btn-secondary {
+            background: transparent; color: var(--text-main);
+            border: 1px solid var(--border-color); backdrop-filter: blur(5px);
+        }
+        .btn-secondary:hover { border-color: var(--primary); color: var(--primary); }
+        .features { padding: 8rem 5%; max-width: 1200px; margin: 0 auto; }
+        .section-title {
+            text-align: center; font-size: 2.5rem; margin-bottom: 4rem;
+            background: linear-gradient(to right, #fff, #9ca3af);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; }
+        .card {
+            background: var(--bg-surface); border: 1px solid var(--border-color);
+            border-radius: 12px; padding: 2rem; position: relative;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); overflow: hidden;
+        }
+        .card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 255, 255, 0.06), transparent 40%);
+            z-index: 1; opacity: 0; transition: opacity 0.3s;
+        }
+        .card:hover::before { opacity: 1; }
+        .card:hover {
+            transform: translateY(-5px); border-color: rgba(0, 240, 255, 0.5);
+            box-shadow: 0 10px 30px -10px rgba(0, 240, 255, 0.2);
+        }
+        .card-icon {
+            font-size: 2rem; margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--primary), #fff);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .card h3 { font-size: 1.25rem; margin-bottom: 1rem; position: relative; z-index: 2; }
+        .card p { color: var(--text-muted); font-size: 0.95rem; position: relative; z-index: 2; }
+        .code-window {
+            margin-top: 4rem; background: #0d1117; border: 1px solid #30363d;
+            border-radius: 8px; overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            opacity: 0; animation: fadeInUp 0.8s ease forwards 0.8s;
+            max-width: 800px; width: 100%; margin-left: auto; margin-right: auto;
+        }
+        .code-header {
+            background: #161b22; padding: 0.75rem 1rem;
+            display: flex; gap: 0.5rem; border-bottom: 1px solid #30363d;
+        }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot.red { background: #ff5f56; }
+        .dot.yellow { background: #ffbd2e; }
+        .dot.green { background: #27c93f; }
+        .code-content {
+            padding: 1.5rem; font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 0.9rem; color: #e6edf3; text-align: left; overflow-x: auto;
+        }
+        .keyword { color: #ff7b72; }
+        .function { color: #d2a8ff; }
+        .string { color: #a5d6ff; }
+        .comment { color: #8b949e; }
+        .cta {
+            padding: 6rem 5%; text-align: center;
+            background: linear-gradient(to top, rgba(112, 0, 255, 0.1), transparent);
+        }
+        .cta h2 { font-size: 2.5rem; margin-bottom: 1.5rem; }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+    <nav>
+        <div class="logo">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="url(#gradient)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <defs>
+                    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#00f0ff" />
+                        <stop offset="100%" stop-color="#7000ff" />
+                    </linearGradient>
+                </defs>
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+            </svg>
+            AI-Express<span>.</span>
+        </div>
+        <div style="display: flex; gap: 1.5rem;">
+            <a href="#" style="color: var(--text-muted); text-decoration: none; font-size: 0.9rem;">指南</a>
+            <a href="#" style="color: var(--text-muted); text-decoration: none; font-size: 0.9rem;">组件</a>
+            <a href="#" style="color: var(--text-main); text-decoration: none; font-size: 0.9rem; font-weight: 600;">GitHub</a>
+        </div>
+    </nav>
+    <section class="hero">
+        <h1>引领 <span class="highlight">AI驱动开发</span> 新范式</h1>
+        <p>专为开发者打造的最佳实践知识库。掌握 Prompt Engineering、Agentic Workflow 与 RAG 架构，在 AGI 时代重塑生产力流水线。</p>
+        <div class="btn-group">
+            <a href="#" class="btn btn-primary">开始探索</a>
+            <a href="#" class="btn btn-secondary">浏览知识库</a>
+        </div>
+        <div class="code-window">
+            <div class="code-header">
+                <div class="dot red"></div>
+                <div class="dot yellow"></div>
+                <div class="dot green"></div>
+            </div>
+            <div class="code-content">
+<pre style="margin: 0;">
+<span class="comment">// Initialize AI-Express workflow</span>
+<span class="keyword">import</span> { AgenticWorkflow } <span class="keyword">from</span> <span class="string">'@aiexpress/core'</span>;
+
+<span class="keyword">const</span> workflow <span class="keyword">= new</span> <span class="function">AgenticWorkflow</span>({
+    mode: <span class="string">'autonomous'</span>,
+    capabilities: [<span class="string">'code_gen'</span>, <span class="string">'review'</span>, <span class="string">'test'</span>],
+    llm: <span class="string">'gemini-pro'</span>
+});
+
+<span class="keyword">await</span> workflow.<span class="function">execute</span>(<span class="string">'Build a scalable knowledge base'</span>);
+<span class="comment">// > Generating architecture... [DONE]</span>
+<span class="comment">// > Applying best practices... [DONE]</span>
+</pre>
+            </div>
+        </div>
+    </section>
+    <section class="features">
+        <h2 class="section-title">系统化重构你的 AI 技术栈</h2>
+        <div class="grid">
+            <div class="card">
+                <div class="card-icon">⚡</div>
+                <h3>提示词工程进阶</h3>
+                <p>收录数百个高阶开发者验证过的提示词模板与框架，深入解析 Context 注入与 System Prompt 调优最佳实践。</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">🤖</div>
+                <h3>Agentic Workflow</h3>
+                <p>从单点 Copilot 走向全自动 Agent，学习如何构建多智能体协同机制，实现需求分析到代码产出的端到端交付。</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">🧠</div>
+                <h3>RAG 架构演进</h3>
+                <p>掌握企业级大模型知识库的构建方法论。涵盖向量检索优化、混合搜索、知识图谱及 Re-rank 的工业级代码实践。</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">🛡️</div>
+                <h3>AI 安全与工程化</h3>
+                <p>全面解析如何防止 Prompt 注入攻击、处理模型幻觉（Hallucination），以及在生产环境部署稳定可靠的 AI 原生应用。</p>
+            </div>
+        </div>
+    </section>
+    <section class="cta">
+        <h2>准备好成为 10x 工程师了吗？</h2>
+        <p style="color: var(--text-muted); margin-bottom: 2rem; max-width: 500px; margin-left: auto; margin-right: auto;">
+            立即加入 AI-Express 开发者社区，获取最新 AI 编程最佳实践，与全球顶尖工程师共同进化。
+        </p>
+        <a href="#" class="btn btn-primary" style="display: inline-block;">立即接入知识库</a>
+    </section>
+    <script>
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('mousemove', e => {
+                const rect = card.getBoundingClientRect();
+                card.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
+                card.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Express | Design System Reference</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+        :root {
+            --primary: #475569;
+            --secondary: #64748B;
+            --cta: #2563EB;
+            --bg: #F8FAFC;
+            --text: #1E293B;
+            --surface: #FFFFFF;
+            --border: #E2E8F0;
+            --transition-fast: 150ms ease;
+            --transition-base: 250ms ease-in-out;
+            --transition-slow: 400ms cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+        h1, h2, h3, h4, h5, h6, .space-grotesk {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600; line-height: 1.2; letter-spacing: -0.02em; color: var(--text);
+        }
+        h1 { font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 700; }
+        h2 { font-size: clamp(2rem, 4vw, 2.5rem); margin-bottom: 1rem; }
+        h3 { font-size: clamp(1.5rem, 3vw, 1.75rem); margin-bottom: 0.75rem; }
+        .body-text { font-size: 1rem; color: var(--primary); }
+        .caption { font-size: 0.875rem; color: var(--secondary); letter-spacing: 0.01em; }
+        .container { width: 100%; max-width: 1440px; margin: 0 auto; padding: 0 2rem; }
+        @media (max-width: 768px) { .container { padding: 0 1.5rem; } }
+        section { padding: 6rem 0; border-bottom: 1px solid var(--border); }
+        .section-header { margin-bottom: 4rem; max-width: 600px; }
+        nav {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(248, 250, 252, 0.85); backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border); padding: 1rem 0;
+        }
+        .nav-inner { display: flex; justify-content: space-between; align-items: center; }
+        .logo {
+            font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1.25rem;
+            display: flex; align-items: center; gap: 0.5rem; color: var(--text); text-decoration: none;
+        }
+        .search-container { position: relative; display: none; }
+        @media (min-width: 768px) { .search-container { display: block; width: 300px; } }
+        .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--secondary); pointer-events: none; }
+        .search-input {
+            width: 100%; padding: 0.5rem 1rem 0.5rem 2.5rem;
+            background: var(--surface); border: 1px solid var(--border); border-radius: 6px;
+            font-family: 'DM Sans', sans-serif; color: var(--text); transition: all var(--transition-base);
+        }
+        .search-input:focus { outline: none; border-color: var(--cta); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+        button, a { cursor: pointer; text-decoration: none; }
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+            padding: 0.75rem 1.5rem; font-weight: 500; border-radius: 6px;
+            border: 1px solid transparent; transition: all var(--transition-base); font-family: 'DM Sans', sans-serif;
+        }
+        .btn-cta { background-color: var(--cta); color: #FFFFFF; }
+        .btn-cta:hover { background-color: #1D4ED8; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25); }
+        .btn-primary { background-color: var(--primary); color: #FFFFFF; }
+        .btn-primary:hover { background-color: var(--text); transform: translateY(-1px); }
+        .btn-secondary { background-color: var(--surface); border-color: var(--border); color: var(--text); }
+        .btn-secondary:hover { border-color: var(--secondary); background-color: var(--bg); }
+        .badge { display: inline-flex; align-items: center; padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+        .badge-cta { background: rgba(37, 99, 235, 0.1); color: var(--cta); }
+        .badge-primary { background: rgba(71, 85, 105, 0.1); color: var(--primary); }
+        .color-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; }
+        .color-card { border-radius: 8px; overflow: hidden; border: 1px solid var(--border); background: var(--surface); }
+        .color-swatch { height: 120px; width: 100%; }
+        .color-info { padding: 1rem; }
+        .color-name { font-weight: 700; margin-bottom: 0.25rem; }
+        .color-hex { font-family: monospace; color: var(--secondary); font-size: 0.875rem; }
+        .bento-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+        @media (min-width: 768px) { .bento-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (min-width: 1024px) { .bento-grid { grid-template-columns: repeat(4, 1fr); grid-auto-rows: 240px; } .bento-wide { grid-column: span 2; } }
+        .bento-card {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+            padding: 2rem; display: flex; flex-direction: column; transition: all var(--transition-base);
+            position: relative; overflow: hidden;
+        }
+        .bento-card:hover { transform: scale(1.02) translateY(-4px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.05); border-color: var(--secondary); z-index: 10; }
+        .bento-icon-wrapper {
+            width: 48px; height: 48px; border-radius: 12px; background: rgba(37, 99, 235, 0.05);
+            display: flex; align-items: center; justify-content: center; color: var(--cta); margin-bottom: auto;
+        }
+        .bento-title { margin-top: 1.5rem; font-size: 1.25rem; }
+        .bento-desc { margin-top: 0.5rem; color: var(--secondary); font-size: 0.875rem; }
+        .component-group {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+            padding: 3rem; margin-bottom: 2rem; display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: center;
+        }
+        .hero-example {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 24px;
+            padding: 6rem 2rem; text-align: center; position: relative; overflow: hidden;
+        }
+        .hero-example::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--cta), transparent); opacity: 0.3; }
+        :focus-visible { outline: 2px solid var(--cta); outline-offset: 2px; }
+        @media (prefers-reduced-motion: reduce) { *, ::before, ::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
+        .stagger-enter > * { opacity: 0; transform: translateY(20px); animation: slideUp var(--transition-slow) forwards; }
+        .stagger-enter > *:nth-child(1) { animation-delay: 100ms; }
+        .stagger-enter > *:nth-child(2) { animation-delay: 200ms; }
+        .stagger-enter > *:nth-child(3) { animation-delay: 300ms; }
+        @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
+        .hover-demo-card {
+            background: var(--surface); border: 1px solid var(--border); padding: 2rem;
+            border-radius: 12px; cursor: pointer; transition: all 250ms ease-in-out; position: relative;
+        }
+        .hover-demo-card::after { content: 'Hovered!'; position: absolute; top: 1rem; right: 1rem; font-size: 0.75rem; color: var(--cta); font-weight: 700; opacity: 0; transition: opacity 250ms ease; }
+        .hover-demo-card:hover { transform: translateY(-8px); box-shadow: 0 12px 24px rgba(30, 41, 59, 0.08); border-color: var(--cta); }
+        .hover-demo-card:hover::after { opacity: 1; }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="container nav-inner">
+            <a href="#" class="logo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+                AI-Express
+            </a>
+            <div class="search-container">
+                <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" class="search-input" placeholder="Search patterns, components..." aria-label="Search">
+            </div>
+            <div style="display: flex; gap: 1rem;"><a href="#components" class="btn btn-secondary" style="padding: 0.5rem 1rem;">Components</a></div>
+        </div>
+    </nav>
+    <main class="container">
+        <header style="padding: 8rem 0 4rem;" class="stagger-enter">
+            <span class="badge badge-cta" style="margin-bottom: 1.5rem;">Design System Demo</span>
+            <h1>AI-Express</h1>
+            <p class="body-text" style="font-size: 1.25rem; margin-top: 1rem; max-width: 600px;">Minimalism & Swiss Style reference page. Immersive product discovery built for developers. Functional, high-contrast, and geometric.</p>
+        </header>
+        <section id="colors">
+            <div class="section-header"><h2>1. Color Strategy</h2><p class="body-text">Neutral grey + link blue. High contrast (WCAG AAA).</p></div>
+            <div class="color-grid">
+                <div class="color-card"><div class="color-swatch" style="background-color: var(--text);"></div><div class="color-info"><div class="color-name">Text</div><div class="color-hex">#1E293B</div><div class="caption">Headings, heavy typography</div></div></div>
+                <div class="color-card"><div class="color-swatch" style="background-color: var(--primary);"></div><div class="color-info"><div class="color-name">Primary</div><div class="color-hex">#475569</div><div class="caption">Body text, solid buttons</div></div></div>
+                <div class="color-card"><div class="color-swatch" style="background-color: var(--secondary);"></div><div class="color-info"><div class="color-name">Secondary</div><div class="color-hex">#64748B</div><div class="caption">Captions, borders, icons</div></div></div>
+                <div class="color-card"><div class="color-swatch" style="background-color: var(--cta);"></div><div class="color-info"><div class="color-name">CTA</div><div class="color-hex">#2563EB</div><div class="caption">Actions, active states, links</div></div></div>
+                <div class="color-card"><div class="color-swatch" style="background-color: var(--bg); border-bottom: 1px solid var(--border);"></div><div class="color-info"><div class="color-name">Background</div><div class="color-hex">#F8FAFC</div><div class="caption">App canvas, subtle fills</div></div></div>
+            </div>
+        </section>
+        <section id="typography">
+            <div class="section-header"><h2>2. Typography Hierarchy</h2><p class="body-text"><strong>Space Grotesk</strong> for headings + <strong>DM Sans</strong> for body.</p></div>
+            <div class="component-group" style="flex-direction: column; align-items: flex-start;">
+                <div style="width: 100%; border-bottom: 1px solid var(--border); padding-bottom: 1rem;"><div class="caption" style="margin-bottom: 0.5rem;">H1 / Space Grotesk / 700</div><h1>Designing for AI Drivers</h1></div>
+                <div style="width: 100%; border-bottom: 1px solid var(--border); padding-bottom: 1rem;"><div class="caption" style="margin-bottom: 0.5rem;">H2 / Space Grotesk / 600</div><h2>Knowledge Base Architecture</h2></div>
+                <div style="width: 100%; border-bottom: 1px solid var(--border); padding-bottom: 1rem;"><div class="caption" style="margin-bottom: 0.5rem;">H3 / Space Grotesk / 600</div><h3>Modular Component Logic</h3></div>
+                <div style="width: 100%; border-bottom: 1px solid var(--border); padding-bottom: 1rem;"><div class="caption" style="margin-bottom: 0.5rem;">Body / DM Sans / 400</div><p class="body-text">AI-Express relies on a clean, functional aesthetic. High information density without clutter.</p></div>
+                <div style="width: 100%;"><div class="caption" style="margin-bottom: 0.5rem;">Caption / DM Sans / 400</div><p class="caption">System status: All models operational. Latency 24ms.</p></div>
+            </div>
+        </section>
+        <section id="components">
+            <div class="section-header"><h2>3. Core Components</h2><p class="body-text">Sharp borders, smooth states, functional SVG iconography.</p></div>
+            <h3 style="font-size: 1.2rem; margin-bottom: 1rem;">Interactive Buttons</h3>
+            <div class="component-group">
+                <button class="btn btn-cta">Primary CTA <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></button>
+                <button class="btn btn-primary">Action Button</button>
+                <button class="btn btn-secondary">Secondary Outline</button>
+            </div>
+            <h3 style="font-size: 1.2rem; margin-bottom: 1rem;">Form Elements & Badges</h3>
+            <div class="component-group">
+                <div style="display: flex; flex-direction: column; gap: 0.5rem; width: 300px;"><label class="caption" style="font-weight: 600; color: var(--text);">Repository URL</label><input type="text" class="search-input" style="background: var(--bg);" placeholder="https://github.com/..." aria-label="Input Example"></div>
+                <div style="display: flex; gap: 1rem; align-items: center; margin-left: auto;"><span class="badge badge-cta">New Feature</span><span class="badge badge-primary">Stable</span></div>
+            </div>
+        </section>
+        <section id="layout">
+            <div class="section-header"><h2>4. Layout & Grid Rhythm</h2><p class="body-text">Hero into Bento Grid Showcase.</p></div>
+            <div class="hero-example" style="margin-bottom: 3rem;">
+                <span class="badge badge-primary" style="margin-bottom: 1rem;">Dynamic Landing</span>
+                <h2>AI-Driven Dynamic Discovery</h2>
+                <p class="body-text" style="max-width: 500px; margin: 0 auto 2rem;">Adaptive to user input. Low friction start.</p>
+                <div style="display: flex; justify-content: center; gap: 1rem;"><button class="btn btn-cta">Try it now</button><button class="btn btn-secondary">Documentation</button></div>
+            </div>
+            <h3 style="font-size: 1.2rem; margin-bottom: 1.5rem;">Bento Grid Showcase</h3>
+            <div class="bento-grid">
+                <div class="bento-card bento-wide"><div class="bento-icon-wrapper"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg></div><h3 class="bento-title">Modular Architecture</h3><p class="bento-desc">Apple-style showcase grids with maximum scannability.</p></div>
+                <div class="bento-card"><div class="bento-icon-wrapper"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg></div><h3 class="bento-title">Fast Performance</h3><p class="bento-desc">Minimal DOM depth ensures rapid rendering.</p></div>
+                <div class="bento-card"><div class="bento-icon-wrapper"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></div><h3 class="bento-title">WCAG AAA</h3><p class="bento-desc">Strict adherence to contrast ratios.</p></div>
+                <div class="bento-card bento-wide"><div class="bento-icon-wrapper"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg></div><h3 class="bento-title">Horizontal Scroll Journey</h3><p class="bento-desc">Immersive product discovery with visible navigation context.</p></div>
+            </div>
+        </section>
+        <section id="motion" style="border-bottom: none; margin-bottom: 4rem;">
+            <div class="section-header"><h2>5. Motion & Kinetics</h2><p class="body-text">Subtle hover (1.02 scale), 200-250ms transitions. Respects <code>prefers-reduced-motion</code>.</p></div>
+            <div class="bento-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
+                <div class="hover-demo-card"><h3 class="space-grotesk">Hover Feedback</h3><p class="caption">Duration: 250ms ease-in-out</p><p class="body-text" style="margin-top: 1rem;">Y-axis translation (-8px) + shadow depth increase without layout shift.</p></div>
+                <div class="hover-demo-card" style="border-color: var(--cta); background: rgba(37, 99, 235, 0.02);"><h3 class="space-grotesk" style="color: var(--cta);">Interactive Focus</h3><p class="caption">Scale: 1.02</p><p class="body-text" style="margin-top: 1rem;">Used for bento grids to establish spatial relationship.</p></div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

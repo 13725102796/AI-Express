@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KnowBase - 登录/注册</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;600;700&display=swap');
+
+/* ===== Design System (from demo.html) ===== */
+:root {
+  /* Colors - Core */
+  --primary: #2563EB;
+  --primary-light: #60A5FA;
+  --primary-dark: #1E3A5F;
+  --accent: #F59E0B;
+  --accent-light: #FEF3C7;
+  --success: #10B981;
+  --error: #EF4444;
+
+  /* Colors - Background & Surface */
+  --bg-main: #F8FAFC;
+  --bg-sec: #F1F5F9;
+  --bg-card: #FFFFFF;
+
+  /* Colors - Text */
+  --text-main: #1A202C;
+  --text-sec: #64748B;
+  --text-tert: #94A3B8;
+
+  /* Colors - Border */
+  --border: #E2E8F0;
+  --divider: #F1F5F9;
+
+  /* Typography */
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Noto Sans SC', 'PingFang SC', sans-serif;
+  --font-code: 'JetBrains Mono', monospace;
+
+  /* Radii */
+  --radius-btn: 8px;
+  --radius-input: 8px;
+  --radius-card: 12px;
+  --radius-modal: 16px;
+  --radius-badge: 6px;
+  --radius-pill: 9999px;
+  --radius-round: 50%;
+
+  /* Shadows */
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-card-hover: 0 4px 12px rgba(0,0,0,0.12), 0 2px 4px rgba(0,0,0,0.08);
+  --shadow-modal: 0 16px 48px rgba(0,0,0,0.16);
+  --shadow-focus: 0 0 0 3px rgba(37,99,235,0.2);
+
+  /* Transitions */
+  --trans-base: 150ms ease-out;
+  --trans-hover: 200ms ease;
+}
+
+/* ===== Reduced Motion ===== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ===== Reset ===== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-ui);
+  background: linear-gradient(135deg, var(--bg-main) 0%, var(--bg-sec) 50%, #EEF2FF 100%);
+  color: var(--text-main);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+}
+
+/* ===== Dev State Controls ===== */
+.dev-controls {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 16px;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+  z-index: 1000;
+  box-shadow: var(--shadow-card);
+}
+
+.dev-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-sec);
+  padding: 5px 14px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 500;
+  font-family: var(--font-ui);
+  cursor: pointer;
+  transition: all var(--trans-base);
+}
+
+.dev-btn:hover {
+  background: var(--bg-sec);
+  color: var(--text-main);
+}
+
+.dev-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+.dev-btn.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+/* ===== Brand Area ===== */
+.brand {
+  text-align: center;
+  margin-bottom: 32px;
+  margin-top: 48px;
+}
+
+.brand-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  background: var(--primary);
+  border-radius: var(--radius-card);
+  margin-bottom: 16px;
+  box-shadow: 0 4px 12px rgba(37,99,235,0.24);
+}
+
+.brand-name {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.brand-slogan {
+  font-size: 15px;
+  color: var(--text-sec);
+  margin-top: 4px;
+}
+
+/* ===== Auth Card ===== */
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--bg-card);
+  border-radius: var(--radius-modal);
+  box-shadow: var(--shadow-modal);
+  border: 1px solid var(--border);
+  padding: 32px;
+  position: relative;
+}
+
+/* ===== Toast ===== */
+.toast {
+  position: absolute;
+  top: -52px;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: var(--radius-btn);
+  font-size: 13px;
+  font-weight: 500;
+  background: var(--error);
+  color: #fff;
+  transform: translateY(-12px);
+  opacity: 0;
+  visibility: hidden;
+  transition: transform 0.3s cubic-bezier(0.4,0,0.2,1),
+              opacity 0.3s cubic-bezier(0.4,0,0.2,1),
+              visibility 0.3s;
+  z-index: 10;
+  box-shadow: var(--shadow-card);
+}
+
+.toast.show {
+  transform: translateY(0);
+  opacity: 1;
+  visibility: visible;
+  box-shadow: var(--shadow-card-hover);
+}
+
+.toast svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+/* ===== Tabs ===== */
+.tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 24px;
+  position: relative;
+}
+
+.tab-btn {
+  flex: 1;
+  background: none;
+  border: none;
+  padding: 12px 0;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: var(--font-ui);
+  color: var(--text-sec);
+  cursor: pointer;
+  transition: color var(--trans-base);
+}
+
+.tab-btn:hover {
+  color: var(--text-main);
+}
+
+.tab-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+  border-radius: 4px;
+}
+
+.tab-btn.active {
+  color: var(--primary);
+}
+
+.tab-indicator {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 50%;
+  height: 2px;
+  background: var(--primary);
+  transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* ===== Form ===== */
+.form-group {
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.form-group-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.form-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-main);
+}
+
+.input-wrapper {
+  position: relative;
+}
+
+.form-input {
+  width: 100%;
+  height: 38px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-input);
+  font-size: 14px;
+  font-family: var(--font-ui);
+  color: var(--text-main);
+  background: var(--bg-card);
+  transition: all var(--trans-base);
+  outline: none;
+}
+
+.form-input::placeholder {
+  color: var(--text-tert);
+}
+
+.form-input:focus {
+  border-color: var(--primary);
+  box-shadow: var(--shadow-focus);
+}
+
+.form-input.has-toggle {
+  padding-right: 42px;
+}
+
+/* Error states */
+.form-group.has-error .form-input {
+  border-color: var(--error);
+}
+
+.form-group.has-error .form-input:focus {
+  box-shadow: 0 0 0 3px rgba(239,68,68,0.2);
+}
+
+.form-error-msg {
+  font-size: 12px;
+  color: var(--error);
+  margin-top: 6px;
+  display: none;
+  align-items: center;
+  gap: 4px;
+}
+
+.form-error-msg svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.form-group.has-error .form-error-msg {
+  display: flex;
+}
+
+/* Password toggle */
+.password-toggle {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  color: var(--text-tert);
+  transition: color var(--trans-base);
+  padding: 0;
+}
+
+.password-toggle:hover {
+  color: var(--text-sec);
+}
+
+.password-toggle:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+/* Forgot password */
+.forgot-link {
+  font-size: 13px;
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color var(--trans-hover);
+}
+
+.forgot-link:hover {
+  color: var(--primary-dark);
+  text-decoration: underline;
+}
+
+.forgot-link:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+  border-radius: 2px;
+}
+
+/* Confirm password (animated show/hide) */
+.confirm-field {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  margin-bottom: 0;
+  visibility: hidden;
+  transition: max-height 0.3s cubic-bezier(0.4,0,0.2,1),
+              opacity 0.3s cubic-bezier(0.4,0,0.2,1),
+              margin 0.3s cubic-bezier(0.4,0,0.2,1),
+              visibility 0.3s;
+}
+
+.state-register .confirm-field {
+  max-height: 110px;
+  opacity: 1;
+  margin-bottom: 20px;
+  overflow: visible;
+  visibility: visible;
+}
+
+.state-register .forgot-link {
+  display: none;
+}
+
+/* ===== Submit Button (btn-primary from demo.html) ===== */
+.btn-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 42px;
+  padding: 0 16px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-btn);
+  font-size: 15px;
+  font-weight: 600;
+  font-family: var(--font-ui);
+  cursor: pointer;
+  transition: all var(--trans-hover);
+  margin-top: 4px;
+}
+
+.btn-submit:hover:not(:disabled) {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(37,99,235,0.2);
+}
+
+.btn-submit:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+.btn-submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-submit .spinner {
+  display: none;
+}
+
+.btn-submit .loading-label {
+  display: none;
+}
+
+.btn-submit.is-loading .spinner {
+  display: inline-block;
+}
+
+.btn-submit.is-loading .loading-label {
+  display: inline;
+}
+
+.btn-submit.is-loading .normal-label {
+  display: none;
+}
+
+/* Spinner */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: var(--radius-round);
+  animation: spin 0.7s linear infinite;
+}
+
+.spinner-dark {
+  border-color: rgba(0,0,0,0.1);
+  border-top-color: var(--text-sec);
+}
+
+/* ===== Divider ===== */
+.divider {
+  display: flex;
+  align-items: center;
+  margin: 24px 0;
+  color: var(--text-tert);
+  font-size: 12px;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.divider::before { margin-right: 12px; }
+.divider::after { margin-left: 12px; }
+
+/* ===== OAuth Buttons (btn-secondary pattern from demo.html) ===== */
+.oauth-group {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-oauth {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 0;
+  background: var(--bg-card);
+  color: var(--text-sec);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-btn);
+  font-size: 12px;
+  font-weight: 500;
+  font-family: var(--font-ui);
+  cursor: pointer;
+  transition: all var(--trans-hover);
+  position: relative;
+}
+
+.btn-oauth:hover:not(:disabled) {
+  background: var(--bg-sec);
+  border-color: var(--text-tert);
+  color: var(--text-main);
+}
+
+.btn-oauth:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+.btn-oauth:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-oauth svg {
+  width: 20px;
+  height: 20px;
+}
+
+.btn-oauth .oauth-loading {
+  display: none;
+}
+
+.btn-oauth.is-loading .oauth-icon {
+  display: none;
+}
+
+.btn-oauth.is-loading .oauth-loading {
+  display: block;
+}
+
+/* ===== Privacy / Footer ===== */
+.footer-links {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-tert);
+  line-height: 1.6;
+}
+
+.footer-links a {
+  color: var(--primary);
+  text-decoration: none;
+  transition: color var(--trans-hover);
+}
+
+.footer-links a:hover {
+  color: var(--primary-dark);
+  text-decoration: underline;
+}
+
+.footer-links a:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+  border-radius: 2px;
+}
+
+/* ===== Copyright ===== */
+.copyright {
+  margin-top: 32px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-tert);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 480px) {
+  body {
+    padding: 16px;
+    justify-content: flex-start;
+  }
+
+  .brand {
+    margin-top: 56px;
+    margin-bottom: 24px;
+  }
+
+  .brand-name {
+    font-size: 24px;
+  }
+
+  .auth-card {
+    padding: 24px;
+  }
+
+  .oauth-group {
+    gap: 8px;
+  }
+
+  .btn-oauth {
+    padding: 10px 0;
+    font-size: 11px;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- Dev State Controls -->
+<div class="dev-controls" id="dev-controls">
+  <button class="dev-btn active" data-state="login">登录态</button>
+  <button class="dev-btn" data-state="register">注册态</button>
+  <button class="dev-btn" data-state="error">校验错误</button>
+  <button class="dev-btn" data-state="loading">登录中</button>
+  <button class="dev-btn" data-state="failed">登录失败</button>
+  <button class="dev-btn" data-state="oauth">OAuth 加载中</button>
+</div>
+
+<!-- Brand Area -->
+<div class="brand">
+  <div class="brand-logo">
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M6 4C6 3.44772 6.44772 3 7 3H17L22 8V24C22 24.5523 21.5523 25 21 25H7C6.44772 25 6 24.5523 6 24V4Z" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1.5"/>
+      <path d="M17 3V8H22" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+      <circle cx="14" cy="16" r="4" stroke="white" stroke-width="1.5"/>
+      <path d="M17 19L20 22" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <div class="brand-name">KnowBase</div>
+  <div class="brand-slogan">个人知识的搜索引擎</div>
+</div>
+
+<main class="auth-container" style="width:100%;max-width:420px;">
+
+  <!-- Auth Card -->
+  <div class="auth-card" id="auth-card">
+
+    <!-- Error Toast -->
+    <div class="toast" id="error-toast">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span id="toast-msg">邮箱或密码错误，请重试</span>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs" role="tablist">
+      <button class="tab-btn active" role="tab" aria-selected="true" id="tab-login" onclick="setMode('login')">登录</button>
+      <button class="tab-btn" role="tab" aria-selected="false" id="tab-register" onclick="setMode('register')">注册</button>
+      <div class="tab-indicator" id="tab-indicator"></div>
+    </div>
+
+    <!-- Form -->
+    <form id="auth-form" novalidate>
+
+      <!-- Email -->
+      <div class="form-group" id="group-email">
+        <div class="form-group-header">
+          <label class="form-label" for="email">邮箱</label>
+        </div>
+        <div class="input-wrapper">
+          <input type="email" id="email" class="form-input" placeholder="请输入邮箱地址" autocomplete="email" required>
+        </div>
+        <div class="form-error-msg">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span id="error-email-text">请输入有效的邮箱地址</span>
+        </div>
+      </div>
+
+      <!-- Password -->
+      <div class="form-group" id="group-password">
+        <div class="form-group-header">
+          <label class="form-label" for="password">密码</label>
+          <a href="#" class="forgot-link" id="forgot-link" onclick="event.preventDefault(); showToast('重置链接已发送到您的邮箱', true)">忘记密码？</a>
+        </div>
+        <div class="input-wrapper">
+          <input type="password" id="password" class="form-input has-toggle" placeholder="请输入密码" autocomplete="current-password" required minlength="8">
+          <button type="button" class="password-toggle" id="toggle-pwd" aria-label="显示密码">
+            <svg class="icon-eye" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg class="icon-eye-off" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+          </button>
+        </div>
+        <div class="form-error-msg">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span id="error-password-text">密码长度不少于 8 位</span>
+        </div>
+      </div>
+
+      <!-- Confirm Password (register only, animated) -->
+      <div class="form-group confirm-field" id="group-confirm">
+        <div class="form-group-header">
+          <label class="form-label" for="confirm-password">确认密码</label>
+        </div>
+        <div class="input-wrapper">
+          <input type="password" id="confirm-password" class="form-input has-toggle" placeholder="请确认密码" autocomplete="new-password" tabindex="-1">
+          <button type="button" class="password-toggle" id="toggle-confirm" aria-label="显示密码" tabindex="-1">
+            <svg class="icon-eye" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg class="icon-eye-off" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+          </button>
+        </div>
+        <div class="form-error-msg">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span id="error-confirm-text">两次输入的密码不一致</span>
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <button type="submit" class="btn-submit" id="submit-btn">
+        <span class="spinner"></span>
+        <span class="normal-label" id="submit-text">登录</span>
+        <span class="loading-label" id="loading-text">登录中...</span>
+      </button>
+    </form>
+
+    <!-- Divider -->
+    <div class="divider">或使用以下方式登录</div>
+
+    <!-- OAuth -->
+    <div class="oauth-group">
+      <!-- WeChat -->
+      <button type="button" class="btn-oauth" id="oauth-wechat" onclick="triggerOAuth('wechat')">
+        <span class="oauth-icon" style="color:#07C160">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8.691 2.188C3.891 2.188 0 5.476 0 9.531c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 0 1 .213.665l-.39 1.48c-.019.07-.048.141-.048.213 0 .163.13.295.29.295a.326.326 0 0 0 .167-.054l1.903-1.114a.864.864 0 0 1 .717-.098 10.16 10.16 0 0 0 2.837.403c.276 0 .543-.027.811-.05a6.127 6.127 0 0 1-.253-1.734c0-3.622 3.488-6.564 7.788-6.564.259 0 .509.021.764.042C17.038 4.654 13.2 2.188 8.691 2.188zm-2.6 4.408a1.073 1.073 0 1 1 0 2.146 1.073 1.073 0 0 1 0-2.146zm5.2 0a1.073 1.073 0 1 1 0 2.146 1.073 1.073 0 0 1 0-2.146z"/><path d="M23.286 15.928c0-3.316-3.14-6.004-7.013-6.004-3.872 0-7.013 2.688-7.013 6.004s3.14 6.003 7.013 6.003c.863 0 1.694-.13 2.463-.366a.71.71 0 0 1 .59.08l1.563.912a.268.268 0 0 0 .137.044c.132 0 .238-.108.238-.242 0-.06-.023-.117-.039-.175l-.32-1.214a.484.484 0 0 1 .174-.544c1.546-1.136 2.207-2.78 2.207-4.498zm-9.506-1.27a.893.893 0 1 1 0-1.786.893.893 0 0 1 0 1.786zm4.987 0a.893.893 0 1 1 0-1.786.893.893 0 0 1 0 1.786z"/></svg>
+        </span>
+        <span class="oauth-loading"><span class="spinner spinner-dark"></span></span>
+        微信
+      </button>
+
+      <!-- Google -->
+      <button type="button" class="btn-oauth" id="oauth-google" onclick="triggerOAuth('google')">
+        <span class="oauth-icon">
+          <svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        </span>
+        <span class="oauth-loading"><span class="spinner spinner-dark"></span></span>
+        Google
+      </button>
+
+      <!-- GitHub -->
+      <button type="button" class="btn-oauth" id="oauth-github" onclick="triggerOAuth('github')">
+        <span class="oauth-icon" style="color:#24292E">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+        </span>
+        <span class="oauth-loading"><span class="spinner spinner-dark"></span></span>
+        GitHub
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Privacy -->
+  <div class="footer-links">
+    登录即表示同意 <a href="#" target="_blank" rel="noopener noreferrer">《服务条款》</a> 和 <a href="#" target="_blank" rel="noopener noreferrer">《隐私政策》</a>
+  </div>
+
+</main>
+
+<!-- Copyright -->
+<div class="copyright">&copy; 2026 KnowBase. All rights reserved.</div>
+
+<script>
+// ===== Elements =====
+const authCard = document.getElementById('auth-card');
+const tabLogin = document.getElementById('tab-login');
+const tabRegister = document.getElementById('tab-register');
+const tabIndicator = document.getElementById('tab-indicator');
+
+const form = document.getElementById('auth-form');
+const emailInput = document.getElementById('email');
+const passwordInput = document.getElementById('password');
+const confirmInput = document.getElementById('confirm-password');
+
+const groupEmail = document.getElementById('group-email');
+const groupPassword = document.getElementById('group-password');
+const groupConfirm = document.getElementById('group-confirm');
+
+const submitBtn = document.getElementById('submit-btn');
+const submitText = document.getElementById('submit-text');
+const loadingText = document.getElementById('loading-text');
+const toast = document.getElementById('error-toast');
+const toastMsg = document.getElementById('toast-msg');
+
+const oauthBtns = document.querySelectorAll('.btn-oauth');
+const devBtns = document.querySelectorAll('.dev-btn');
+
+// ===== State =====
+let isRegister = false;
+let toastTimeout;
+
+// ===== Tab / Mode =====
+function setMode(mode) {
+  isRegister = mode === 'register';
+
+  if (isRegister) {
+    tabRegister.classList.add('active');
+    tabRegister.setAttribute('aria-selected', 'true');
+    tabLogin.classList.remove('active');
+    tabLogin.setAttribute('aria-selected', 'false');
+    tabIndicator.style.transform = 'translateX(100%)';
+    authCard.classList.add('state-register');
+    submitText.textContent = '创建账户';
+    loadingText.textContent = '注册中...';
+    confirmInput.removeAttribute('tabindex');
+    document.getElementById('toggle-confirm').removeAttribute('tabindex');
+    passwordInput.setAttribute('autocomplete', 'new-password');
+  } else {
+    tabLogin.classList.add('active');
+    tabLogin.setAttribute('aria-selected', 'true');
+    tabRegister.classList.remove('active');
+    tabRegister.setAttribute('aria-selected', 'false');
+    tabIndicator.style.transform = 'translateX(0)';
+    authCard.classList.remove('state-register');
+    submitText.textContent = '登录';
+    loadingText.textContent = '登录中...';
+    confirmInput.setAttribute('tabindex', '-1');
+    document.getElementById('toggle-confirm').setAttribute('tabindex', '-1');
+    passwordInput.setAttribute('autocomplete', 'current-password');
+  }
+
+  clearErrors();
+  hideToast();
+}
+
+// ===== Password Toggle =====
+document.getElementById('toggle-pwd').addEventListener('click', function () {
+  togglePasswordField(passwordInput, this);
+});
+document.getElementById('toggle-confirm').addEventListener('click', function () {
+  togglePasswordField(confirmInput, this);
+});
+
+function togglePasswordField(input, btn) {
+  const eyeOpen = btn.querySelector('.icon-eye');
+  const eyeClosed = btn.querySelector('.icon-eye-off');
+  if (input.type === 'password') {
+    input.type = 'text';
+    eyeOpen.style.display = 'none';
+    eyeClosed.style.display = 'block';
+    btn.setAttribute('aria-label', '隐藏密码');
+  } else {
+    input.type = 'password';
+    eyeOpen.style.display = '';
+    eyeClosed.style.display = 'none';
+    btn.setAttribute('aria-label', '显示密码');
+  }
+}
+
+// ===== Validation =====
+const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function validateEmail() {
+  const val = emailInput.value.trim();
+  if (!val || !regexEmail.test(val)) {
+    groupEmail.classList.add('has-error');
+    return false;
+  }
+  groupEmail.classList.remove('has-error');
+  return true;
+}
+
+function validatePassword() {
+  const val = passwordInput.value;
+  if (!val || val.length < 8) {
+    groupPassword.classList.add('has-error');
+    return false;
+  }
+  groupPassword.classList.remove('has-error');
+  return true;
+}
+
+function validateConfirm() {
+  if (!isRegister) return true;
+  const pwd = passwordInput.value;
+  const conf = confirmInput.value;
+  if (!conf || pwd !== conf) {
+    groupConfirm.classList.add('has-error');
+    return false;
+  }
+  groupConfirm.classList.remove('has-error');
+  return true;
+}
+
+function clearErrors() {
+  groupEmail.classList.remove('has-error');
+  groupPassword.classList.remove('has-error');
+  groupConfirm.classList.remove('has-error');
+}
+
+// Blur validation
+emailInput.addEventListener('blur', validateEmail);
+passwordInput.addEventListener('blur', validatePassword);
+confirmInput.addEventListener('blur', validateConfirm);
+
+// ===== Toast =====
+function showToast(msg, isSuccess) {
+  toastMsg.textContent = msg;
+  toast.style.background = isSuccess ? 'var(--success)' : 'var(--error)';
+  toast.classList.add('show');
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => { toast.classList.remove('show'); }, 3500);
+}
+
+function hideToast() {
+  toast.classList.remove('show');
+  clearTimeout(toastTimeout);
+}
+
+// ===== Form Loading =====
+function setFormLoading(loading) {
+  if (loading) {
+    submitBtn.classList.add('is-loading');
+    submitBtn.disabled = true;
+    emailInput.disabled = true;
+    passwordInput.disabled = true;
+    confirmInput.disabled = true;
+    oauthBtns.forEach(b => b.disabled = true);
+  } else {
+    submitBtn.classList.remove('is-loading');
+    submitBtn.disabled = false;
+    emailInput.disabled = false;
+    passwordInput.disabled = false;
+    confirmInput.disabled = false;
+    oauthBtns.forEach(b => b.disabled = false);
+  }
+}
+
+// ===== Form Submit =====
+form.addEventListener('submit', function (e) {
+  e.preventDefault();
+  hideToast();
+
+  const ok1 = validateEmail();
+  const ok2 = validatePassword();
+  const ok3 = validateConfirm();
+
+  if (ok1 && ok2 && ok3) {
+    setFormLoading(true);
+    setTimeout(() => {
+      setFormLoading(false);
+      showToast(isRegister ? '注册成功，即将跳转...' : '登录成功，即将跳转...', true);
+    }, 2000);
+  }
+});
+
+// ===== OAuth =====
+function triggerOAuth(provider) {
+  const btn = document.getElementById('oauth-' + provider);
+  btn.classList.add('is-loading');
+  btn.disabled = true;
+  submitBtn.disabled = true;
+
+  setTimeout(() => {
+    btn.classList.remove('is-loading');
+    btn.disabled = false;
+    submitBtn.disabled = false;
+    showToast('OAuth 授权成功，正在跳转...', true);
+  }, 2000);
+}
+
+// ===== Dev Controls =====
+function resetAllState() {
+  setFormLoading(false);
+  clearErrors();
+  hideToast();
+  oauthBtns.forEach(b => {
+    b.classList.remove('is-loading');
+    b.disabled = false;
+  });
+  emailInput.value = '';
+  passwordInput.value = '';
+  confirmInput.value = '';
+}
+
+devBtns.forEach(btn => {
+  btn.addEventListener('click', function () {
+    devBtns.forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+
+    const state = this.dataset.state;
+    resetAllState();
+
+    switch (state) {
+      case 'login':
+        setMode('login');
+        break;
+
+      case 'register':
+        setMode('register');
+        break;
+
+      case 'error':
+        setMode('register');
+        emailInput.value = 'invalid-email';
+        passwordInput.value = '123';
+        confirmInput.value = '456';
+        validateEmail();
+        validatePassword();
+        validateConfirm();
+        break;
+
+      case 'loading':
+        setMode('login');
+        emailInput.value = 'liwei@example.com';
+        passwordInput.value = 'password123';
+        setFormLoading(true);
+        break;
+
+      case 'failed':
+        setMode('login');
+        emailInput.value = 'liwei@example.com';
+        passwordInput.value = 'wrongpassword';
+        showToast('邮箱或密码错误，请重试', false);
+        break;
+
+      case 'oauth':
+        setMode('login');
+        submitBtn.disabled = true;
+        oauthBtns.forEach(b => {
+          b.classList.add('is-loading');
+          b.disabled = true;
+        });
+        break;
+    }
+  });
+});
+
+// Init
+setMode('login');
+</script>
+
+</body>
+</html>
