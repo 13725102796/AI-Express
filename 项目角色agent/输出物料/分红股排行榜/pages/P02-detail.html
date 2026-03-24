@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>股票详情 - 分红股排行榜</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --color-primary: #1A73E8;
+      --color-primary-hover: #1565C0;
+      --color-primary-active: #0D47A1;
+      --color-primary-light: #E8F0FE;
+      --color-primary-50: #EFF6FF;
+      --color-secondary: #5F6368;
+      --color-secondary-light: #9AA0A6;
+      --color-accent: #F59E0B;
+      --color-accent-hover: #D97706;
+      --color-accent-light: #FEF3C7;
+      --color-accent-dark: #92400E;
+      --color-success: #34A853;
+      --color-success-light: #E6F4EA;
+      --color-error: #EA4335;
+      --color-error-light: #FCE8E6;
+      --color-bg-primary: #F8FAFC;
+      --color-bg-secondary: #FFFFFF;
+      --color-bg-tertiary: #F1F5F9;
+      --color-bg-hover: #EFF6FF;
+      --color-text-primary: #1F2937;
+      --color-text-secondary: #6B7280;
+      --color-text-tertiary: #9CA3AF;
+      --color-text-inverse: #FFFFFF;
+      --color-border: #E5E7EB;
+      --color-border-hover: #D1D5DB;
+      --color-border-focus: #1A73E8;
+      --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+      --space-5: 20px; --space-6: 24px; --space-8: 32px; --space-10: 40px;
+      --space-12: 48px; --space-16: 64px;
+      --font-family-en: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-family-zh: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      --font-family-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', monospace;
+      --font-size-xs: 12px; --font-size-sm: 14px; --font-size-base: 16px;
+      --font-size-lg: 18px; --font-size-xl: 20px; --font-size-2xl: 24px;
+      --font-size-3xl: 30px; --font-size-4xl: 36px;
+      --font-weight-regular: 400; --font-weight-medium: 500;
+      --font-weight-semibold: 600; --font-weight-bold: 700;
+      --line-height-tight: 1.25; --line-height-normal: 1.5; --line-height-relaxed: 1.625;
+      --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.03), 0 1px 3px 0 rgba(0,0,0,0.06);
+      --shadow-md: 0 2px 4px -1px rgba(0,0,0,0.04), 0 4px 8px -1px rgba(0,0,0,0.08);
+      --shadow-lg: 0 4px 6px -2px rgba(0,0,0,0.03), 0 10px 20px -3px rgba(0,0,0,0.10);
+      --radius-sm: 6px; --radius-md: 8px; --radius-lg: 12px;
+      --radius-xl: 16px; --radius-full: 9999px;
+      --duration-fast: 150ms; --duration-normal: 200ms; --duration-slow: 300ms;
+      --easing-out: cubic-bezier(0, 0, 0.2, 1);
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { font-size: 16px; scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-family-zh);
+      color: var(--color-text-primary);
+      background: var(--color-bg-primary);
+      line-height: var(--line-height-normal);
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+
+    /* State Switcher */
+    .state-switcher {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+      background: #1F2937; color: #fff; padding: 8px 16px;
+      display: flex; align-items: center; gap: 8px; font-size: 12px;
+      font-family: var(--font-family-mono);
+    }
+    .state-switcher span { opacity: 0.7; }
+    .state-switcher button {
+      background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.2);
+      padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 11px;
+      font-family: var(--font-family-mono); transition: all 0.15s;
+    }
+    .state-switcher button:hover { background: rgba(255,255,255,0.25); }
+    .state-switcher button.active { background: var(--color-primary); border-color: var(--color-primary); }
+    body { padding-top: 40px; }
+
+    .page-container { max-width: 1200px; margin: 0 auto; padding: 0 var(--space-6); }
+
+    /* HEADER (simplified) */
+    .site-header {
+      background: var(--color-bg-secondary);
+      border-bottom: 1px solid var(--color-border);
+      padding: var(--space-4) 0;
+    }
+    .header-inner {
+      max-width: 1200px; margin: 0 auto; padding: 0 var(--space-6);
+    }
+    .header-top {
+      display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-3);
+    }
+    .header-brand { display: flex; align-items: center; gap: var(--space-3); text-decoration: none; color: inherit; }
+    .header-logo {
+      width: 32px; height: 32px; background: var(--color-primary);
+      border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center;
+    }
+    .header-logo svg { width: 18px; height: 18px; }
+    .header-title { font-size: var(--font-size-lg); font-weight: var(--font-weight-bold); }
+
+    /* Breadcrumb */
+    .breadcrumb {
+      display: flex; align-items: center; gap: var(--space-2);
+      font-size: var(--font-size-sm); color: var(--color-text-secondary);
+    }
+    .breadcrumb a {
+      color: var(--color-primary); text-decoration: none;
+      transition: color var(--duration-fast);
+    }
+    .breadcrumb a:hover { color: var(--color-primary-hover); text-decoration: underline; }
+    .breadcrumb a:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; border-radius: 2px; }
+    .breadcrumb-sep { color: var(--color-text-tertiary); }
+    .breadcrumb-current { color: var(--color-text-primary); font-weight: var(--font-weight-medium); }
+
+    /* STOCK INFO */
+    .stock-hero {
+      padding: var(--space-8) 0;
+      opacity: 0; transform: translateY(16px);
+    }
+    .stock-hero.loaded { opacity: 1; transform: translateY(0); transition: opacity 0.5s var(--easing-out), transform 0.5s var(--easing-out); }
+    .stock-header { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: var(--space-6); margin-bottom: var(--space-6); }
+    .stock-identity { }
+    .stock-code {
+      font-family: var(--font-family-mono); font-size: var(--font-size-sm);
+      color: var(--color-text-secondary); margin-bottom: var(--space-1);
+    }
+    .stock-name {
+      font-size: var(--font-size-3xl); font-weight: var(--font-weight-bold);
+      margin-bottom: var(--space-2);
+    }
+    .industry-badge {
+      display: inline-flex; padding: var(--space-1) var(--space-3);
+      font-size: var(--font-size-xs); font-weight: var(--font-weight-medium);
+      border-radius: var(--radius-full);
+      background: var(--color-primary-light); color: var(--color-primary);
+    }
+
+    .score-display { text-align: right; }
+    .score-big {
+      font-family: var(--font-family-en); font-size: var(--font-size-4xl);
+      font-weight: var(--font-weight-bold); color: var(--color-accent-dark);
+      line-height: 1;
+    }
+    .score-label { font-size: var(--font-size-sm); color: var(--color-text-secondary); margin-top: var(--space-1); }
+    .score-bar-large {
+      width: 160px; height: 8px; background: var(--color-bg-tertiary);
+      border-radius: var(--radius-full); overflow: hidden; margin-top: var(--space-2);
+    }
+    .score-bar-fill-large {
+      height: 100%; border-radius: var(--radius-full); background: var(--color-accent);
+      transition: width var(--duration-slow) var(--easing-out);
+    }
+    .score-rank {
+      font-size: var(--font-size-xs); color: var(--color-accent-dark);
+      font-weight: var(--font-weight-medium); margin-top: var(--space-1);
+    }
+
+    /* Metric Cards */
+    .metrics-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-4);
+      margin-bottom: var(--space-8);
+    }
+    .metric-card {
+      background: var(--color-bg-secondary); border-radius: var(--radius-lg);
+      padding: var(--space-5); box-shadow: var(--shadow-sm); border: 1px solid var(--color-border);
+      transition: transform var(--duration-normal) var(--easing-out), box-shadow var(--duration-normal) var(--easing-out);
+    }
+    .metric-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .metric-value {
+      font-family: var(--font-family-en); font-size: var(--font-size-2xl);
+      font-weight: var(--font-weight-bold); font-variant-numeric: tabular-nums;
+      margin-bottom: var(--space-1);
+    }
+    .metric-value.primary { color: var(--color-primary); }
+    .metric-value.accent { color: var(--color-accent-dark); }
+    .metric-label {
+      font-size: var(--font-size-sm); color: var(--color-text-secondary);
+    }
+
+    /* HISTORY TABLE */
+    .section-title {
+      font-size: var(--font-size-xl); font-weight: var(--font-weight-bold);
+      margin-bottom: var(--space-4); display: flex; align-items: center; gap: var(--space-2);
+    }
+    .section-title::before {
+      content: ''; display: inline-block; width: 4px; height: 20px;
+      background: var(--color-primary); border-radius: 2px;
+    }
+
+    .table-wrapper {
+      background: var(--color-bg-secondary); border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm); border: 1px solid var(--color-border);
+      overflow: hidden; margin-bottom: var(--space-8);
+    }
+    .table-scroll { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 700px; }
+    thead { background: var(--color-bg-tertiary); }
+    th {
+      padding: var(--space-3) var(--space-4); font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold); color: var(--color-text-secondary);
+      text-align: left; text-transform: uppercase; letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--color-border); white-space: nowrap;
+    }
+    th.text-right { text-align: right; }
+    td {
+      padding: var(--space-3) var(--space-4); font-size: var(--font-size-sm);
+      color: var(--color-text-primary); border-bottom: 1px solid var(--color-border);
+    }
+    td.text-right {
+      text-align: right; font-family: var(--font-family-en); font-variant-numeric: tabular-nums;
+    }
+    tbody tr { transition: background var(--duration-fast) var(--easing-out); }
+    tbody tr:hover { background: var(--color-bg-hover); }
+    tbody tr:last-child td { border-bottom: none; }
+
+    /* CHART */
+    .chart-section { margin-bottom: var(--space-8); }
+    .chart-container {
+      background: var(--color-bg-secondary); border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm); border: 1px solid var(--color-border);
+      padding: var(--space-6);
+    }
+    .chart-bar-row {
+      display: flex; align-items: center; gap: var(--space-3);
+      padding: var(--space-2) 0; border-bottom: 1px solid var(--color-bg-tertiary);
+    }
+    .chart-bar-row:last-child { border-bottom: none; }
+    .chart-year {
+      width: 48px; font-family: var(--font-family-en); font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium); color: var(--color-text-secondary);
+      flex-shrink: 0;
+    }
+    .chart-bar-bg {
+      flex: 1; height: 24px; background: var(--color-bg-tertiary);
+      border-radius: var(--radius-sm); overflow: hidden;
+    }
+    .chart-bar-fill {
+      height: 100%; border-radius: var(--radius-sm);
+      background: linear-gradient(90deg, var(--color-primary-light), var(--color-primary));
+      transition: width 0.6s var(--easing-out);
+      display: flex; align-items: center; justify-content: flex-end;
+      padding-right: var(--space-2);
+    }
+    .chart-bar-value {
+      font-family: var(--font-family-en); font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold); color: var(--color-text-inverse);
+      white-space: nowrap;
+    }
+    .chart-amount {
+      width: 80px; font-family: var(--font-family-en); font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium); color: var(--color-text-primary);
+      text-align: right; flex-shrink: 0;
+    }
+
+    /* BACK BUTTON */
+    .back-section { padding-bottom: var(--space-8); }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
+      padding: var(--space-3) var(--space-6); font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium); font-family: var(--font-family-zh);
+      border: none; border-radius: var(--radius-md); cursor: pointer;
+      transition: all var(--duration-normal) var(--easing-out);
+      outline: none; text-decoration: none;
+    }
+    .btn:focus-visible { box-shadow: 0 0 0 3px rgba(26,115,232,0.3); }
+    .btn-secondary {
+      background: var(--color-bg-secondary); color: var(--color-text-primary);
+      border: 1px solid var(--color-border);
+    }
+    .btn-secondary:hover { background: var(--color-bg-tertiary); border-color: var(--color-border-hover); }
+
+    /* NOT FOUND */
+    .not-found {
+      text-align: center; padding: var(--space-16) var(--space-8);
+    }
+    .not-found svg { width: 100px; height: 100px; color: var(--color-text-tertiary); opacity: 0.4; margin-bottom: var(--space-6); }
+    .not-found h2 { font-size: var(--font-size-2xl); margin-bottom: var(--space-3); }
+    .not-found p { font-size: var(--font-size-sm); color: var(--color-text-secondary); margin-bottom: var(--space-6); }
+
+    /* SKELETON */
+    .skeleton { background: linear-gradient(90deg, var(--color-bg-tertiary) 25%, #E2E8F0 50%, var(--color-bg-tertiary) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: var(--radius-sm); }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    .skeleton-block { height: 200px; border-radius: var(--radius-lg); margin-bottom: var(--space-6); }
+    .skeleton-cards { display: grid; grid-template-columns: repeat(4,1fr); gap: var(--space-4); margin-bottom: var(--space-8); }
+    .skeleton-card { height: 100px; border-radius: var(--radius-lg); }
+
+    /* FOOTER */
+    .site-footer {
+      background: var(--color-bg-tertiary); border-top: 1px solid var(--color-border);
+      padding: var(--space-8) 0;
+    }
+    .footer-inner { max-width: 1200px; margin: 0 auto; padding: 0 var(--space-6); text-align: center; }
+    .footer-disclaimer { font-size: var(--font-size-xs); color: var(--color-text-tertiary); margin-bottom: var(--space-3); }
+    .footer-copy { font-size: var(--font-size-xs); color: var(--color-text-tertiary); }
+
+    /* ANIMATIONS */
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* RESPONSIVE */
+    @media (max-width: 1024px) { .metrics-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 767px) {
+      .metrics-grid { grid-template-columns: 1fr; }
+      .stock-header { flex-direction: column; }
+      .score-display { text-align: left; }
+      .skeleton-cards { grid-template-columns: repeat(2,1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- State Switcher -->
+<div class="state-switcher">
+  <span>State:</span>
+  <button class="active" onclick="switchState('normal')">S1 Normal</button>
+  <button onclick="switchState('loading')">S2 Loading</button>
+  <button onclick="switchState('not-found')">S3 Not Found</button>
+</div>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+    <div class="header-top">
+      <a href="P01-home.html" class="header-brand">
+        <div class="header-logo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+        </div>
+        <span class="header-title">分红股排行榜</span>
+      </a>
+    </div>
+    <nav class="breadcrumb" aria-label="面包屑导航">
+      <a href="P01-home.html">首页</a>
+      <span class="breadcrumb-sep">&gt;</span>
+      <span>股票详情</span>
+      <span class="breadcrumb-sep">&gt;</span>
+      <span class="breadcrumb-current" id="breadcrumbName">--</span>
+    </nav>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main>
+  <!-- Content (normal state) -->
+  <div id="contentArea">
+    <section class="stock-hero page-container" id="stockHero">
+      <div class="stock-header">
+        <div class="stock-identity">
+          <div class="stock-code" id="stockCode">--</div>
+          <h1 class="stock-name" id="stockName">--</h1>
+          <span class="industry-badge" id="stockIndustry">--</span>
+        </div>
+        <div class="score-display">
+          <div class="score-big" id="scoreValue">--</div>
+          <div class="score-label">综合评分</div>
+          <div class="score-bar-large"><div class="score-bar-fill-large" id="scoreBar" style="width:0%"></div></div>
+          <div class="score-rank" id="scoreRank">--</div>
+        </div>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-value accent" id="metricYears">--</div>
+          <div class="metric-label">连续分红年数</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value primary" id="metricYield">--</div>
+          <div class="metric-label">最近年度股息率</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value primary" id="metricAvgYield">--</div>
+          <div class="metric-label">近3年平均股息率</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value accent" id="metricTotal">--</div>
+          <div class="metric-label">累计分红总额(亿元)</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- History Table -->
+    <section class="page-container" id="historySection">
+      <h2 class="section-title">历年分红记录</h2>
+      <div class="table-wrapper">
+        <div class="table-scroll">
+          <table aria-label="历年分红记录">
+            <thead>
+              <tr>
+                <th scope="col">年度</th>
+                <th scope="col">分红方案</th>
+                <th scope="col" class="text-right">每股分红(元)</th>
+                <th scope="col" class="text-right">股息率(%)</th>
+                <th scope="col">除权除息日</th>
+                <th scope="col" class="text-right">分红总额(亿元)</th>
+              </tr>
+            </thead>
+            <tbody id="historyBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Chart -->
+    <section class="chart-section page-container" id="chartSection">
+      <h2 class="section-title">每股分红趋势</h2>
+      <div class="chart-container" id="chartContainer"></div>
+    </section>
+
+    <!-- Back button -->
+    <section class="back-section page-container">
+      <a href="P01-home.html" class="btn btn-secondary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        返回排行榜
+      </a>
+    </section>
+  </div>
+
+  <!-- Loading skeleton -->
+  <div id="skeletonArea" style="display:none; padding-top: var(--space-8);" class="page-container">
+    <div class="skeleton skeleton-block" style="height:120px;margin-top:var(--space-8);"></div>
+    <div class="skeleton-cards">
+      <div class="skeleton skeleton-card"></div>
+      <div class="skeleton skeleton-card"></div>
+      <div class="skeleton skeleton-card"></div>
+      <div class="skeleton skeleton-card"></div>
+    </div>
+    <div class="skeleton skeleton-block" style="height:300px;"></div>
+  </div>
+
+  <!-- Not found -->
+  <div id="notFoundArea" style="display:none;" class="page-container">
+    <div class="not-found">
+      <svg viewBox="0 0 100 100" fill="none">
+        <circle cx="50" cy="50" r="40" stroke="currentColor" stroke-width="2" stroke-dasharray="8 4"/>
+        <path d="M35 60c0-8.284 6.716-15 15-15s15 6.716 15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="40" cy="42" r="3" fill="currentColor"/>
+        <circle cx="60" cy="42" r="3" fill="currentColor"/>
+      </svg>
+      <h2>未找到该股票信息</h2>
+      <p>请确认股票代码是否正确，或返回排行榜查看其他股票</p>
+      <a href="P01-home.html" class="btn btn-secondary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        返回排行榜
+      </a>
+    </div>
+  </div>
+</main>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <p class="footer-disclaimer">本站数据仅供参考，不构成投资建议。投资有风险，入市需谨慎。</p>
+    <p class="footer-copy">&copy; 2026 分红股排行榜</p>
+  </div>
+</footer>
+
+<script>
+// ===== STOCK DATA =====
+const DETAIL_DATA = {
+  "600519": {
+    code:"600519", name:"贵州茅台", industry:"白酒", score:95.2, comprehensiveRank:1,
+    consecutiveYears:27, dividendYield:3.85, avgYield3Y:3.52, totalDividend:2365.12,
+    history: [
+      {year:"2024",plan:"每10股派259.80元",dps:25.98,yield:3.85,exDate:"2024-07-12",totalAmount:326.52},
+      {year:"2023",plan:"每10股派240.00元",dps:24.00,yield:3.52,exDate:"2023-07-14",totalAmount:301.42},
+      {year:"2022",plan:"每10股派222.60元",dps:22.26,yield:3.18,exDate:"2022-07-08",totalAmount:279.68},
+      {year:"2021",plan:"每10股派216.75元",dps:21.68,yield:2.95,exDate:"2021-07-16",totalAmount:272.38},
+      {year:"2020",plan:"每10股派192.93元",dps:19.29,yield:2.68,exDate:"2020-07-10",totalAmount:242.36},
+      {year:"2019",plan:"每10股派170.25元",dps:17.03,yield:2.42,exDate:"2019-07-12",totalAmount:213.92},
+      {year:"2018",plan:"每10股派145.39元",dps:14.54,yield:2.15,exDate:"2018-07-13",totalAmount:182.72},
+      {year:"2017",plan:"每10股派109.99元",dps:11.00,yield:1.82,exDate:"2017-07-07",totalAmount:138.16},
+      {year:"2016",plan:"每10股派67.87元",dps:6.79,yield:1.56,exDate:"2016-07-08",totalAmount:85.28},
+      {year:"2015",plan:"每10股派61.71元",dps:6.17,yield:1.45,exDate:"2015-07-10",totalAmount:77.52}
+    ]
+  },
+  "601318": {
+    code:"601318", name:"中国平安", industry:"保险", score:91.8, comprehensiveRank:2,
+    consecutiveYears:18, dividendYield:5.42, avgYield3Y:4.88, totalDividend:4528.16,
+    history: [
+      {year:"2024",plan:"每10股派24.20元",dps:2.42,yield:5.42,exDate:"2024-08-02",totalAmount:442.56},
+      {year:"2023",plan:"每10股派22.80元",dps:2.28,yield:4.88,exDate:"2023-08-04",totalAmount:416.92},
+      {year:"2022",plan:"每10股派22.00元",dps:2.20,yield:4.35,exDate:"2022-08-05",totalAmount:402.28},
+      {year:"2021",plan:"每10股派22.00元",dps:2.20,yield:3.92,exDate:"2021-07-23",totalAmount:402.28},
+      {year:"2020",plan:"每10股派16.20元",dps:1.62,yield:3.15,exDate:"2020-07-31",totalAmount:296.28},
+      {year:"2019",plan:"每10股派15.00元",dps:1.50,yield:2.85,exDate:"2019-08-02",totalAmount:274.32},
+      {year:"2018",plan:"每10股派12.00元",dps:1.20,yield:2.56,exDate:"2018-07-27",totalAmount:219.42},
+      {year:"2017",plan:"每10股派10.00元",dps:1.00,yield:2.12,exDate:"2017-07-28",totalAmount:182.86}
+    ]
+  },
+  "601398": {
+    code:"601398", name:"工商银行", industry:"银行", score:88.3, comprehensiveRank:4,
+    consecutiveYears:20, dividendYield:6.15, avgYield3Y:5.78, totalDividend:12856.32,
+    history: [
+      {year:"2024",plan:"每10股派3.064元",dps:0.31,yield:6.15,exDate:"2024-07-05",totalAmount:1092.68},
+      {year:"2023",plan:"每10股派2.933元",dps:0.29,yield:5.78,exDate:"2023-07-07",totalAmount:1045.86},
+      {year:"2022",plan:"每10股派2.933元",dps:0.29,yield:5.42,exDate:"2022-07-08",totalAmount:1045.86},
+      {year:"2021",plan:"每10股派2.660元",dps:0.27,yield:5.15,exDate:"2021-07-09",totalAmount:948.56},
+      {year:"2020",plan:"每10股派2.628元",dps:0.26,yield:4.92,exDate:"2020-07-10",totalAmount:937.12},
+      {year:"2019",plan:"每10股派2.506元",dps:0.25,yield:4.68,exDate:"2019-07-04",totalAmount:893.68},
+      {year:"2018",plan:"每10股派2.408元",dps:0.24,yield:4.35,exDate:"2018-07-13",totalAmount:858.72},
+      {year:"2017",plan:"每10股派2.343元",dps:0.23,yield:4.12,exDate:"2017-07-07",totalAmount:835.56}
+    ]
+  }
+};
+
+// Extended pool for auto-generated history
+const STOCK_POOL = [
+  {code:"000858",name:"五粮液",industry:"白酒",score:89.6,comprehensiveRank:3,consecutiveYears:25,dividendYield:3.62,avgYield3Y:3.21,dps:4.56,totalDividend:856.42},
+  {code:"600036",name:"招商银行",industry:"银行",score:87.1,comprehensiveRank:5,consecutiveYears:19,dividendYield:5.68,avgYield3Y:5.23,dps:1.85,totalDividend:2986.45},
+  {code:"601088",name:"中国神华",industry:"煤炭",score:85.7,comprehensiveRank:6,consecutiveYears:17,dividendYield:7.82,avgYield3Y:6.95,dps:2.56,totalDividend:3215.68},
+  {code:"000333",name:"美的集团",industry:"家电",score:84.2,comprehensiveRank:7,consecutiveYears:16,dividendYield:4.35,avgYield3Y:3.98,dps:3.00,totalDividend:856.72},
+  {code:"600900",name:"长江电力",industry:"电力",score:83.5,comprehensiveRank:8,consecutiveYears:22,dividendYield:3.92,avgYield3Y:3.65,dps:0.85,totalDividend:1568.92},
+  {code:"000651",name:"格力电器",industry:"家电",score:83.0,comprehensiveRank:9,consecutiveYears:24,dividendYield:4.18,avgYield3Y:3.75,dps:2.00,totalDividend:1025.38},
+  {code:"600585",name:"海螺水泥",industry:"建材",score:82.1,comprehensiveRank:10,consecutiveYears:15,dividendYield:4.56,avgYield3Y:4.12,dps:2.68,totalDividend:758.23},
+  {code:"002415",name:"海康威视",industry:"安防",score:80.8,comprehensiveRank:11,consecutiveYears:14,dividendYield:3.28,avgYield3Y:3.05,dps:0.80,totalDividend:425.16},
+  {code:"601166",name:"兴业银行",industry:"银行",score:79.5,comprehensiveRank:12,consecutiveYears:16,dividendYield:5.92,avgYield3Y:5.35,dps:1.05,totalDividend:1856.42},
+  {code:"600016",name:"民生银行",industry:"银行",score:78.2,comprehensiveRank:13,consecutiveYears:15,dividendYield:5.45,avgYield3Y:4.98,dps:0.25,totalDividend:1425.68},
+  {code:"601288",name:"农业银行",industry:"银行",score:77.8,comprehensiveRank:14,consecutiveYears:14,dividendYield:6.82,avgYield3Y:6.25,dps:0.23,totalDividend:9856.32},
+  {code:"000002",name:"万科A",industry:"房地产",score:76.5,comprehensiveRank:15,consecutiveYears:20,dividendYield:2.85,avgYield3Y:3.42,dps:0.35,totalDividend:1256.78},
+  {code:"601857",name:"中国石油",industry:"石油",score:75.3,comprehensiveRank:16,consecutiveYears:16,dividendYield:5.12,avgYield3Y:4.68,dps:0.45,totalDividend:8965.42},
+  {code:"600887",name:"伊利股份",industry:"乳业",score:74.8,comprehensiveRank:17,consecutiveYears:18,dividendYield:3.15,avgYield3Y:2.95,dps:0.92,totalDividend:568.32},
+  {code:"000568",name:"泸州老窖",industry:"白酒",score:74.2,comprehensiveRank:18,consecutiveYears:17,dividendYield:3.42,avgYield3Y:3.18,dps:6.80,totalDividend:425.16}
+];
+
+function generateHistory(stock) {
+  const years = Math.min(stock.consecutiveYears, 10);
+  const history = [];
+  let dps = stock.dps;
+  let yieldVal = stock.dividendYield;
+  for (let i = 0; i < years; i++) {
+    const year = String(2024 - i);
+    const factor = i === 0 ? 1 : (0.90 + Math.random() * 0.05);
+    if (i > 0) { dps = dps * factor; yieldVal = yieldVal * factor; }
+    const dpsRound = Math.round(dps * 100) / 100;
+    const totalAmount = Math.round(dpsRound * (stock.totalDividend / stock.dps) / years * 100) / 100;
+    history.push({
+      year: year,
+      plan: "每10股派" + (dpsRound * 10).toFixed(2) + "元",
+      dps: dpsRound,
+      yield: Math.round(yieldVal * 100) / 100,
+      exDate: year + "-07-" + String(5 + Math.floor(Math.random() * 20)).padStart(2, '0'),
+      totalAmount: Math.round(totalAmount * 100) / 100
+    });
+  }
+  return history;
+}
+
+function findStock(code) {
+  if (DETAIL_DATA[code]) return DETAIL_DATA[code];
+  const poolStock = STOCK_POOL.find(s => s.code === code);
+  if (poolStock) {
+    return { ...poolStock, history: generateHistory(poolStock) };
+  }
+  return null;
+}
+
+// ===== RENDER =====
+function renderStock(stock) {
+  document.title = stock.name + ' - 分红股排行榜';
+  document.getElementById('breadcrumbName').textContent = stock.name;
+  document.getElementById('stockCode').textContent = stock.code;
+  document.getElementById('stockName').textContent = stock.name;
+  document.getElementById('stockIndustry').textContent = stock.industry;
+  document.getElementById('scoreValue').textContent = stock.score.toFixed(1);
+  document.getElementById('scoreBar').style.width = stock.score + '%';
+  document.getElementById('scoreRank').textContent = '综合排名第 ' + stock.comprehensiveRank + ' 名';
+  document.getElementById('metricYears').textContent = stock.consecutiveYears + ' 年';
+  document.getElementById('metricYield').textContent = stock.dividendYield.toFixed(2) + '%';
+  document.getElementById('metricAvgYield').textContent = stock.avgYield3Y.toFixed(2) + '%';
+  document.getElementById('metricTotal').textContent = stock.totalDividend.toFixed(2);
+
+  // History table
+  const tbody = document.getElementById('historyBody');
+  tbody.innerHTML = stock.history.map(row =>
+    '<tr>' +
+    '<td>' + row.year + '</td>' +
+    '<td>' + row.plan + '</td>' +
+    '<td class="text-right">' + row.dps.toFixed(2) + '</td>' +
+    '<td class="text-right">' + row.yield.toFixed(2) + '</td>' +
+    '<td>' + row.exDate + '</td>' +
+    '<td class="text-right">' + row.totalAmount.toFixed(2) + '</td>' +
+    '</tr>'
+  ).join('');
+
+  // Chart
+  const maxDps = Math.max(...stock.history.map(h => h.dps));
+  const chartContainer = document.getElementById('chartContainer');
+  chartContainer.innerHTML = stock.history.map(row => {
+    const pct = Math.round((row.dps / maxDps) * 100);
+    return '<div class="chart-bar-row">' +
+      '<span class="chart-year">' + row.year + '</span>' +
+      '<div class="chart-bar-bg"><div class="chart-bar-fill" style="width:' + pct + '%">' +
+      (pct > 20 ? '<span class="chart-bar-value">' + row.dps.toFixed(2) + '</span>' : '') +
+      '</div></div>' +
+      '<span class="chart-amount">' + row.dps.toFixed(2) + ' 元</span>' +
+      '</div>';
+  }).join('');
+}
+
+function showNormal(stock) {
+  document.getElementById('contentArea').style.display = '';
+  document.getElementById('skeletonArea').style.display = 'none';
+  document.getElementById('notFoundArea').style.display = 'none';
+  renderStock(stock);
+  setTimeout(() => document.getElementById('stockHero').classList.add('loaded'), 100);
+}
+
+function showLoading() {
+  document.getElementById('contentArea').style.display = 'none';
+  document.getElementById('skeletonArea').style.display = '';
+  document.getElementById('notFoundArea').style.display = 'none';
+}
+
+function showNotFound() {
+  document.getElementById('contentArea').style.display = 'none';
+  document.getElementById('skeletonArea').style.display = 'none';
+  document.getElementById('notFoundArea').style.display = '';
+}
+
+// ===== STATE SWITCHER =====
+function switchState(state) {
+  document.querySelectorAll('.state-switcher button').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+
+  const code = new URLSearchParams(window.location.search).get('code') || '600519';
+  const stock = findStock(code) || findStock('600519');
+
+  switch(state) {
+    case 'normal': showNormal(stock); break;
+    case 'loading': showLoading(); break;
+    case 'not-found': showNotFound(); break;
+  }
+}
+
+// ===== INIT =====
+function init() {
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get('code') || '600519';
+
+  // Show loading first
+  showLoading();
+
+  // Simulate load delay
+  setTimeout(() => {
+    const stock = findStock(code);
+    if (stock) {
+      showNormal(stock);
+    } else {
+      showNotFound();
+    }
+  }, 500);
+}
+
+init();
+</script>
+</body>
+</html>

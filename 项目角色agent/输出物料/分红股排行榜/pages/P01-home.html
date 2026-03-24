@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>分红股排行榜 - A股分红数据极简排行工具</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --color-primary: #1A73E8;
+      --color-primary-hover: #1565C0;
+      --color-primary-active: #0D47A1;
+      --color-primary-light: #E8F0FE;
+      --color-primary-50: #EFF6FF;
+      --color-secondary: #5F6368;
+      --color-secondary-light: #9AA0A6;
+      --color-accent: #F59E0B;
+      --color-accent-hover: #D97706;
+      --color-accent-light: #FEF3C7;
+      --color-accent-dark: #92400E;
+      --color-success: #34A853;
+      --color-success-light: #E6F4EA;
+      --color-warning: #FBBC04;
+      --color-warning-light: #FEF7E0;
+      --color-error: #EA4335;
+      --color-error-light: #FCE8E6;
+      --color-bg-primary: #F8FAFC;
+      --color-bg-secondary: #FFFFFF;
+      --color-bg-tertiary: #F1F5F9;
+      --color-bg-hover: #EFF6FF;
+      --color-text-primary: #1F2937;
+      --color-text-secondary: #6B7280;
+      --color-text-tertiary: #9CA3AF;
+      --color-text-inverse: #FFFFFF;
+      --color-border: #E5E7EB;
+      --color-border-hover: #D1D5DB;
+      --color-border-focus: #1A73E8;
+      --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+      --space-5: 20px; --space-6: 24px; --space-8: 32px; --space-10: 40px;
+      --space-12: 48px; --space-16: 64px; --space-20: 80px;
+      --font-family-en: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-family-zh: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      --font-family-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', monospace;
+      --font-size-xs: 12px; --font-size-sm: 14px; --font-size-base: 16px;
+      --font-size-lg: 18px; --font-size-xl: 20px; --font-size-2xl: 24px;
+      --font-size-3xl: 30px; --font-size-4xl: 36px;
+      --font-weight-regular: 400; --font-weight-medium: 500;
+      --font-weight-semibold: 600; --font-weight-bold: 700;
+      --line-height-tight: 1.25; --line-height-normal: 1.5; --line-height-relaxed: 1.625;
+      --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.03), 0 1px 3px 0 rgba(0,0,0,0.06);
+      --shadow-md: 0 2px 4px -1px rgba(0,0,0,0.04), 0 4px 8px -1px rgba(0,0,0,0.08);
+      --shadow-lg: 0 4px 6px -2px rgba(0,0,0,0.03), 0 10px 20px -3px rgba(0,0,0,0.10);
+      --shadow-xl: 0 8px 16px -4px rgba(0,0,0,0.04), 0 20px 40px -8px rgba(0,0,0,0.12);
+      --radius-sm: 6px; --radius-md: 8px; --radius-lg: 12px;
+      --radius-xl: 16px; --radius-full: 9999px;
+      --duration-fast: 150ms; --duration-normal: 200ms; --duration-slow: 300ms;
+      --easing-default: cubic-bezier(0.4, 0, 0.2, 1);
+      --easing-out: cubic-bezier(0, 0, 0.2, 1);
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { font-size: 16px; scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-family-zh);
+      color: var(--color-text-primary);
+      background: var(--color-bg-primary);
+      line-height: var(--line-height-normal);
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* ===== STATE SWITCHER (dev preview only) ===== */
+    .state-switcher {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+      background: #1F2937; color: #fff; padding: 8px 16px;
+      display: flex; align-items: center; gap: 8px; font-size: 12px;
+      font-family: var(--font-family-mono);
+    }
+    .state-switcher span { opacity: 0.7; }
+    .state-switcher button {
+      background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.2);
+      padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 11px;
+      font-family: var(--font-family-mono); transition: all 0.15s;
+    }
+    .state-switcher button:hover { background: rgba(255,255,255,0.25); }
+    .state-switcher button.active { background: var(--color-primary); border-color: var(--color-primary); }
+    body { padding-top: 40px; }
+
+    /* ===== LAYOUT ===== */
+    .page-container { max-width: 1200px; margin: 0 auto; padding: 0 var(--space-6); }
+
+    /* ===== HEADER ===== */
+    .site-header {
+      background: var(--color-bg-secondary);
+      border-bottom: 1px solid var(--color-border);
+      padding: var(--space-5) 0;
+    }
+    .header-inner {
+      max-width: 1200px; margin: 0 auto; padding: 0 var(--space-6);
+      display: flex; align-items: center; justify-content: space-between; gap: var(--space-4);
+      flex-wrap: wrap;
+    }
+    .header-brand { display: flex; align-items: center; gap: var(--space-3); text-decoration: none; color: inherit; }
+    .header-logo {
+      width: 36px; height: 36px; background: var(--color-primary);
+      border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center;
+    }
+    .header-logo svg { width: 20px; height: 20px; }
+    .header-title {
+      font-size: var(--font-size-xl); font-weight: var(--font-weight-bold);
+      color: var(--color-text-primary);
+    }
+    .header-meta { display: flex; align-items: center; gap: var(--space-4); }
+    .header-stat {
+      font-size: var(--font-size-sm); color: var(--color-text-secondary);
+      display: flex; align-items: center; gap: var(--space-1);
+    }
+    .header-stat strong {
+      color: var(--color-text-primary); font-weight: var(--font-weight-semibold);
+      font-family: var(--font-family-en);
+    }
+    .header-actions { display: flex; align-items: center; gap: var(--space-3); }
+    .update-time { font-size: var(--font-size-xs); color: var(--color-text-tertiary); }
+
+    /* ===== BUTTONS ===== */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
+      padding: var(--space-3) var(--space-6); font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium); font-family: var(--font-family-zh);
+      border: none; border-radius: var(--radius-md); cursor: pointer;
+      transition: all var(--duration-normal) var(--easing-out);
+      outline: none; text-decoration: none;
+    }
+    .btn:focus-visible { box-shadow: 0 0 0 3px rgba(26,115,232,0.3); }
+    .btn-primary { background: var(--color-primary); color: var(--color-text-inverse); }
+    .btn-primary:hover { background: var(--color-primary-hover); box-shadow: var(--shadow-md); }
+    .btn-primary:active { background: var(--color-primary-active); transform: scale(0.98); }
+    .btn-primary:disabled { background: var(--color-bg-tertiary); color: var(--color-text-tertiary); cursor: not-allowed; opacity: 0.6; }
+    .btn-secondary {
+      background: var(--color-bg-secondary); color: var(--color-text-primary);
+      border: 1px solid var(--color-border);
+    }
+    .btn-secondary:hover { background: var(--color-bg-tertiary); border-color: var(--color-border-hover); }
+    .btn .spinner {
+      width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .btn-pulse { animation: btnPulse 2s ease-in-out infinite; }
+    @keyframes btnPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(26,115,232,0.4); }
+      50% { box-shadow: 0 0 0 8px rgba(26,115,232,0); }
+    }
+
+    /* ===== ERROR TOAST ===== */
+    .error-toast {
+      position: fixed; top: 52px; left: 50%; transform: translateX(-50%);
+      background: var(--color-error-light); color: var(--color-error); border: 1px solid var(--color-error);
+      padding: var(--space-3) var(--space-6); border-radius: var(--radius-md);
+      font-size: var(--font-size-sm); font-weight: var(--font-weight-medium);
+      z-index: 1000; opacity: 0; pointer-events: none;
+      transition: opacity var(--duration-slow) var(--easing-out);
+    }
+    .error-toast.show { opacity: 1; pointer-events: auto; }
+
+    /* ===== STAT CARDS ===== */
+    .stats-section { padding: var(--space-8) 0 var(--space-6); }
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-6);
+    }
+    .stat-card {
+      background: var(--color-bg-secondary); border-radius: var(--radius-lg);
+      padding: var(--space-6); box-shadow: var(--shadow-sm); border: 1px solid var(--color-border);
+      transition: transform var(--duration-normal) var(--easing-out), box-shadow var(--duration-normal) var(--easing-out);
+      opacity: 0; transform: translateY(16px);
+    }
+    .stat-card.loaded { opacity: 1; transform: translateY(0); transition: opacity 0.5s var(--easing-out), transform 0.5s var(--easing-out); }
+    .stat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+    .stat-card.loaded:hover { transform: translateY(-4px); }
+    .stat-icon {
+      width: 48px; height: 48px; border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center; margin-bottom: var(--space-4);
+    }
+    .stat-icon svg { width: 24px; height: 24px; }
+    .stat-icon.blue { background: var(--color-primary-light); color: var(--color-primary); }
+    .stat-icon.amber { background: var(--color-accent-light); color: var(--color-accent-dark); }
+    .stat-value {
+      font-family: var(--font-family-en); font-size: var(--font-size-3xl);
+      font-weight: var(--font-weight-bold); font-variant-numeric: tabular-nums;
+      margin-bottom: var(--space-1);
+    }
+    .stat-value.accent { color: var(--color-accent-dark); }
+    .stat-value.primary { color: var(--color-primary); }
+    .stat-label { font-size: var(--font-size-sm); color: var(--color-text-secondary); }
+    .stat-sub { font-size: var(--font-size-xs); color: var(--color-text-tertiary); margin-top: var(--space-1); }
+
+    /* Skeleton */
+    .skeleton { background: linear-gradient(90deg, var(--color-bg-tertiary) 25%, #E2E8F0 50%, var(--color-bg-tertiary) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: var(--radius-sm); }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    .skeleton-value { height: 36px; width: 100px; margin-bottom: var(--space-2); }
+    .skeleton-label { height: 16px; width: 140px; }
+    .skeleton-row { display: flex; gap: var(--space-3); padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--color-border); }
+    .skeleton-cell { height: 16px; border-radius: var(--radius-sm); }
+
+    /* ===== TAB BAR ===== */
+    .ranking-section { padding-bottom: var(--space-8); }
+    .tab-bar {
+      display: flex; gap: var(--space-1); background: var(--color-bg-tertiary);
+      padding: var(--space-1); border-radius: var(--radius-lg); margin-bottom: var(--space-6);
+    }
+    .tab-item {
+      flex: 1; padding: var(--space-3) var(--space-4); text-align: center;
+      font-size: var(--font-size-sm); font-weight: var(--font-weight-medium);
+      color: var(--color-text-secondary); background: transparent; border: none;
+      border-radius: var(--radius-md); cursor: pointer;
+      transition: all var(--duration-normal) var(--easing-out);
+      font-family: var(--font-family-zh);
+    }
+    .tab-item:hover { color: var(--color-text-primary); background: rgba(255,255,255,0.5); }
+    .tab-item:focus-visible { box-shadow: 0 0 0 3px rgba(26,115,232,0.3); outline: none; }
+    .tab-item[aria-selected="true"] {
+      background: var(--color-bg-secondary); color: var(--color-primary);
+      font-weight: var(--font-weight-semibold); box-shadow: var(--shadow-sm);
+    }
+
+    /* ===== TOOLBAR ===== */
+    .table-toolbar {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: var(--space-4); gap: var(--space-4);
+    }
+    .search-box {
+      position: relative; max-width: 320px; flex: 1;
+    }
+    .search-box svg {
+      position: absolute; left: var(--space-3); top: 50%; transform: translateY(-50%);
+      width: 16px; height: 16px; color: var(--color-text-tertiary);
+    }
+    .search-input {
+      width: 100%; padding: var(--space-2) var(--space-4) var(--space-2) 36px;
+      font-size: var(--font-size-sm); font-family: var(--font-family-zh);
+      color: var(--color-text-primary); background: var(--color-bg-secondary);
+      border: 1px solid var(--color-border); border-radius: var(--radius-md);
+      outline: none; transition: all var(--duration-fast) var(--easing-out);
+    }
+    .search-input::placeholder { color: var(--color-text-tertiary); }
+    .search-input:hover { border-color: var(--color-border-hover); }
+    .search-input:focus { border-color: var(--color-border-focus); box-shadow: 0 0 0 3px rgba(26,115,232,0.15); }
+    .result-count { font-size: var(--font-size-sm); color: var(--color-text-secondary); white-space: nowrap; }
+
+    /* ===== TABLE ===== */
+    .table-wrapper {
+      transition: opacity 100ms var(--easing-out);
+      background: var(--color-bg-secondary); border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm); border: 1px solid var(--color-border);
+      overflow: hidden; margin-bottom: var(--space-4);
+    }
+    .table-scroll { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 800px; }
+    thead { background: var(--color-bg-tertiary); }
+    th {
+      padding: var(--space-3) var(--space-4); font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold); color: var(--color-text-secondary);
+      text-align: left; text-transform: uppercase; letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--color-border); white-space: nowrap;
+      position: sticky; top: 0; background: var(--color-bg-tertiary); z-index: 1;
+    }
+    th.text-right { text-align: right; }
+    th.text-center { text-align: center; }
+    td {
+      padding: var(--space-3) var(--space-4); font-size: var(--font-size-sm);
+      color: var(--color-text-primary); border-bottom: 1px solid var(--color-border);
+    }
+    td.text-right {
+      text-align: right; font-family: var(--font-family-en);
+      font-variant-numeric: tabular-nums;
+    }
+    td.text-center { text-align: center; }
+    td.text-mono { font-family: var(--font-family-mono); font-size: var(--font-size-xs); color: var(--color-text-secondary); }
+    tbody tr { transition: background var(--duration-fast) var(--easing-out); }
+    tbody tr:hover { background: var(--color-bg-hover); }
+    tbody tr:last-child td { border-bottom: none; }
+
+    .rank-badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 28px; height: 28px; border-radius: var(--radius-sm);
+      font-family: var(--font-family-en); font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-bold);
+    }
+    .rank-1 { background: #FEF3C7; color: #92400E; }
+    .rank-2 { background: #F1F5F9; color: #475569; }
+    .rank-3 { background: #FED7AA; color: #9A3412; }
+    .rank-default { background: var(--color-bg-tertiary); color: var(--color-text-secondary); }
+
+    .stock-link {
+      color: var(--color-primary); text-decoration: none; font-weight: var(--font-weight-medium);
+      transition: color var(--duration-fast);
+    }
+    .stock-link:hover { color: var(--color-primary-hover); text-decoration: underline; }
+    .stock-link:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; border-radius: 2px; }
+
+    .industry-badge {
+      display: inline-flex; padding: 2px var(--space-2); font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-medium); border-radius: var(--radius-full);
+      background: var(--color-primary-light); color: var(--color-primary);
+    }
+
+    .score-bar { display: flex; align-items: center; gap: var(--space-2); }
+    .score-bar-bg {
+      flex: 1; height: 6px; background: var(--color-bg-tertiary);
+      border-radius: var(--radius-full); overflow: hidden; max-width: 80px;
+    }
+    .score-bar-fill { height: 100%; border-radius: var(--radius-full); transition: width var(--duration-slow) var(--easing-out); }
+    .score-value {
+      font-family: var(--font-family-en); font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold); min-width: 36px;
+    }
+
+    /* ===== EMPTY STATE ===== */
+    .empty-state {
+      text-align: center; padding: var(--space-16) var(--space-8);
+    }
+    .empty-state svg { width: 120px; height: 120px; color: var(--color-text-tertiary); margin-bottom: var(--space-6); opacity: 0.5; }
+    .empty-state h3 { font-size: var(--font-size-lg); font-weight: var(--font-weight-semibold); color: var(--color-text-primary); margin-bottom: var(--space-2); }
+    .empty-state p { font-size: var(--font-size-sm); color: var(--color-text-secondary); }
+
+    /* ===== PAGINATION ===== */
+    .pagination {
+      display: flex; align-items: center; justify-content: center; gap: var(--space-2);
+      padding: var(--space-4) 0;
+    }
+    .pagination-info { font-size: var(--font-size-sm); color: var(--color-text-secondary); margin-right: var(--space-4); }
+    .page-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 36px; height: 36px; padding: 0 var(--space-2);
+      font-size: var(--font-size-sm); font-family: var(--font-family-en);
+      color: var(--color-text-primary); background: var(--color-bg-secondary);
+      border: 1px solid var(--color-border); border-radius: var(--radius-md);
+      cursor: pointer; transition: all var(--duration-fast);
+    }
+    .page-btn:hover:not(:disabled):not(.active) { background: var(--color-bg-tertiary); border-color: var(--color-border-hover); }
+    .page-btn:focus-visible { box-shadow: 0 0 0 3px rgba(26,115,232,0.3); outline: none; }
+    .page-btn.active { background: var(--color-primary); color: #fff; border-color: var(--color-primary); }
+    .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .page-ellipsis { color: var(--color-text-tertiary); padding: 0 var(--space-1); font-family: var(--font-family-en); }
+
+    /* ===== FOOTER ===== */
+    .site-footer {
+      background: var(--color-bg-tertiary); border-top: 1px solid var(--color-border);
+      padding: var(--space-10) 0 var(--space-8);
+    }
+    .footer-inner { max-width: 1200px; margin: 0 auto; padding: 0 var(--space-6); }
+    .footer-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-8); margin-bottom: var(--space-8); }
+    .footer-section h4 {
+      font-size: var(--font-size-sm); font-weight: var(--font-weight-semibold);
+      color: var(--color-text-primary); margin-bottom: var(--space-3);
+    }
+    .footer-section p, .footer-section li {
+      font-size: var(--font-size-sm); color: var(--color-text-secondary);
+      line-height: var(--line-height-relaxed);
+    }
+    .footer-section ul { list-style: none; }
+    .footer-section li { padding: var(--space-1) 0; }
+    .footer-section li::before { content: ""; display: inline-block; width: 4px; height: 4px; background: var(--color-secondary-light); border-radius: 50%; margin-right: var(--space-2); vertical-align: middle; }
+    .footer-bottom {
+      text-align: center; padding-top: var(--space-6);
+      border-top: 1px solid var(--color-border);
+    }
+    .footer-bottom p { font-size: var(--font-size-xs); color: var(--color-text-tertiary); }
+    .footer-disclaimer {
+      font-size: var(--font-size-xs); color: var(--color-text-tertiary);
+      text-align: center; margin-bottom: var(--space-4);
+    }
+
+    /* ===== ANIMATIONS ===== */
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-in { animation: fadeIn 0.3s var(--easing-out) forwards; }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 1279px) {
+      .header-inner { flex-wrap: wrap; }
+      .header-meta { width: 100%; order: 3; }
+    }
+    @media (max-width: 767px) {
+      .stats-grid { grid-template-columns: 1fr; }
+      .header-inner { flex-direction: column; align-items: flex-start; }
+      .header-actions { width: 100%; justify-content: space-between; }
+      .table-toolbar { flex-direction: column; align-items: stretch; }
+      .search-box { max-width: 100%; }
+      .footer-grid { grid-template-columns: 1fr; }
+      .tab-item { font-size: var(--font-size-xs); padding: var(--space-2) var(--space-3); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- State Switcher (dev preview) -->
+<div class="state-switcher">
+  <span>State:</span>
+  <button class="active" onclick="switchState('normal')">S3 Normal</button>
+  <button onclick="switchState('empty')">S1 Empty</button>
+  <button onclick="switchState('loading')">S2 Loading</button>
+  <button onclick="switchState('error')">S4 Error</button>
+  <button onclick="switchState('search-empty')">S5 No Results</button>
+  <button onclick="switchState('cooldown')">S6 Cooldown</button>
+</div>
+
+<!-- Error Toast -->
+<div id="errorToast" class="error-toast"></div>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+    <a href="P01-home.html" class="header-brand">
+      <div class="header-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+      </div>
+      <span class="header-title">分红股排行榜</span>
+    </a>
+    <div class="header-meta" id="headerMeta">
+      <span class="header-stat">共 <strong id="totalCount">856</strong> 只分红股</span>
+      <span class="header-stat">数据更新于 <strong id="updateTimeDisplay">--</strong></span>
+    </div>
+    <div class="header-actions">
+      <span class="update-time" id="cooldownText"></span>
+      <button class="btn btn-primary" id="updateBtn" onclick="handleUpdate()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+        <span id="updateBtnText">更新数据</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- MAIN CONTENT -->
+<main>
+  <!-- Stats Cards -->
+  <section class="stats-section">
+    <div class="page-container">
+      <div class="stats-grid" id="statsGrid">
+        <div class="stat-card" id="statCard1">
+          <div class="stat-icon amber">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="12" width="4" height="9" rx="1"/><rect x="10" y="7" width="4" height="14" rx="1"/><rect x="17" y="3" width="4" height="18" rx="1"/></svg>
+          </div>
+          <div id="statValue1" class="stat-value accent">856</div>
+          <div class="stat-label">A股分红股数量</div>
+        </div>
+        <div class="stat-card" id="statCard2" style="transition-delay: 0.1s">
+          <div class="stat-icon blue">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <div id="statValue2" class="stat-value primary">3.28%</div>
+          <div class="stat-label">全市场平均股息率</div>
+        </div>
+        <div class="stat-card" id="statCard3" style="transition-delay: 0.2s">
+          <div class="stat-icon amber">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 010-5C7 4 6 2 12 2s5 2 7.5 2a2.5 2.5 0 010 5H18"/><path d="M18 9v10a2 2 0 01-2 2H8a2 2 0 01-2-2V9"/><path d="M12 9v12"/></svg>
+          </div>
+          <div id="statValue3" class="stat-value accent">27<span style="font-size:var(--font-size-lg);font-weight:var(--font-weight-semibold)">年</span></div>
+          <div class="stat-label">最长连续分红年数</div>
+          <div class="stat-sub">贵州茅台</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Ranking Section -->
+  <section class="ranking-section">
+    <div class="page-container">
+      <!-- Tab Bar -->
+      <div class="tab-bar" role="tablist" aria-label="排行榜类型切换" id="tabBar">
+        <button role="tab" aria-selected="true" aria-controls="panel-comprehensive" id="tab-comprehensive" tabindex="0" class="tab-item" onclick="switchTab('comprehensive')">综合排行</button>
+        <button role="tab" aria-selected="false" aria-controls="panel-stable" id="tab-stable" tabindex="-1" class="tab-item" onclick="switchTab('stable')">稳定分红</button>
+        <button role="tab" aria-selected="false" aria-controls="panel-highest" id="tab-highest" tabindex="-1" class="tab-item" onclick="switchTab('highest')">分红最多</button>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="table-toolbar">
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input type="text" class="search-input" id="searchInput" placeholder="搜索股票代码或名称..." aria-label="搜索股票" oninput="handleSearch()">
+        </div>
+        <div class="result-count" id="resultCount">当前显示 50 条</div>
+      </div>
+
+      <!-- Table Panel -->
+      <div role="tabpanel" aria-labelledby="tab-comprehensive" id="panel-comprehensive">
+        <div class="table-wrapper">
+          <div class="table-scroll">
+            <table aria-label="综合排行数据">
+              <thead id="tableHead"></thead>
+              <tbody id="tableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" style="display:none;">
+          <div class="table-wrapper">
+            <div class="empty-state">
+              <svg viewBox="0 0 120 120" fill="none">
+                <circle cx="60" cy="60" r="50" stroke="currentColor" stroke-width="2" stroke-dasharray="8 4" opacity="0.3"/>
+                <path d="M45 65c0-8.284 6.716-15 15-15 8.284 0 15 6.716 15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+                <circle cx="48" cy="52" r="3" fill="currentColor" opacity="0.4"/>
+                <circle cx="72" cy="52" r="3" fill="currentColor" opacity="0.4"/>
+              </svg>
+              <h3 id="emptyTitle">暂无数据</h3>
+              <p id="emptyDesc">请点击"更新数据"获取最新排行</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Skeleton Loading -->
+        <div id="skeletonState" style="display:none;">
+          <div class="table-wrapper">
+            <div style="padding: var(--space-4);">
+              <div class="skeleton-row"><div class="skeleton skeleton-cell" style="width:40px"></div><div class="skeleton skeleton-cell" style="width:80px"></div><div class="skeleton skeleton-cell" style="flex:1"></div><div class="skeleton skeleton-cell" style="width:60px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:60px"></div><div class="skeleton skeleton-cell" style="width:60px"></div></div>
+              <div class="skeleton-row"><div class="skeleton skeleton-cell" style="width:40px"></div><div class="skeleton skeleton-cell" style="width:80px"></div><div class="skeleton skeleton-cell" style="flex:1"></div><div class="skeleton skeleton-cell" style="width:60px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:60px"></div><div class="skeleton skeleton-cell" style="width:60px"></div></div>
+              <div class="skeleton-row"><div class="skeleton skeleton-cell" style="width:40px"></div><div class="skeleton skeleton-cell" style="width:80px"></div><div class="skeleton skeleton-cell" style="flex:1"></div><div class="skeleton skeleton-cell" style="width:60px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:60px"></div><div class="skeleton skeleton-cell" style="width:60px"></div></div>
+              <div class="skeleton-row"><div class="skeleton skeleton-cell" style="width:40px"></div><div class="skeleton skeleton-cell" style="width:80px"></div><div class="skeleton skeleton-cell" style="flex:1"></div><div class="skeleton skeleton-cell" style="width:60px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:60px"></div><div class="skeleton skeleton-cell" style="width:60px"></div></div>
+              <div class="skeleton-row"><div class="skeleton skeleton-cell" style="width:40px"></div><div class="skeleton skeleton-cell" style="width:80px"></div><div class="skeleton skeleton-cell" style="flex:1"></div><div class="skeleton skeleton-cell" style="width:60px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:60px"></div><div class="skeleton skeleton-cell" style="width:60px"></div></div>
+              <div class="skeleton-row"><div class="skeleton skeleton-cell" style="width:40px"></div><div class="skeleton skeleton-cell" style="width:80px"></div><div class="skeleton skeleton-cell" style="flex:1"></div><div class="skeleton skeleton-cell" style="width:60px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:60px"></div><div class="skeleton skeleton-cell" style="width:60px"></div></div>
+              <div class="skeleton-row"><div class="skeleton skeleton-cell" style="width:40px"></div><div class="skeleton skeleton-cell" style="width:80px"></div><div class="skeleton skeleton-cell" style="flex:1"></div><div class="skeleton skeleton-cell" style="width:60px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:60px"></div><div class="skeleton skeleton-cell" style="width:60px"></div></div>
+              <div class="skeleton-row"><div class="skeleton skeleton-cell" style="width:40px"></div><div class="skeleton skeleton-cell" style="width:80px"></div><div class="skeleton skeleton-cell" style="flex:1"></div><div class="skeleton skeleton-cell" style="width:60px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:60px"></div><div class="skeleton skeleton-cell" style="width:60px"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination" id="pagination"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-section">
+        <h4>综合评分说明</h4>
+        <ul>
+          <li>稳定性得分：连续分红年数归一化，占 40%</li>
+          <li>股息率得分：近3年平均股息率归一化，占 35%</li>
+          <li>分红规模得分：累计分红总额归一化，占 25%</li>
+        </ul>
+        <p style="margin-top: var(--space-2);">归一化方法：(当前值 - 最小值) / (最大值 - 最小值) x 100，总分 0-100 分</p>
+      </div>
+      <div class="footer-section">
+        <h4>数据来源</h4>
+        <p>数据来自 A 股公开市场数据。本站仅展示已公开的分红信息，不涉及任何非公开数据。排行榜默认排除 ST 股。</p>
+      </div>
+      <div class="footer-section">
+        <h4>关于</h4>
+        <p>分红股排行榜是一个极简的 A 股分红数据查询工具，帮助关注股息收入的投资者快速找到优质分红股。</p>
+      </div>
+    </div>
+    <p class="footer-disclaimer">本站数据仅供参考，不构成投资建议。投资有风险，入市需谨慎。</p>
+    <div class="footer-bottom">
+      <p>&copy; 2026 分红股排行榜</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ===== DATA =====
+const STOCK_DATA = [
+  {code:"600519",name:"贵州茅台",industry:"白酒",score:95.2,consecutiveYears:27,dividendYield:3.85,avgYield3Y:3.52,dps:25.98,totalDividend:2365.12},
+  {code:"601318",name:"中国平安",industry:"保险",score:91.8,consecutiveYears:18,dividendYield:5.42,avgYield3Y:4.88,dps:2.42,totalDividend:4528.16},
+  {code:"000858",name:"五粮液",industry:"白酒",score:89.6,consecutiveYears:25,dividendYield:3.62,avgYield3Y:3.21,dps:4.56,totalDividend:856.42},
+  {code:"601398",name:"工商银行",industry:"银行",score:88.3,consecutiveYears:20,dividendYield:6.15,avgYield3Y:5.78,dps:0.30,totalDividend:12856.32},
+  {code:"600036",name:"招商银行",industry:"银行",score:87.1,consecutiveYears:19,dividendYield:5.68,avgYield3Y:5.23,dps:1.85,totalDividend:2986.45},
+  {code:"601088",name:"中国神华",industry:"煤炭",score:85.7,consecutiveYears:17,dividendYield:7.82,avgYield3Y:6.95,dps:2.56,totalDividend:3215.68},
+  {code:"000333",name:"美的集团",industry:"家电",score:84.2,consecutiveYears:16,dividendYield:4.35,avgYield3Y:3.98,dps:3.00,totalDividend:856.72},
+  {code:"600900",name:"长江电力",industry:"电力",score:83.5,consecutiveYears:22,dividendYield:3.92,avgYield3Y:3.65,dps:0.85,totalDividend:1568.92},
+  {code:"000651",name:"格力电器",industry:"家电",score:83.0,consecutiveYears:24,dividendYield:4.18,avgYield3Y:3.75,dps:2.00,totalDividend:1025.38},
+  {code:"600585",name:"海螺水泥",industry:"建材",score:82.1,consecutiveYears:15,dividendYield:4.56,avgYield3Y:4.12,dps:2.68,totalDividend:758.23},
+  {code:"002415",name:"海康威视",industry:"安防",score:80.8,consecutiveYears:14,dividendYield:3.28,avgYield3Y:3.05,dps:0.80,totalDividend:425.16},
+  {code:"601166",name:"兴业银行",industry:"银行",score:79.5,consecutiveYears:16,dividendYield:5.92,avgYield3Y:5.35,dps:1.05,totalDividend:1856.42},
+  {code:"600016",name:"民生银行",industry:"银行",score:78.2,consecutiveYears:15,dividendYield:5.45,avgYield3Y:4.98,dps:0.25,totalDividend:1425.68},
+  {code:"601288",name:"农业银行",industry:"银行",score:77.8,consecutiveYears:14,dividendYield:6.82,avgYield3Y:6.25,dps:0.23,totalDividend:9856.32},
+  {code:"000002",name:"万科A",industry:"房地产",score:76.5,consecutiveYears:20,dividendYield:2.85,avgYield3Y:3.42,dps:0.35,totalDividend:1256.78},
+  {code:"601857",name:"中国石油",industry:"石油",score:75.3,consecutiveYears:16,dividendYield:5.12,avgYield3Y:4.68,dps:0.45,totalDividend:8965.42},
+  {code:"600887",name:"伊利股份",industry:"乳业",score:74.8,consecutiveYears:18,dividendYield:3.15,avgYield3Y:2.95,dps:0.92,totalDividend:568.32},
+  {code:"000568",name:"泸州老窖",industry:"白酒",score:74.2,consecutiveYears:17,dividendYield:3.42,avgYield3Y:3.18,dps:6.80,totalDividend:425.16},
+  {code:"601668",name:"中国建筑",industry:"建筑",score:73.5,consecutiveYears:13,dividendYield:4.85,avgYield3Y:4.32,dps:0.30,totalDividend:2156.89},
+  {code:"600104",name:"上汽集团",industry:"汽车",score:72.8,consecutiveYears:18,dividendYield:4.92,avgYield3Y:4.56,dps:0.85,totalDividend:1568.45},
+  {code:"601939",name:"建设银行",industry:"银行",score:72.1,consecutiveYears:15,dividendYield:6.52,avgYield3Y:5.98,dps:0.39,totalDividend:11256.32},
+  {code:"002304",name:"洋河股份",industry:"白酒",score:71.5,consecutiveYears:14,dividendYield:3.68,avgYield3Y:3.35,dps:3.00,totalDividend:356.78},
+  {code:"600048",name:"保利发展",industry:"房地产",score:70.8,consecutiveYears:16,dividendYield:3.92,avgYield3Y:3.56,dps:0.48,totalDividend:856.42},
+  {code:"601601",name:"中国太保",industry:"保险",score:70.2,consecutiveYears:13,dividendYield:4.28,avgYield3Y:3.85,dps:1.20,totalDividend:625.36},
+  {code:"601328",name:"交通银行",industry:"银行",score:69.5,consecutiveYears:14,dividendYield:6.35,avgYield3Y:5.82,dps:0.37,totalDividend:5268.45},
+  {code:"002714",name:"牧原股份",industry:"养殖",score:68.8,consecutiveYears:10,dividendYield:3.56,avgYield3Y:2.85,dps:1.50,totalDividend:256.32},
+  {code:"600276",name:"恒瑞医药",industry:"医药",score:68.2,consecutiveYears:16,dividendYield:1.85,avgYield3Y:1.62,dps:0.80,totalDividend:325.68},
+  {code:"601628",name:"中国人寿",industry:"保险",score:67.5,consecutiveYears:12,dividendYield:3.92,avgYield3Y:3.45,dps:0.65,totalDividend:2568.42},
+  {code:"002230",name:"科大讯飞",industry:"科技",score:66.8,consecutiveYears:11,dividendYield:1.25,avgYield3Y:1.08,dps:0.30,totalDividend:98.56},
+  {code:"600030",name:"中信证券",industry:"证券",score:66.2,consecutiveYears:15,dividendYield:3.25,avgYield3Y:2.95,dps:0.65,totalDividend:856.78},
+  {code:"601899",name:"紫金矿业",industry:"有色",score:65.5,consecutiveYears:13,dividendYield:3.85,avgYield3Y:3.42,dps:0.35,totalDividend:568.92},
+  {code:"600028",name:"中国石化",industry:"石化",score:64.8,consecutiveYears:18,dividendYield:5.68,avgYield3Y:5.12,dps:0.42,totalDividend:7856.45},
+  {code:"000001",name:"平安银行",industry:"银行",score:64.2,consecutiveYears:12,dividendYield:5.15,avgYield3Y:4.68,dps:0.58,totalDividend:1256.32},
+  {code:"601111",name:"中国国航",industry:"航空",score:63.5,consecutiveYears:9,dividendYield:2.45,avgYield3Y:1.85,dps:0.15,totalDividend:356.78},
+  {code:"600031",name:"三一重工",industry:"机械",score:62.8,consecutiveYears:12,dividendYield:3.68,avgYield3Y:3.25,dps:0.80,totalDividend:425.16},
+  {code:"002352",name:"顺丰控股",industry:"物流",score:62.2,consecutiveYears:8,dividendYield:2.15,avgYield3Y:1.92,dps:0.55,totalDividend:198.56},
+  {code:"601818",name:"光大银行",industry:"银行",score:61.5,consecutiveYears:13,dividendYield:5.85,avgYield3Y:5.32,dps:0.21,totalDividend:1568.92},
+  {code:"600050",name:"中国联通",industry:"通信",score:60.8,consecutiveYears:11,dividendYield:3.42,avgYield3Y:3.05,dps:0.12,totalDividend:856.45},
+  {code:"601888",name:"中国中免",industry:"旅游",score:60.2,consecutiveYears:10,dividendYield:2.35,avgYield3Y:2.12,dps:2.50,totalDividend:325.68},
+  {code:"002475",name:"立讯精密",industry:"电子",score:59.5,consecutiveYears:9,dividendYield:1.45,avgYield3Y:1.28,dps:0.35,totalDividend:156.32},
+  {code:"600690",name:"海尔智家",industry:"家电",score:59.0,consecutiveYears:15,dividendYield:3.28,avgYield3Y:2.95,dps:0.78,totalDividend:458.92},
+  {code:"601012",name:"隆基绿能",industry:"光伏",score:58.2,consecutiveYears:8,dividendYield:2.65,avgYield3Y:2.35,dps:0.65,totalDividend:198.56},
+  {code:"600809",name:"山西汾酒",industry:"白酒",score:57.5,consecutiveYears:12,dividendYield:2.85,avgYield3Y:2.56,dps:8.50,totalDividend:268.45},
+  {code:"000725",name:"京东方A",industry:"面板",score:56.8,consecutiveYears:7,dividendYield:3.92,avgYield3Y:3.15,dps:0.15,totalDividend:325.68},
+  {code:"002594",name:"比亚迪",industry:"汽车",score:56.2,consecutiveYears:10,dividendYield:0.85,avgYield3Y:0.72,dps:2.32,totalDividend:156.32},
+  {code:"601985",name:"中国核电",industry:"电力",score:55.5,consecutiveYears:8,dividendYield:3.25,avgYield3Y:2.98,dps:0.22,totalDividend:356.78},
+  {code:"600741",name:"华域汽车",industry:"汽车零部件",score:55.0,consecutiveYears:14,dividendYield:4.85,avgYield3Y:4.32,dps:1.10,totalDividend:268.45},
+  {code:"601225",name:"陕西煤业",industry:"煤炭",score:54.2,consecutiveYears:9,dividendYield:6.25,avgYield3Y:5.68,dps:1.38,totalDividend:568.92},
+  {code:"002027",name:"分众传媒",industry:"传媒",score:53.5,consecutiveYears:8,dividendYield:5.12,avgYield3Y:4.56,dps:0.30,totalDividend:256.78},
+  {code:"600188",name:"兖矿能源",industry:"煤炭",score:52.8,consecutiveYears:12,dividendYield:5.85,avgYield3Y:5.12,dps:2.18,totalDividend:625.45}
+];
+
+const PAGE_SIZE = 50;
+let currentTab = 'comprehensive';
+let currentPage = 1;
+let filteredData = [];
+let searchTimeout = null;
+let tabDebounceTimeout = null;
+let currentState = 'normal';
+
+// ===== TAB COLUMNS =====
+const TAB_CONFIGS = {
+  comprehensive: {
+    label: '综合排行',
+    sort: (a, b) => b.score - a.score,
+    columns: [
+      {key:'rank', label:'排名', align:'center', width:'60px'},
+      {key:'code', label:'股票代码', align:'left', width:'100px', mono:true},
+      {key:'name', label:'股票名称', align:'left', width:'120px', link:true},
+      {key:'industry', label:'所属行业', align:'left', width:'100px', badge:true},
+      {key:'score', label:'综合评分', align:'left', width:'160px', scoreBar:true},
+      {key:'consecutiveYears', label:'连续分红', align:'right', width:'100px', suffix:'年'},
+      {key:'dividendYield', label:'最近股息率', align:'right', width:'110px', suffix:'%', decimal:2},
+      {key:'avgYield3Y', label:'3年平均股息率', align:'right', width:'120px', suffix:'%', decimal:2}
+    ]
+  },
+  stable: {
+    label: '稳定分红',
+    sort: (a, b) => b.consecutiveYears - a.consecutiveYears || b.dividendYield - a.dividendYield,
+    columns: [
+      {key:'rank', label:'排名', align:'center', width:'60px'},
+      {key:'code', label:'股票代码', align:'left', width:'100px', mono:true},
+      {key:'name', label:'股票名称', align:'left', width:'120px', link:true},
+      {key:'industry', label:'所属行业', align:'left', width:'100px', badge:true},
+      {key:'consecutiveYears', label:'连续分红年数', align:'right', width:'120px', suffix:'年'},
+      {key:'dividendYield', label:'最近股息率', align:'right', width:'110px', suffix:'%', decimal:2},
+      {key:'dps', label:'每股分红', align:'right', width:'110px', suffix:'元', decimal:2}
+    ]
+  },
+  highest: {
+    label: '分红最多',
+    sort: (a, b) => b.dividendYield - a.dividendYield,
+    columns: [
+      {key:'rank', label:'排名', align:'center', width:'60px'},
+      {key:'code', label:'股票代码', align:'left', width:'100px', mono:true},
+      {key:'name', label:'股票名称', align:'left', width:'120px', link:true},
+      {key:'industry', label:'所属行业', align:'left', width:'100px', badge:true},
+      {key:'dividendYield', label:'最近股息率', align:'right', width:'110px', suffix:'%', decimal:2},
+      {key:'avgYield3Y', label:'3年平均股息率', align:'right', width:'120px', suffix:'%', decimal:2},
+      {key:'dps', label:'每股分红', align:'right', width:'100px', suffix:'元', decimal:2},
+      {key:'totalDividend', label:'累计分红(亿)', align:'right', width:'120px', suffix:'', decimal:2}
+    ]
+  }
+};
+
+// ===== INIT =====
+function init() {
+  const hash = window.location.hash.replace('#', '');
+  if (['comprehensive', 'stable', 'highest'].includes(hash)) {
+    currentTab = hash;
+  }
+  const lastUpdate = localStorage.getItem('lastUpdateTime');
+  if (lastUpdate) {
+    document.getElementById('updateTimeDisplay').textContent = lastUpdate;
+  }
+  checkCooldown();
+  loadData();
+  setupKeyboardNav();
+}
+
+function setupKeyboardNav() {
+  const tabBar = document.getElementById('tabBar');
+  tabBar.addEventListener('keydown', function(e) {
+    const tabs = Array.from(tabBar.querySelectorAll('[role="tab"]'));
+    const idx = tabs.indexOf(document.activeElement);
+    if (idx === -1) return;
+    let newIdx = idx;
+    if (e.key === 'ArrowRight') { newIdx = (idx + 1) % tabs.length; e.preventDefault(); }
+    else if (e.key === 'ArrowLeft') { newIdx = (idx - 1 + tabs.length) % tabs.length; e.preventDefault(); }
+    else if (e.key === 'Home') { newIdx = 0; e.preventDefault(); }
+    else if (e.key === 'End') { newIdx = tabs.length - 1; e.preventDefault(); }
+    if (newIdx !== idx) { tabs[newIdx].focus(); }
+  });
+
+  document.getElementById('searchInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') { this.value = ''; handleSearch(); }
+  });
+}
+
+function loadData() {
+  const config = TAB_CONFIGS[currentTab];
+  const sorted = [...STOCK_DATA].sort(config.sort);
+  sorted.forEach((item, i) => item._rank = i + 1);
+  filteredData = sorted;
+  renderTable();
+  animateCards();
+}
+
+function animateCards() {
+  setTimeout(() => {
+    document.querySelectorAll('.stat-card').forEach(c => c.classList.add('loaded'));
+  }, 100);
+}
+
+// ===== TAB SWITCH =====
+function switchTab(tab) {
+  if (tab === currentTab || tabDebounceTimeout) return;
+  tabDebounceTimeout = setTimeout(() => { tabDebounceTimeout = null; }, 300);
+
+  currentTab = tab;
+  currentPage = 1;
+  document.getElementById('searchInput').value = '';
+  window.location.hash = tab;
+
+  document.querySelectorAll('[role="tab"]').forEach(t => {
+    const isActive = t.id === 'tab-' + tab;
+    t.setAttribute('aria-selected', isActive);
+    t.setAttribute('tabindex', isActive ? '0' : '-1');
+  });
+
+  document.getElementById('panel-comprehensive').setAttribute('aria-labelledby', 'tab-' + tab);
+    const tableEl = document.querySelector('.table-wrapper');
+  tableEl.style.opacity = '0';
+  setTimeout(() => {
+    loadData();
+    tableEl.style.opacity = '1';
+    tableEl.style.transition = 'opacity 100ms';
+  }, 50);
+}
+
+// ===== RENDER TABLE =====
+function renderTable() {
+  const config = TAB_CONFIGS[currentTab];
+  const thead = document.getElementById('tableHead');
+  const tbody = document.getElementById('tableBody');
+
+  // Render header
+  thead.innerHTML = '<tr>' + config.columns.map(col => {
+    const cls = col.align === 'right' ? ' class="text-right"' : col.align === 'center' ? ' class="text-center"' : '';
+    return '<th scope="col"' + cls + ' style="width:' + col.width + '">' + col.label + '</th>';
+  }).join('') + '</tr>';
+
+  // Update aria-label
+  const table = thead.closest('table');
+  table.setAttribute('aria-label', config.label + '排行数据');
+
+  // Pagination
+  const totalPages = Math.ceil(filteredData.length / PAGE_SIZE);
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const pageData = filteredData.slice(start, start + PAGE_SIZE);
+
+  // Render body
+  tbody.innerHTML = pageData.map((item, i) => {
+    return '<tr>' + config.columns.map(col => {
+      if (col.key === 'rank') {
+        const rank = item._rank;
+        const cls = rank <= 3 ? 'rank-' + rank : 'rank-default';
+        return '<td class="text-center"><span class="rank-badge ' + cls + '" aria-label="排名第' + rank + '名">' + rank + '</span></td>';
+      }
+      if (col.mono) {
+        return '<td class="text-mono">' + item[col.key] + '</td>';
+      }
+      if (col.link) {
+        return '<td><a href="P02-detail.html?code=' + item.code + '" target="_blank" class="stock-link">' + item[col.key] + '</a></td>';
+      }
+      if (col.badge) {
+        return '<td><span class="industry-badge">' + item[col.key] + '</span></td>';
+      }
+      if (col.scoreBar) {
+        const score = item[col.key];
+        const pct = score;
+        const color = score >= 80 ? 'var(--color-primary)' : score >= 60 ? 'var(--color-accent)' : 'var(--color-secondary-light)';
+        return '<td><div class="score-bar"><span class="score-value" style="color:' + color + '">' + score.toFixed(1) + '</span><div class="score-bar-bg"><div class="score-bar-fill" style="width:' + pct + '%;background:' + color + '"></div></div></div></td>';
+      }
+      const val = item[col.key];
+      if (val == null) return '<td class="text-right">--</td>';
+      const formatted = col.decimal != null ? val.toFixed(col.decimal) : val;
+      return '<td class="text-right">' + formatted + (col.suffix || '') + '</td>';
+    }).join('') + '</tr>';
+  }).join('');
+
+  // Update result count
+  document.getElementById('resultCount').textContent = '当前显示 ' + filteredData.length + ' 条';
+
+  // Render pagination
+  renderPagination(totalPages);
+
+  // Show/hide states
+  const tableWrapper = document.querySelector('.table-wrapper');
+  const emptyState = document.getElementById('emptyState');
+  if (currentState === 'normal' || currentState === 'error' || currentState === 'cooldown') {
+    if (filteredData.length === 0) {
+      tableWrapper.style.display = 'none';
+      emptyState.style.display = 'block';
+      document.getElementById('emptyTitle').textContent = '未找到匹配的股票';
+      document.getElementById('emptyDesc').textContent = '请尝试其他关键词';
+    } else {
+      tableWrapper.style.display = '';
+      emptyState.style.display = 'none';
+    }
+  }
+}
+
+function renderPagination(totalPages) {
+  const container = document.getElementById('pagination');
+  if (totalPages <= 1) { container.innerHTML = '<span class="pagination-info">共 ' + filteredData.length + ' 条</span>'; return; }
+
+  let html = '<span class="pagination-info">共 ' + filteredData.length + ' 条</span>';
+  html += '<button class="page-btn" onclick="goPage(' + (currentPage - 1) + ')"' + (currentPage === 1 ? ' disabled' : '') + '>&laquo; 上一页</button>';
+
+  const maxVisible = 5;
+  let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+  let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+  if (endPage - startPage < maxVisible - 1) startPage = Math.max(1, endPage - maxVisible + 1);
+
+  if (startPage > 1) { html += '<button class="page-btn" onclick="goPage(1)">1</button>'; if (startPage > 2) html += '<span class="page-ellipsis">...</span>'; }
+  for (let i = startPage; i <= endPage; i++) {
+    html += '<button class="page-btn' + (i === currentPage ? ' active' : '') + '" onclick="goPage(' + i + ')">' + i + '</button>';
+  }
+  if (endPage < totalPages) { if (endPage < totalPages - 1) html += '<span class="page-ellipsis">...</span>'; html += '<button class="page-btn" onclick="goPage(' + totalPages + ')">' + totalPages + '</button>'; }
+
+  html += '<button class="page-btn" onclick="goPage(' + (currentPage + 1) + ')"' + (currentPage === totalPages ? ' disabled' : '') + '>下一页 &raquo;</button>';
+  container.innerHTML = html;
+}
+
+function goPage(page) {
+  const totalPages = Math.ceil(filteredData.length / PAGE_SIZE);
+  if (page < 1 || page > totalPages || page === currentPage) return;
+  currentPage = page;
+  renderTable();
+  document.querySelector('.table-wrapper').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ===== SEARCH =====
+function handleSearch() {
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(() => {
+    const query = document.getElementById('searchInput').value.trim().toLowerCase();
+    const config = TAB_CONFIGS[currentTab];
+    const sorted = [...STOCK_DATA].sort(config.sort);
+    sorted.forEach((item, i) => item._rank = i + 1);
+    if (query) {
+      filteredData = sorted.filter(s => s.code.includes(query) || s.name.toLowerCase().includes(query));
+    } else {
+      filteredData = sorted;
+    }
+    currentPage = 1;
+    renderTable();
+  }, 300);
+}
+
+// ===== UPDATE DATA =====
+function handleUpdate() {
+  const btn = document.getElementById('updateBtn');
+  const btnText = document.getElementById('updateBtnText');
+  if (btn.disabled) return;
+
+  const lastUpdate = localStorage.getItem('lastUpdateTimestamp');
+  if (lastUpdate && Date.now() - parseInt(lastUpdate) < 5 * 60 * 1000) {
+    showError('5分钟内只能更新一次，请稍后再试');
+    return;
+  }
+
+  btn.disabled = true;
+  btnText.innerHTML = '<span class="spinner"></span> 更新中...';
+
+  setTimeout(() => {
+    const success = Math.random() > 0.2;
+    if (success) {
+      const now = new Date();
+      const timeStr = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0') + ' ' + String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+      localStorage.setItem('lastUpdateTime', timeStr);
+      localStorage.setItem('lastUpdateTimestamp', String(Date.now()));
+      document.getElementById('updateTimeDisplay').textContent = timeStr;
+      loadData();
+    } else {
+      showError('数据更新失败，请稍后重试');
+    }
+    btn.disabled = false;
+    btnText.innerHTML = '更新数据';
+    checkCooldown();
+  }, 2000);
+}
+
+function showError(msg) {
+  const toast = document.getElementById('errorToast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 5000);
+}
+
+function checkCooldown() {
+  const btn = document.getElementById('updateBtn');
+  const cooldownText = document.getElementById('cooldownText');
+  const lastTs = localStorage.getItem('lastUpdateTimestamp');
+  if (!lastTs) { cooldownText.textContent = ''; return; }
+
+  const elapsed = Date.now() - parseInt(lastTs);
+  const remaining = 5 * 60 * 1000 - elapsed;
+  if (remaining > 0) {
+    btn.disabled = true;
+    const mins = Math.floor(remaining / 60000);
+    const secs = Math.floor((remaining % 60000) / 1000);
+    cooldownText.textContent = mins + '分' + secs + '秒后可更新';
+    document.getElementById('updateBtnText').textContent = mins + '分' + secs + '秒后可更新';
+    setTimeout(checkCooldown, 1000);
+  } else {
+    btn.disabled = false;
+    cooldownText.textContent = '';
+    document.getElementById('updateBtnText').textContent = '更新数据';
+  }
+}
+
+// ===== STATE SWITCHER =====
+function switchState(state) {
+  currentState = state;
+  document.querySelectorAll('.state-switcher button').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+
+  const tableWrapper = document.querySelector('.table-wrapper');
+  const emptyState = document.getElementById('emptyState');
+  const skeletonState = document.getElementById('skeletonState');
+  const pagination = document.getElementById('pagination');
+  const btn = document.getElementById('updateBtn');
+  const btnText = document.getElementById('updateBtnText');
+  const searchInput = document.getElementById('searchInput');
+
+  // Reset
+  tableWrapper.style.display = '';
+  emptyState.style.display = 'none';
+  skeletonState.style.display = 'none';
+  pagination.style.display = '';
+  btn.disabled = false;
+  btnText.textContent = '更新数据';
+  btn.classList.remove('btn-pulse');
+
+  switch(state) {
+    case 'empty':
+      tableWrapper.style.display = 'none';
+      emptyState.style.display = 'block';
+      document.getElementById('emptyTitle').textContent = '暂无数据';
+      document.getElementById('emptyDesc').textContent = '请点击"更新数据"获取最新排行';
+      pagination.style.display = 'none';
+      document.getElementById('statValue1').textContent = '--';
+      document.getElementById('statValue2').textContent = '--';
+      document.getElementById('statValue3').innerHTML = '--';
+      btn.classList.add('btn-pulse');
+      break;
+    case 'loading':
+      tableWrapper.style.display = 'none';
+      skeletonState.style.display = 'block';
+      pagination.style.display = 'none';
+      btn.disabled = true;
+      btnText.innerHTML = '<span class="spinner"></span> 更新中...';
+      break;
+    case 'normal':
+      document.getElementById('statValue1').textContent = '856';
+      document.getElementById('statValue2').textContent = '3.28%';
+      document.getElementById('statValue3').innerHTML = '27<span style="font-size:var(--font-size-lg);font-weight:var(--font-weight-semibold)">年</span>';
+      loadData();
+      break;
+    case 'error':
+      showError('数据更新失败，请稍后重试');
+      loadData();
+      break;
+    case 'search-empty':
+      searchInput.value = 'ZZZZZ';
+      filteredData = [];
+      renderTable();
+      break;
+    case 'cooldown':
+      btn.disabled = true;
+      btnText.textContent = '4分32秒后可更新';
+      loadData();
+      break;
+  }
+}
+
+// ===== START =====
+init();
+</script>
+</body>
+</html>

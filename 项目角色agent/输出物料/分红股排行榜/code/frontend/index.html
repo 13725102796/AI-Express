@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>分红股排行榜 - A股分红数据极简排行工具</title>
+  <meta name="description" content="A股分红数据排行榜，提供综合排行、稳定分红排行、高股息排行三个维度，帮投资者快速找到最值得关注的分红股。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<!-- Error Toast -->
+<div id="errorToast" class="error-toast" role="alert"></div>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="header-brand">
+      <div class="header-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round">
+          <path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>
+        </svg>
+      </div>
+      <span class="header-title">分红股排行榜</span>
+    </a>
+    <div class="header-meta">
+      <span class="header-stat">共 <strong id="headerTotalStocks">--</strong> 只分红股</span>
+      <span class="header-stat" id="updateTime">数据更新于 --</span>
+    </div>
+    <div class="header-actions">
+      <button id="updateBtn" class="btn btn-primary">
+        <span id="updateBtnText">更新数据</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- Stats Cards -->
+  <section class="stats-section page-container">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon amber">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <rect x="3" y="3" width="7" height="18" rx="1"/><rect x="14" y="9" width="7" height="12" rx="1"/>
+          </svg>
+        </div>
+        <div class="stat-value accent" id="statTotalStocks">--</div>
+        <div class="stat-label">A股分红股数量</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon blue">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          </svg>
+        </div>
+        <div class="stat-value primary" id="statAvgYield">--</div>
+        <div class="stat-label">全市场平均股息率</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon amber">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M6 9H4.5a2.5 2.5 0 010-5C7 4 7 7 7 7s0 3 2.5 3"/><path d="M18 9h1.5a2.5 2.5 0 000-5C17 4 17 7 17 7s0 3-2.5 3"/><path d="M12 15V3M8 21h8M12 21v-6"/>
+          </svg>
+        </div>
+        <div class="stat-value accent" id="statMaxYears">--</div>
+        <div class="stat-label">最长连续分红年数</div>
+        <div class="stat-sub" id="statMaxStock"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Ranking Section -->
+  <section class="ranking-section page-container">
+    <!-- Tab Bar -->
+    <div class="tab-bar" role="tablist" aria-label="排行榜类型切换">
+      <button class="tab-item" role="tab" aria-selected="true" aria-controls="tabpanel-ranking" data-tab="comprehensive" tabindex="0">综合排行</button>
+      <button class="tab-item" role="tab" aria-selected="false" aria-controls="tabpanel-ranking" data-tab="stable" tabindex="-1">稳定分红</button>
+      <button class="tab-item" role="tab" aria-selected="false" aria-controls="tabpanel-ranking" data-tab="highest" tabindex="-1">分红最多</button>
+    </div>
+
+    <!-- Table Panel -->
+    <div id="tabpanel-ranking" role="tabpanel" aria-labelledby="tab-comprehensive">
+      <!-- Toolbar -->
+      <div class="table-toolbar">
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input id="searchInput" class="search-input" type="text" placeholder="搜索股票代码或名称..." aria-label="搜索股票">
+        </div>
+        <span id="resultCount" class="result-count">共 -- 条</span>
+      </div>
+
+      <!-- Skeleton Loading -->
+      <div id="skeletonArea" style="display:none;">
+        <div class="table-wrapper">
+          <div class="table-scroll">
+            <div class="skeleton-row"><div class="skeleton skeleton-cell" style="width:60px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:120px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:140px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:120px"></div></div>
+            <div class="skeleton-row"><div class="skeleton skeleton-cell" style="width:60px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:120px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:140px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:120px"></div></div>
+            <div class="skeleton-row"><div class="skeleton skeleton-cell" style="width:60px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:120px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:140px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:120px"></div></div>
+            <div class="skeleton-row"><div class="skeleton skeleton-cell" style="width:60px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:120px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:140px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:120px"></div></div>
+            <div class="skeleton-row"><div class="skeleton skeleton-cell" style="width:60px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:120px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:140px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:120px"></div></div>
+            <div class="skeleton-row"><div class="skeleton skeleton-cell" style="width:60px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:120px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:140px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:120px"></div></div>
+            <div class="skeleton-row"><div class="skeleton skeleton-cell" style="width:60px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:120px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:140px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:120px"></div></div>
+            <div class="skeleton-row"><div class="skeleton skeleton-cell" style="width:60px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:120px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:140px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:120px"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Data Table -->
+      <div id="tableWrapper" class="table-wrapper" style="display:none;">
+        <div class="table-scroll">
+          <table aria-label="排行榜数据">
+            <thead id="tableHead"></thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div id="emptyState" class="empty-state" style="display:none;"></div>
+
+      <!-- Pagination -->
+      <div id="paginationArea"></div>
+    </div>
+  </section>
+</main>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-section">
+        <h4>综合评分说明</h4>
+        <ul>
+          <li>稳定性得分：连续分红年数归一化，占 40%</li>
+          <li>股息率得分：近3年平均股息率归一化，占 35%</li>
+          <li>分红规模得分：累计分红总额归一化，占 25%</li>
+          <li>归一化方法：(当前值 - 最小值) / (最大值 - 最小值) x 100</li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h4>数据来源</h4>
+        <p>数据来自 A 股公开市场数据，通过 AKShare 开源库获取。数据可能存在延迟，仅供参考。</p>
+        <p>默认排除 ST 股票，仅统计现金分红（不含送股、转增）。</p>
+      </div>
+      <div class="footer-section">
+        <h4>关于</h4>
+        <p>分红股排行榜是一个极简的 A 股分红数据工具，帮助投资者快速找到分红质量最好的股票。</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-disclaimer">本站数据仅供参考，不构成投资建议。投资有风险，入市需谨慎。</p>
+      <p>&copy; 2026 分红股排行榜</p>
+    </div>
+  </div>
+</footer>
+
+<script src="/js/api.js"></script>
+<script src="/js/home.js"></script>
+</body>
+</html>
