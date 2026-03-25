@@ -5,9 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>分红股排行榜 - A股分红数据极简排行工具</title>
   <meta name="description" content="A股分红数据排行榜，提供综合排行、稳定分红排行、高股息排行三个维度，帮投资者快速找到最值得关注的分红股。">
+
+  <!-- Google Fonts: Inter (EN/Numbers) + Noto Sans SC (Chinese) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
@@ -15,23 +18,34 @@
 <!-- Error Toast -->
 <div id="errorToast" class="error-toast" role="alert"></div>
 
-<!-- HEADER -->
+<!-- HEADER / NAVBAR -->
 <header class="site-header">
   <div class="header-inner">
+    <!-- Brand -->
     <a href="/" class="header-brand">
-      <div class="header-logo">
+      <div class="header-logo" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round">
           <path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>
         </svg>
       </div>
       <span class="header-title">分红股排行榜</span>
     </a>
+
+    <!-- Stats meta -->
     <div class="header-meta">
-      <span class="header-stat">共 <strong id="headerTotalStocks">--</strong> 只分红股</span>
+      <span class="header-stat">
+        共 <strong id="headerTotalStocks">--</strong> 只分红股
+      </span>
       <span class="header-stat" id="updateTime">数据更新于 --</span>
     </div>
+
+    <!-- Actions -->
     <div class="header-actions">
-      <button id="updateBtn" class="btn btn-primary">
+      <button id="updateBtn" class="btn btn-primary" aria-label="更新数据">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <path d="M23 4v6h-6M1 20v-6h6"/>
+          <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
+        </svg>
         <span id="updateBtnText">更新数据</span>
       </button>
     </div>
@@ -39,20 +53,25 @@
 </header>
 
 <main>
-  <!-- Stats Cards -->
+  <!-- ===== Stats Cards ===== -->
   <section class="stats-section page-container">
     <div class="stats-grid">
+
+      <!-- Card 1: Total stocks -->
       <div class="stat-card">
-        <div class="stat-icon amber">
+        <div class="stat-icon amber" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-            <rect x="3" y="3" width="7" height="18" rx="1"/><rect x="14" y="9" width="7" height="12" rx="1"/>
+            <rect x="3" y="3" width="7" height="18" rx="1"/>
+            <rect x="14" y="9" width="7" height="12" rx="1"/>
           </svg>
         </div>
         <div class="stat-value accent" id="statTotalStocks">--</div>
         <div class="stat-label">A股分红股数量</div>
       </div>
+
+      <!-- Card 2: Avg yield -->
       <div class="stat-card">
-        <div class="stat-icon blue">
+        <div class="stat-icon blue" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
             <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
           </svg>
@@ -60,37 +79,57 @@
         <div class="stat-value primary" id="statAvgYield">--</div>
         <div class="stat-label">全市场平均股息率</div>
       </div>
+
+      <!-- Card 3: Max years -->
       <div class="stat-card">
-        <div class="stat-icon amber">
+        <div class="stat-icon amber" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-            <path d="M6 9H4.5a2.5 2.5 0 010-5C7 4 7 7 7 7s0 3 2.5 3"/><path d="M18 9h1.5a2.5 2.5 0 000-5C17 4 17 7 17 7s0 3-2.5 3"/><path d="M12 15V3M8 21h8M12 21v-6"/>
+            <path d="M6 9H4.5a2.5 2.5 0 010-5C7 4 7 7 7 7s0 3 2.5 3"/>
+            <path d="M18 9h1.5a2.5 2.5 0 000-5C17 4 17 7 17 7s0 3-2.5 3"/>
+            <path d="M12 15V3M8 21h8M12 21v-6"/>
           </svg>
         </div>
         <div class="stat-value accent" id="statMaxYears">--</div>
         <div class="stat-label">最长连续分红年数</div>
         <div class="stat-sub" id="statMaxStock"></div>
       </div>
+
     </div>
   </section>
 
-  <!-- Ranking Section -->
+  <!-- ===== Ranking Section ===== -->
   <section class="ranking-section page-container">
+
     <!-- Tab Bar -->
     <div class="tab-bar" role="tablist" aria-label="排行榜类型切换">
-      <button class="tab-item" role="tab" aria-selected="true" aria-controls="tabpanel-ranking" data-tab="comprehensive" tabindex="0">综合排行</button>
-      <button class="tab-item" role="tab" aria-selected="false" aria-controls="tabpanel-ranking" data-tab="stable" tabindex="-1">稳定分红</button>
-      <button class="tab-item" role="tab" aria-selected="false" aria-controls="tabpanel-ranking" data-tab="highest" tabindex="-1">分红最多</button>
+      <button class="tab-item" role="tab" aria-selected="true" aria-controls="tabpanel-ranking" data-tab="comprehensive" tabindex="0">
+        综合排行
+      </button>
+      <button class="tab-item" role="tab" aria-selected="false" aria-controls="tabpanel-ranking" data-tab="stable" tabindex="-1">
+        稳定分红
+      </button>
+      <button class="tab-item" role="tab" aria-selected="false" aria-controls="tabpanel-ranking" data-tab="highest" tabindex="-1">
+        分红最多
+      </button>
     </div>
 
     <!-- Table Panel -->
     <div id="tabpanel-ranking" role="tabpanel" aria-labelledby="tab-comprehensive">
-      <!-- Toolbar -->
+
+      <!-- Toolbar: search + count -->
       <div class="table-toolbar">
         <div class="search-box">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
           </svg>
-          <input id="searchInput" class="search-input" type="text" placeholder="搜索股票代码或名称..." aria-label="搜索股票">
+          <input
+            id="searchInput"
+            class="search-input"
+            type="text"
+            placeholder="搜索股票代码或名称..."
+            aria-label="搜索股票"
+          >
         </div>
         <span id="resultCount" class="result-count">共 -- 条</span>
       </div>
@@ -99,14 +138,78 @@
       <div id="skeletonArea" style="display:none;">
         <div class="table-wrapper">
           <div class="table-scroll">
-            <div class="skeleton-row"><div class="skeleton skeleton-cell" style="width:60px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:120px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:140px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:120px"></div></div>
-            <div class="skeleton-row"><div class="skeleton skeleton-cell" style="width:60px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:120px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:140px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:120px"></div></div>
-            <div class="skeleton-row"><div class="skeleton skeleton-cell" style="width:60px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:120px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:140px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:120px"></div></div>
-            <div class="skeleton-row"><div class="skeleton skeleton-cell" style="width:60px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:120px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:140px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:120px"></div></div>
-            <div class="skeleton-row"><div class="skeleton skeleton-cell" style="width:60px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:120px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:140px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:120px"></div></div>
-            <div class="skeleton-row"><div class="skeleton skeleton-cell" style="width:60px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:120px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:140px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:120px"></div></div>
-            <div class="skeleton-row"><div class="skeleton skeleton-cell" style="width:60px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:120px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:140px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:120px"></div></div>
-            <div class="skeleton-row"><div class="skeleton skeleton-cell" style="width:60px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:120px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:140px"></div><div class="skeleton skeleton-cell" style="width:100px"></div><div class="skeleton skeleton-cell" style="width:120px"></div></div>
+            <div class="skeleton-row">
+              <div class="skeleton skeleton-cell" style="width:60px"></div>
+              <div class="skeleton skeleton-cell" style="width:100px"></div>
+              <div class="skeleton skeleton-cell" style="width:120px"></div>
+              <div class="skeleton skeleton-cell" style="width:100px"></div>
+              <div class="skeleton skeleton-cell" style="width:140px"></div>
+              <div class="skeleton skeleton-cell" style="width:100px"></div>
+              <div class="skeleton skeleton-cell" style="width:120px"></div>
+            </div>
+            <div class="skeleton-row">
+              <div class="skeleton skeleton-cell" style="width:60px"></div>
+              <div class="skeleton skeleton-cell" style="width:100px"></div>
+              <div class="skeleton skeleton-cell" style="width:120px"></div>
+              <div class="skeleton skeleton-cell" style="width:100px"></div>
+              <div class="skeleton skeleton-cell" style="width:140px"></div>
+              <div class="skeleton skeleton-cell" style="width:100px"></div>
+              <div class="skeleton skeleton-cell" style="width:120px"></div>
+            </div>
+            <div class="skeleton-row">
+              <div class="skeleton skeleton-cell" style="width:60px"></div>
+              <div class="skeleton skeleton-cell" style="width:100px"></div>
+              <div class="skeleton skeleton-cell" style="width:120px"></div>
+              <div class="skeleton skeleton-cell" style="width:100px"></div>
+              <div class="skeleton skeleton-cell" style="width:140px"></div>
+              <div class="skeleton skeleton-cell" style="width:100px"></div>
+              <div class="skeleton skeleton-cell" style="width:120px"></div>
+            </div>
+            <div class="skeleton-row">
+              <div class="skeleton skeleton-cell" style="width:60px"></div>
+              <div class="skeleton skeleton-cell" style="width:100px"></div>
+              <div class="skeleton skeleton-cell" style="width:120px"></div>
+              <div class="skeleton skeleton-cell" style="width:100px"></div>
+              <div class="skeleton skeleton-cell" style="width:140px"></div>
+              <div class="skeleton skeleton-cell" style="width:100px"></div>
+              <div class="skeleton skeleton-cell" style="width:120px"></div>
+            </div>
+            <div class="skeleton-row">
+              <div class="skeleton skeleton-cell" style="width:60px"></div>
+              <div class="skeleton skeleton-cell" style="width:100px"></div>
+              <div class="skeleton skeleton-cell" style="width:120px"></div>
+              <div class="skeleton skeleton-cell" style="width:100px"></div>
+              <div class="skeleton skeleton-cell" style="width:140px"></div>
+              <div class="skeleton skeleton-cell" style="width:100px"></div>
+              <div class="skeleton skeleton-cell" style="width:120px"></div>
+            </div>
+            <div class="skeleton-row">
+              <div class="skeleton skeleton-cell" style="width:60px"></div>
+              <div class="skeleton skeleton-cell" style="width:100px"></div>
+              <div class="skeleton skeleton-cell" style="width:120px"></div>
+              <div class="skeleton skeleton-cell" style="width:100px"></div>
+              <div class="skeleton skeleton-cell" style="width:140px"></div>
+              <div class="skeleton skeleton-cell" style="width:100px"></div>
+              <div class="skeleton skeleton-cell" style="width:120px"></div>
+            </div>
+            <div class="skeleton-row">
+              <div class="skeleton skeleton-cell" style="width:60px"></div>
+              <div class="skeleton skeleton-cell" style="width:100px"></div>
+              <div class="skeleton skeleton-cell" style="width:120px"></div>
+              <div class="skeleton skeleton-cell" style="width:100px"></div>
+              <div class="skeleton skeleton-cell" style="width:140px"></div>
+              <div class="skeleton skeleton-cell" style="width:100px"></div>
+              <div class="skeleton skeleton-cell" style="width:120px"></div>
+            </div>
+            <div class="skeleton-row">
+              <div class="skeleton skeleton-cell" style="width:60px"></div>
+              <div class="skeleton skeleton-cell" style="width:100px"></div>
+              <div class="skeleton skeleton-cell" style="width:120px"></div>
+              <div class="skeleton skeleton-cell" style="width:100px"></div>
+              <div class="skeleton skeleton-cell" style="width:140px"></div>
+              <div class="skeleton skeleton-cell" style="width:100px"></div>
+              <div class="skeleton skeleton-cell" style="width:120px"></div>
+            </div>
           </div>
         </div>
       </div>

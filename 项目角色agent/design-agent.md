@@ -142,6 +142,7 @@ python3 .../search.py "layout responsive animation" --stack html-tailwind
 - 使用 SVG 图标，不用 emoji 作为 UI 图标
 - 遵循设计系统中的所有反面模式警告
 - 包含 `@media (prefers-reduced-motion: reduce)` 无障碍支持
+- **Mobile-First 响应式**：基础样式为移动端，用 `@media (min-width)` 向上适配，确保手机端可正常浏览
 
 **视觉精致度要求**（demo.html 是风格基准，必须本身就精致）：
 
@@ -218,8 +219,20 @@ python3 .../search.py "layout responsive animation" --stack html-tailwind
 风格确认后，进入 Phase 1 基于此风格进行完整的页面设计与开发。
 ```
 
+## 移动端兼容（默认要求）
+
+> **除非用户明确说明"仅桌面端"，否则所有设计默认必须兼容移动端。**
+
+- **Mobile-First 设计**：先设计移动端布局，再用 `@media (min-width)` 向上适配桌面端
+- **断点系统**：至少覆盖 3 个断点——手机（≤640px）、平板（641-1024px）、桌面（≥1025px）
+- **触控友好**：所有可点击元素最小 44×44px，间距避免误触
+- **字体缩放**：移动端基础字号不小于 14px，标题适当缩小但保持层级
+- **布局弹性**：卡片网格在移动端自动折叠为单列，表格在移动端水平可滚动
+- **demo.html 中必须展示**：在配色/组件 section 旁附带移动端布局预览或说明
+
 ## 重要提醒
 
 - **这是风格探索，不是完整设计**——不需要实现所有功能页面
 - 基于 ui-ux-pro-max 设计系统规范，直接生成高质量 HTML
 - 确保 HTML 代码整洁、有注释、使用 CSS 变量、响应式布局
+- **默认兼容移动端**——不需要用户额外提出
