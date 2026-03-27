@@ -2,123 +2,165 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>分红股排行榜 - 设计风格参考</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>分红股排行榜 -- 设计风格参考</title>
 
-  <!-- Google Fonts: Inter (EN/Numbers) + Noto Sans SC (Chinese) -->
+  <!-- Instrument Sans: distinctive alternative to Inter, geometric but warm -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
-    /* =============================================
-       DESIGN SYSTEM TOKENS
-       Source: ui-ux-pro-max (Banking + Analytics Dashboard)
-       Calibrated with: research-design.md "Trust Blue" scheme
-       ============================================= */
+    /* ==========================================================
+       DESIGN TOKEN SYSTEM
+       Direction: Editorial/Utilitarian
+       Inspired by: Financial broadsheet typography + warm materiality
+       Memory point: Amber gold accent on warm parchment neutrals
+       ========================================================== */
 
     :root {
-      /* --- Primary Palette --- */
-      --color-primary:        #1E40AF;   /* Deep blue - brand, active tabs, primary buttons */
-      --color-primary-hover:  #1E3A8A;   /* Darkened primary for hover */
-      --color-primary-light:  #DBEAFE;   /* Light blue tint for backgrounds */
-      --color-primary-ultra:  #EFF6FF;   /* Ultra-light blue for subtle highlights */
+      /* ---- COLOR TOKENS (OKLCH) ----
+         All neutrals carry warm hue (~70) at chroma 0.01
+         creating subconscious parchment/paper warmth.
+         No pure black, no pure white, no pure gray. */
 
-      /* --- Secondary --- */
-      --color-secondary:      #3B82F6;   /* Bright blue - links, secondary actions */
-      --color-secondary-hover:#2563EB;   /* Darkened secondary for hover */
+      /* Primary: Deep Navy -- trust, authority, depth */
+      --color-primary:          oklch(35% 0.08 255);
+      --color-primary-hover:    oklch(30% 0.09 255);
+      --color-primary-light:    oklch(92% 0.025 255);
+      --color-primary-muted:    oklch(55% 0.06 255);
 
-      /* --- Accent (Amber Gold) --- */
-      --color-accent:         #D97706;   /* Amber gold - dividends, wealth, CTA (WCAG 3:1 on white) */
-      --color-accent-hover:   #B45309;   /* Darkened accent for hover */
-      --color-accent-light:   #FEF3C7;   /* Light amber background */
-      --color-accent-bg:      #FFFBEB;   /* Ultra-light amber for highlight rows */
+      /* Accent: Amber Gold -- wealth, dividends, harvest */
+      --color-accent:           oklch(72% 0.16 70);
+      --color-accent-hover:     oklch(65% 0.17 70);
+      --color-accent-light:     oklch(94% 0.04 70);
+      --color-accent-dark:      oklch(50% 0.14 65);
 
-      /* --- Semantic Status --- */
-      --color-success:        #DC2626;   /* Red = A-share bullish/positive (Chinese convention) */
-      --color-success-bg:     #FEF2F2;
-      --color-danger:         #16A34A;   /* Green = A-share bearish/negative (Chinese convention) */
-      --color-danger-bg:      #F0FDF4;
-      --color-warning:        #F59E0B;
-      --color-warning-bg:     #FFFBEB;
-      --color-error:          #DC2626;   /* Errors still use red */
-      --color-error-bg:       #FEF2F2;
+      /* Semantic: A-share convention (red=up/positive, green=down/negative) */
+      --color-bullish:          oklch(55% 0.2 25);
+      --color-bullish-bg:       oklch(95% 0.02 25);
+      --color-bearish:          oklch(55% 0.12 155);
+      --color-bearish-bg:       oklch(95% 0.015 155);
 
-      /* --- Neutral Palette (5-level grayscale) --- */
-      --color-white:          #FFFFFF;
-      --color-gray-50:        #F8FAFC;   /* Page background */
-      --color-gray-100:       #F1F5F9;   /* Card hover, alt rows */
-      --color-gray-200:       #E2E8F0;   /* Borders, dividers */
-      --color-gray-300:       #CBD5E1;   /* Disabled borders */
-      --color-gray-400:       #94A3B8;   /* Placeholder text */
-      --color-gray-500:       #64748B;   /* Secondary text, captions */
-      --color-gray-600:       #475569;   /* Subtle headings */
-      --color-gray-700:       #334155;   /* Body text alternative */
-      --color-gray-800:       #1E293B;   /* Body text primary */
-      --color-gray-900:       #0F172A;   /* Headings, titles */
+      /* System semantic */
+      --color-error:            oklch(55% 0.2 25);
+      --color-error-bg:         oklch(95% 0.02 25);
+      --color-success:          oklch(60% 0.13 155);
+      --color-success-bg:       oklch(95% 0.015 155);
+      --color-warning:          oklch(78% 0.15 80);
+      --color-warning-bg:       oklch(95% 0.03 80);
 
-      /* --- Typography --- */
-      --font-sans:   'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      --font-mono:   'SF Mono', 'Fira Code', 'Cascadia Code', ui-monospace, monospace;
+      /* Tinted Neutrals: warm hue 70 (parchment), chroma 0.01 */
+      --color-surface-0:        oklch(98.5% 0.005 70);  /* Page bg */
+      --color-surface-1:        oklch(99% 0.003 70);    /* Card bg */
+      --color-surface-2:        oklch(96% 0.008 70);    /* Subtle bg */
+      --color-surface-3:        oklch(93% 0.01 70);     /* Hover bg */
 
-      /* Type Scale (based on 16px base, 1.25 ratio) */
-      --text-xs:     0.75rem;    /* 12px */
-      --text-sm:     0.875rem;   /* 14px */
-      --text-base:   1rem;       /* 16px */
-      --text-lg:     1.125rem;   /* 18px */
-      --text-xl:     1.25rem;    /* 20px */
-      --text-2xl:    1.5rem;     /* 24px */
-      --text-3xl:    2rem;       /* 32px */
-      --text-4xl:    2.5rem;     /* 40px */
+      --color-border:           oklch(88% 0.012 70);
+      --color-border-strong:    oklch(78% 0.015 70);
 
-      /* Line Heights */
-      --leading-tight:   1.25;
-      --leading-normal:  1.5;
-      --leading-relaxed: 1.625;
+      --color-text-primary:     oklch(20% 0.01 70);
+      --color-text-secondary:   oklch(45% 0.012 70);
+      --color-text-tertiary:    oklch(60% 0.01 70);
+      --color-text-inverse:     oklch(97% 0.005 70);
+      --color-text-on-accent:   oklch(20% 0.02 65);
 
-      /* Font Weights */
-      --font-regular:  400;
-      --font-medium:   500;
-      --font-semibold: 600;
-      --font-bold:     700;
+      /* ---- TYPOGRAPHY TOKENS ----
+         Font: Instrument Sans -- geometric, warm, distinctive
+         Scale: 1.25 ratio (Major Third) from 16px base
+         Chinese fallback: system fonts for best rendering */
+      --font-sans: 'Instrument Sans', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
 
-      /* --- Spacing (4px grid) --- */
-      --space-1:   4px;
-      --space-2:   8px;
-      --space-3:   12px;
-      --space-4:   16px;
-      --space-5:   20px;
-      --space-6:   24px;
-      --space-8:   32px;
-      --space-10:  40px;
-      --space-12:  48px;
-      --space-16:  64px;
-      --space-20:  80px;
+      /* Modular scale: 1.25 ratio */
+      --text-xs:    0.75rem;      /* 12px */
+      --text-sm:    0.875rem;     /* 14px */
+      --text-base:  1rem;         /* 16px */
+      --text-lg:    1.25rem;      /* 20px */
+      --text-xl:    1.5rem;       /* 24px */
+      --text-2xl:   1.875rem;     /* 30px */
+      --text-3xl:   2.375rem;     /* 38px */
+      --text-4xl:   3rem;         /* 48px */
 
-      /* --- Border Radius --- */
-      --radius-sm:   4px;
-      --radius-md:   8px;
-      --radius-lg:   12px;
-      --radius-xl:   16px;
-      --radius-full: 9999px;
+      /* Fluid heading sizes */
+      --text-display: clamp(2rem, 1.5rem + 2.5vw, 3rem);
+      --text-heading: clamp(1.5rem, 1.25rem + 1.25vw, 2.375rem);
+      --text-subheading: clamp(1.125rem, 1rem + 0.6vw, 1.5rem);
 
-      /* --- Shadows (multi-layer soft) --- */
-      --shadow-sm:   0 1px 2px 0 rgba(0, 0, 0, 0.05);
-      --shadow-md:   0 1px 3px 0 rgba(0, 0, 0, 0.06), 0 2px 8px -1px rgba(0, 0, 0, 0.06);
-      --shadow-lg:   0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.05);
-      --shadow-xl:   0 8px 16px -4px rgba(0, 0, 0, 0.08), 0 20px 40px -8px rgba(0, 0, 0, 0.06);
-      --shadow-focus: 0 0 0 3px rgba(30, 64, 175, 0.2);
-      --shadow-accent-focus: 0 0 0 3px rgba(217, 119, 6, 0.2);
+      --leading-tight:    1.2;
+      --leading-snug:     1.35;
+      --leading-normal:   1.5;
+      --leading-relaxed:  1.65;
 
-      /* --- Transitions --- */
-      --transition-fast:   150ms ease-out;
-      --transition-normal: 200ms ease-out;
-      --transition-slow:   300ms ease-out;
+      --weight-regular:   400;
+      --weight-medium:    500;
+      --weight-semibold:  600;
+      --weight-bold:      700;
+
+      --tracking-tight:   -0.02em;
+      --tracking-normal:  0;
+      --tracking-wide:    0.04em;
+
+      /* ---- SPACING TOKENS (4px base) ---- */
+      --space-1:    4px;
+      --space-2:    8px;
+      --space-3:    12px;
+      --space-4:    16px;
+      --space-5:    20px;
+      --space-6:    24px;
+      --space-8:    32px;
+      --space-10:   40px;
+      --space-12:   48px;
+      --space-16:   64px;
+      --space-20:   80px;
+      --space-24:   96px;
+
+      /* ---- SHADOW TOKENS ----
+         Multi-layer, subtle, warm-tinted.
+         Using oklch-based shadows for warmth. */
+      --shadow-sm:
+        0 1px 2px oklch(20% 0.01 70 / 0.04),
+        0 1px 3px oklch(20% 0.01 70 / 0.03);
+      --shadow-md:
+        0 2px 4px oklch(20% 0.01 70 / 0.04),
+        0 4px 12px oklch(20% 0.01 70 / 0.04);
+      --shadow-lg:
+        0 4px 8px oklch(20% 0.01 70 / 0.03),
+        0 8px 24px oklch(20% 0.01 70 / 0.06);
+      --shadow-xl:
+        0 8px 16px oklch(20% 0.01 70 / 0.04),
+        0 16px 48px oklch(20% 0.01 70 / 0.08);
+      --shadow-focus:
+        0 0 0 3px oklch(35% 0.08 255 / 0.2);
+      --shadow-accent-focus:
+        0 0 0 3px oklch(72% 0.16 70 / 0.25);
+
+      /* ---- BORDER RADIUS TOKENS ---- */
+      --radius-sm:    6px;
+      --radius-md:    8px;
+      --radius-lg:    12px;
+      --radius-xl:    16px;
+      --radius-full:  9999px;
+
+      /* ---- MOTION TOKENS ----
+         Duration tiers: instant / state / layout / entrance
+         Easing: exponential (ease-out-quart) default */
+      --duration-instant:   100ms;
+      --duration-state:     200ms;
+      --duration-layout:    350ms;
+      --duration-entrance:  500ms;
+
+      --ease-out-quart:     cubic-bezier(0.25, 1, 0.5, 1);
+      --ease-out-expo:      cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-in-out:        cubic-bezier(0.65, 0, 0.35, 1);
+
+      --transition-fast:    var(--duration-instant) var(--ease-out-quart);
+      --transition-normal:  var(--duration-state) var(--ease-out-quart);
+      --transition-slow:    var(--duration-layout) var(--ease-out-quart);
     }
 
-    /* =============================================
-       REDUCED MOTION SUPPORT
-       ============================================= */
+    /* ==========================================================
+       REDUCED MOTION
+       ========================================================== */
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
         animation-duration: 0.01ms !important;
@@ -127,9 +169,9 @@
       }
     }
 
-    /* =============================================
+    /* ==========================================================
        RESET & BASE
-       ============================================= */
+       ========================================================== */
     *, *::before, *::after {
       margin: 0;
       padding: 0;
@@ -141,57 +183,78 @@
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
       scroll-behavior: smooth;
+      text-size-adjust: 100%;
     }
 
     body {
       font-family: var(--font-sans);
       font-size: var(--text-base);
+      font-weight: var(--weight-regular);
       line-height: var(--leading-normal);
-      color: var(--color-gray-800);
-      background-color: var(--color-gray-50);
+      color: var(--color-text-primary);
+      background-color: var(--color-surface-0);
+      font-kerning: normal;
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
     }
 
-    /* =============================================
-       DEMO PAGE LAYOUT
-       ============================================= */
+    /* ==========================================================
+       DEMO PAGE STRUCTURE
+       ========================================================== */
 
-    /* --- Page Header (Demo meta, not the product header) --- */
-    .demo-header {
-      background: linear-gradient(135deg, var(--color-primary) 0%, #1E3A8A 100%);
-      color: var(--color-white);
-      padding: var(--space-12) var(--space-6);
-      text-align: center;
+    /* --- Page masthead (editorial style: left-aligned, rule-based) --- */
+    .demo-masthead {
+      border-bottom: 3px solid var(--color-text-primary);
+      padding: var(--space-8) var(--space-6) var(--space-6);
+      max-width: 1200px;
+      margin: 0 auto;
     }
 
-    .demo-header__badge {
+    .demo-masthead__tag {
       display: inline-block;
-      background: rgba(255, 255, 255, 0.15);
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      border-radius: var(--radius-full);
-      padding: var(--space-1) var(--space-4);
       font-size: var(--text-xs);
-      font-weight: var(--font-medium);
-      letter-spacing: 0.08em;
+      font-weight: var(--weight-semibold);
+      letter-spacing: var(--tracking-wide);
       text-transform: uppercase;
+      color: var(--color-accent-dark);
+      border: 1.5px solid var(--color-accent);
+      border-radius: var(--radius-sm);
+      padding: var(--space-1) var(--space-3);
       margin-bottom: var(--space-4);
     }
 
-    .demo-header__title {
-      font-size: var(--text-3xl);
-      font-weight: var(--font-bold);
+    .demo-masthead__title {
+      font-size: var(--text-display);
+      font-weight: var(--weight-bold);
       line-height: var(--leading-tight);
-      margin-bottom: var(--space-3);
+      letter-spacing: var(--tracking-tight);
+      color: var(--color-text-primary);
+      max-width: 680px;
     }
 
-    .demo-header__subtitle {
+    .demo-masthead__break {
+      display: block;
+    }
+
+    @media (min-width: 768px) {
+      .demo-masthead__break {
+        display: inline;
+      }
+      .demo-masthead__break::before {
+        content: ' — ';
+      }
+    }
+
+    .demo-masthead__subtitle {
       font-size: var(--text-lg);
-      opacity: 0.8;
-      max-width: 600px;
-      margin: 0 auto;
+      font-weight: var(--weight-regular);
+      color: var(--color-text-secondary);
+      margin-top: var(--space-3);
+      max-width: 560px;
       line-height: var(--leading-relaxed);
     }
 
-    /* --- Section Container --- */
+    /* --- Section container --- */
     .demo-container {
       max-width: 1200px;
       margin: 0 auto;
@@ -199,143 +262,212 @@
     }
 
     .demo-section {
-      padding: var(--space-16) 0;
+      padding: var(--space-16) 0 var(--space-12);
     }
 
     .demo-section + .demo-section {
-      border-top: 1px solid var(--color-gray-200);
+      border-top: 1px solid var(--color-border);
+    }
+
+    /* Section titles: left-aligned with accent rule */
+    .demo-section__header {
+      margin-bottom: var(--space-10);
+    }
+
+    .demo-section__number {
+      font-size: var(--text-xs);
+      font-weight: var(--weight-semibold);
+      letter-spacing: var(--tracking-wide);
+      text-transform: uppercase;
+      color: var(--color-accent-dark);
+      display: block;
+      margin-bottom: var(--space-2);
     }
 
     .demo-section__title {
-      font-size: var(--text-2xl);
-      font-weight: var(--font-bold);
-      color: var(--color-gray-900);
-      margin-bottom: var(--space-2);
+      font-size: var(--text-heading);
+      font-weight: var(--weight-bold);
+      line-height: var(--leading-tight);
+      letter-spacing: var(--tracking-tight);
+      color: var(--color-text-primary);
     }
 
     .demo-section__desc {
       font-size: var(--text-base);
-      color: var(--color-gray-500);
-      margin-bottom: var(--space-8);
-      max-width: 640px;
+      color: var(--color-text-secondary);
+      margin-top: var(--space-3);
+      max-width: 560px;
+      line-height: var(--leading-relaxed);
     }
 
     /* --- Subsection --- */
-    .demo-subsection {
+    .demo-sub {
       margin-bottom: var(--space-12);
     }
 
-    .demo-subsection__title {
-      font-size: var(--text-lg);
-      font-weight: var(--font-semibold);
-      color: var(--color-gray-700);
-      margin-bottom: var(--space-4);
+    .demo-sub__title {
+      font-size: var(--text-subheading);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-6);
+      padding-bottom: var(--space-2);
+      border-bottom: 1px solid var(--color-border);
     }
 
-    /* =============================================
+    /* ==========================================================
        SECTION 1: COLOR PALETTE
-       ============================================= */
-    .color-grid {
+       Layout: 2-column asymmetric on desktop, stack on mobile
+       ========================================================== */
+
+    .color-palette {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: var(--space-4);
+      grid-template-columns: 1fr;
+      gap: var(--space-8);
+    }
+
+    @media (min-width: 768px) {
+      .color-palette {
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-6);
+      }
+    }
+
+    .color-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .color-group__label {
+      font-size: var(--text-xs);
+      font-weight: var(--weight-semibold);
+      letter-spacing: var(--tracking-wide);
+      text-transform: uppercase;
+      color: var(--color-text-tertiary);
     }
 
     .color-swatch {
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      background: var(--color-white);
-      box-shadow: var(--shadow-md);
-      transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+      display: grid;
+      grid-template-columns: 64px 1fr;
+      gap: var(--space-4);
+      align-items: center;
+      padding: var(--space-3);
+      border-radius: var(--radius-md);
+      transition: background var(--transition-fast);
     }
 
     .color-swatch:hover {
-      transform: translateY(-4px);
-      box-shadow: var(--shadow-xl);
+      background: var(--color-surface-2);
     }
 
-    .color-swatch__preview {
-      height: 80px;
-      display: flex;
-      align-items: flex-end;
-      padding: var(--space-2) var(--space-3);
-    }
-
-    .color-swatch__contrast {
-      font-size: var(--text-xs);
-      font-weight: var(--font-medium);
-      padding: 2px 6px;
+    .color-swatch__block {
+      width: 64px;
+      height: 48px;
       border-radius: var(--radius-sm);
-      background: rgba(0,0,0,0.2);
-      color: #fff;
+      border: 1px solid oklch(50% 0 0 / 0.06);
     }
 
-    .color-swatch__info {
-      padding: var(--space-3) var(--space-4);
-    }
-
-    .color-swatch__hex {
-      font-family: var(--font-mono);
-      font-size: var(--text-sm);
-      font-weight: var(--font-semibold);
-      color: var(--color-gray-800);
+    .color-swatch__meta {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
     }
 
     .color-swatch__name {
-      font-size: var(--text-xs);
-      color: var(--color-gray-500);
-      margin-top: 2px;
+      font-size: var(--text-sm);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-primary);
     }
 
-    /* Neutral grayscale strip */
+    .color-swatch__value {
+      font-size: var(--text-xs);
+      color: var(--color-text-tertiary);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .color-swatch__usage {
+      font-size: var(--text-xs);
+      color: var(--color-text-secondary);
+    }
+
+    .color-swatch__badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: var(--weight-semibold);
+      letter-spacing: 0.02em;
+      padding: 1px 5px;
+      border-radius: var(--radius-sm);
+      background: var(--color-surface-3);
+      color: var(--color-text-secondary);
+      margin-top: 2px;
+      width: fit-content;
+    }
+
+    .color-swatch__badge--pass {
+      background: oklch(92% 0.03 155);
+      color: oklch(35% 0.08 155);
+    }
+
+    /* Neutral strip */
     .neutral-strip {
       display: flex;
       border-radius: var(--radius-lg);
       overflow: hidden;
-      box-shadow: var(--shadow-md);
-      margin-top: var(--space-6);
+      border: 1px solid var(--color-border);
+      margin-top: var(--space-4);
     }
 
     .neutral-strip__swatch {
       flex: 1;
-      padding: var(--space-6) var(--space-3);
+      padding: var(--space-6) var(--space-2);
       text-align: center;
-      font-size: var(--text-xs);
-      font-family: var(--font-mono);
-      font-weight: var(--font-medium);
-      min-height: 80px;
+      font-size: 10px;
+      font-weight: var(--weight-medium);
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-end;
       gap: 4px;
+      min-height: 72px;
     }
 
     .neutral-strip__label {
-      font-family: var(--font-sans);
-      font-size: 10px;
+      font-size: 9px;
+      letter-spacing: 0.02em;
       opacity: 0.7;
     }
 
     /* Readability demo */
-    .readability-demo {
+    .readability-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      grid-template-columns: 1fr;
       gap: var(--space-4);
       margin-top: var(--space-6);
     }
 
+    @media (min-width: 640px) {
+      .readability-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (min-width: 1025px) {
+      .readability-grid {
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+    }
+
     .readability-card {
       padding: var(--space-6);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-sm);
+      border-radius: var(--radius-md);
     }
 
     .readability-card__label {
       font-size: var(--text-xs);
-      font-weight: var(--font-medium);
+      font-weight: var(--weight-semibold);
       margin-bottom: var(--space-2);
-      opacity: 0.7;
+      letter-spacing: var(--tracking-wide);
+      text-transform: uppercase;
     }
 
     .readability-card__text {
@@ -345,27 +477,36 @@
 
     .readability-card__ratio {
       font-size: var(--text-xs);
-      font-family: var(--font-mono);
       margin-top: var(--space-3);
-      opacity: 0.6;
+      font-variant-numeric: tabular-nums;
+      opacity: 0.65;
     }
 
-    /* =============================================
+    /* ==========================================================
        SECTION 2: TYPOGRAPHY
-       ============================================= */
+       ========================================================== */
+
     .type-specimen {
-      background: var(--color-white);
+      background: var(--color-surface-1);
       border-radius: var(--radius-lg);
       padding: var(--space-8);
-      box-shadow: var(--shadow-md);
+      border: 1px solid var(--color-border);
     }
 
     .type-row {
       display: flex;
-      align-items: baseline;
-      padding: var(--space-4) 0;
-      border-bottom: 1px solid var(--color-gray-100);
-      gap: var(--space-6);
+      flex-direction: column;
+      gap: var(--space-2);
+      padding: var(--space-5) 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    @media (min-width: 768px) {
+      .type-row {
+        flex-direction: row;
+        align-items: baseline;
+        gap: var(--space-8);
+      }
     }
 
     .type-row:last-child {
@@ -374,72 +515,108 @@
 
     .type-meta {
       flex-shrink: 0;
-      width: 140px;
+      width: auto;
     }
 
-    .type-meta__label {
+    @media (min-width: 768px) {
+      .type-meta {
+        width: 120px;
+      }
+    }
+
+    .type-meta__role {
       font-size: var(--text-xs);
-      font-weight: var(--font-semibold);
-      color: var(--color-primary);
+      font-weight: var(--weight-semibold);
+      color: var(--color-accent-dark);
+      letter-spacing: var(--tracking-wide);
       text-transform: uppercase;
-      letter-spacing: 0.06em;
     }
 
     .type-meta__spec {
       font-size: var(--text-xs);
-      color: var(--color-gray-400);
-      font-family: var(--font-mono);
+      color: var(--color-text-tertiary);
+      font-variant-numeric: tabular-nums;
       margin-top: 2px;
     }
 
     .type-sample {
       flex: 1;
-      color: var(--color-gray-900);
+      color: var(--color-text-primary);
       min-width: 0;
     }
 
     /* Number specimen */
     .number-specimen {
-      background: var(--color-white);
-      border-radius: var(--radius-lg);
-      padding: var(--space-8);
-      box-shadow: var(--shadow-md);
-      margin-top: var(--space-6);
-    }
-
-    .number-grid {
+      margin-top: var(--space-8);
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
       gap: var(--space-6);
     }
 
-    .number-card {
-      text-align: center;
+    .number-item {
+      background: var(--color-surface-1);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-6);
     }
 
-    .number-card__value {
-      font-size: var(--text-3xl);
-      font-weight: var(--font-bold);
-      font-variant-numeric: tabular-nums;
-      letter-spacing: -0.02em;
-    }
-
-    .number-card__label {
+    .number-item__label {
       font-size: var(--text-xs);
-      color: var(--color-gray-500);
+      color: var(--color-text-tertiary);
+      font-weight: var(--weight-medium);
+      letter-spacing: var(--tracking-wide);
+      text-transform: uppercase;
+    }
+
+    .number-item__value {
+      font-size: var(--text-2xl);
+      font-weight: var(--weight-bold);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: var(--tracking-tight);
+      margin-top: var(--space-2);
+      color: var(--color-text-primary);
+    }
+
+    .number-item__change {
+      font-size: var(--text-sm);
+      font-weight: var(--weight-medium);
       margin-top: var(--space-1);
     }
 
-    /* =============================================
+    .number-item__change--up {
+      color: var(--color-bullish);
+    }
+
+    .number-item__change--down {
+      color: var(--color-bearish);
+    }
+
+    /* ==========================================================
        SECTION 3: COMPONENTS
-       ============================================= */
+       ========================================================== */
 
     /* --- Buttons --- */
+    .btn-showcase {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-8);
+    }
+
     .btn-row {
       display: flex;
       flex-wrap: wrap;
       gap: var(--space-4);
       align-items: center;
+    }
+
+    .btn-row__label {
+      font-size: var(--text-xs);
+      font-weight: var(--weight-semibold);
+      letter-spacing: var(--tracking-wide);
+      text-transform: uppercase;
+      color: var(--color-text-tertiary);
+      width: 100%;
+      margin-bottom: calc(var(--space-2) * -1);
     }
 
     .btn {
@@ -450,15 +627,20 @@
       padding: var(--space-3) var(--space-6);
       font-family: var(--font-sans);
       font-size: var(--text-sm);
-      font-weight: var(--font-semibold);
+      font-weight: var(--weight-semibold);
       line-height: 1;
-      border: none;
+      border: 1.5px solid transparent;
       border-radius: var(--radius-md);
       cursor: pointer;
-      transition: all var(--transition-fast);
+      transition:
+        background var(--transition-fast),
+        border-color var(--transition-fast),
+        box-shadow var(--transition-fast),
+        transform var(--transition-fast);
       white-space: nowrap;
-      outline: none;
+      outline: 2px solid transparent;
       min-height: 44px;
+      text-decoration: none;
     }
 
     .btn:active {
@@ -469,60 +651,37 @@
       box-shadow: var(--shadow-focus);
     }
 
-    /* Primary button */
+    /* Primary */
     .btn--primary {
       background: var(--color-primary);
-      color: var(--color-white);
+      color: var(--color-text-inverse);
+      border-color: var(--color-primary);
     }
 
     .btn--primary:hover {
       background: var(--color-primary-hover);
+      border-color: var(--color-primary-hover);
       box-shadow: var(--shadow-md);
-    }
-
-    .btn--primary:focus-visible {
-      box-shadow: var(--shadow-focus);
     }
 
     .btn--primary:disabled,
     .btn--primary[aria-disabled="true"] {
-      background: var(--color-primary);
-      opacity: 0.4;
+      opacity: 0.35;
       cursor: not-allowed;
       transform: none;
+      box-shadow: none;
     }
 
-    /* Secondary button */
-    .btn--secondary {
-      background: var(--color-white);
-      color: var(--color-gray-700);
-      border: 1px solid var(--color-gray-200);
-    }
-
-    .btn--secondary:hover {
-      background: var(--color-gray-50);
-      border-color: var(--color-gray-300);
-    }
-
-    .btn--secondary:focus-visible {
-      box-shadow: var(--shadow-focus);
-    }
-
-    .btn--secondary:disabled,
-    .btn--secondary[aria-disabled="true"] {
-      opacity: 0.4;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    /* Accent button */
+    /* Accent */
     .btn--accent {
       background: var(--color-accent);
-      color: var(--color-white);
+      color: var(--color-text-on-accent);
+      border-color: var(--color-accent);
     }
 
     .btn--accent:hover {
       background: var(--color-accent-hover);
+      border-color: var(--color-accent-hover);
       box-shadow: var(--shadow-md);
     }
 
@@ -530,14 +689,39 @@
       box-shadow: var(--shadow-accent-focus);
     }
 
-    /* Ghost button */
+    /* Secondary (outline) */
+    .btn--secondary {
+      background: var(--color-surface-1);
+      color: var(--color-text-primary);
+      border-color: var(--color-border-strong);
+    }
+
+    .btn--secondary:hover {
+      background: var(--color-surface-2);
+      border-color: var(--color-text-tertiary);
+    }
+
+    /* Ghost */
     .btn--ghost {
       background: transparent;
-      color: var(--color-secondary);
+      color: var(--color-primary-muted);
+      border-color: transparent;
     }
 
     .btn--ghost:hover {
-      background: var(--color-primary-ultra);
+      background: var(--color-primary-light);
+      color: var(--color-primary);
+    }
+
+    /* Danger */
+    .btn--danger {
+      background: transparent;
+      color: var(--color-error);
+      border-color: var(--color-error);
+    }
+
+    .btn--danger:hover {
+      background: var(--color-error-bg);
     }
 
     /* Button sizes */
@@ -553,10 +737,10 @@
       min-height: 48px;
     }
 
-    /* Loading button */
+    /* Loading state */
     .btn--loading {
       position: relative;
-      color: transparent;
+      color: transparent !important;
       pointer-events: none;
     }
 
@@ -565,8 +749,8 @@
       position: absolute;
       width: 16px;
       height: 16px;
-      border: 2px solid rgba(255,255,255,0.3);
-      border-top-color: #fff;
+      border: 2px solid oklch(80% 0 0 / 0.4);
+      border-top-color: var(--color-text-inverse);
       border-radius: 50%;
       animation: spin 0.6s linear infinite;
     }
@@ -575,98 +759,85 @@
       to { transform: rotate(360deg); }
     }
 
-    /* --- Cards --- */
-    .card-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: var(--space-6);
-    }
-
-    .card {
-      background: var(--color-white);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-md);
-      overflow: hidden;
-      transition: transform var(--transition-normal), box-shadow var(--transition-normal);
-    }
-
-    .card:hover {
-      transform: translateY(-4px);
-      box-shadow: var(--shadow-xl);
-    }
-
-    .card__header {
-      padding: var(--space-6) var(--space-6) 0;
+    /* --- State chain display --- */
+    .state-chain {
       display: flex;
-      align-items: center;
+      flex-wrap: wrap;
       gap: var(--space-3);
-    }
-
-    .card__icon {
-      width: 40px;
-      height: 40px;
-      border-radius: var(--radius-md);
-      display: flex;
       align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
+      padding: var(--space-4);
+      background: var(--color-surface-2);
+      border-radius: var(--radius-md);
     }
 
-    .card__icon--blue {
-      background: var(--color-primary-light);
+    .state-chain__arrow {
+      color: var(--color-text-tertiary);
+      font-size: var(--text-sm);
+    }
+
+    .state-chain__label {
+      font-size: var(--text-xs);
+      color: var(--color-text-tertiary);
+      font-weight: var(--weight-medium);
+    }
+
+    /* --- Tabs --- */
+    .tab-bar {
+      display: flex;
+      gap: 0;
+      border-bottom: 2px solid var(--color-border);
+    }
+
+    .tab {
+      font-family: var(--font-sans);
+      font-size: var(--text-sm);
+      font-weight: var(--weight-medium);
+      color: var(--color-text-secondary);
+      background: none;
+      border: none;
+      padding: var(--space-3) var(--space-5);
+      cursor: pointer;
+      position: relative;
+      transition:
+        color var(--transition-fast),
+        background var(--transition-fast);
+      min-height: 44px;
+      outline: 2px solid transparent;
+    }
+
+    .tab:hover {
+      color: var(--color-text-primary);
+      background: var(--color-surface-2);
+    }
+
+    .tab:focus-visible {
+      box-shadow: inset 0 0 0 2px var(--color-primary);
+      border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+    }
+
+    .tab--active {
       color: var(--color-primary);
+      font-weight: var(--weight-semibold);
     }
 
-    .card__icon--amber {
-      background: var(--color-accent-light);
-      color: var(--color-accent);
+    .tab--active::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--color-primary);
     }
 
-    .card__icon--slate {
-      background: var(--color-gray-100);
-      color: var(--color-gray-600);
+    /* --- Input --- */
+    .input-stack {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-6);
+      max-width: 420px;
     }
 
-    .card__body {
-      padding: var(--space-4) var(--space-6) var(--space-6);
-    }
-
-    .card__title {
-      font-size: var(--text-base);
-      font-weight: var(--font-semibold);
-      color: var(--color-gray-900);
-    }
-
-    .card__desc {
-      font-size: var(--text-sm);
-      color: var(--color-gray-500);
-      line-height: var(--leading-relaxed);
-      margin-top: var(--space-2);
-    }
-
-    .card__value {
-      font-size: var(--text-2xl);
-      font-weight: var(--font-bold);
-      color: var(--color-gray-900);
-      font-variant-numeric: tabular-nums;
-      margin-top: var(--space-3);
-    }
-
-    .card__change {
-      font-size: var(--text-sm);
-      font-weight: var(--font-medium);
-      margin-top: var(--space-1);
-    }
-
-    .card__change--up {
-      color: var(--color-success);
-    }
-
-    .card__change--down {
-      color: var(--color-danger);
-    }
-
-    /* --- Inputs --- */
     .input-group {
       display: flex;
       flex-direction: column;
@@ -675,8 +846,8 @@
 
     .input-label {
       font-size: var(--text-sm);
-      font-weight: var(--font-medium);
-      color: var(--color-gray-700);
+      font-weight: var(--weight-medium);
+      color: var(--color-text-primary);
     }
 
     .input-label__required {
@@ -684,31 +855,38 @@
       margin-left: 2px;
     }
 
+    .input-hint {
+      font-size: var(--text-xs);
+      color: var(--color-text-tertiary);
+    }
+
     .input {
       font-family: var(--font-sans);
-      font-size: var(--text-sm);
+      font-size: var(--text-base);
       padding: var(--space-3) var(--space-4);
-      border: 1px solid var(--color-gray-200);
+      border: 1.5px solid var(--color-border-strong);
       border-radius: var(--radius-md);
-      background: var(--color-white);
-      color: var(--color-gray-800);
-      transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+      background: var(--color-surface-1);
+      color: var(--color-text-primary);
+      transition:
+        border-color var(--transition-fast),
+        box-shadow var(--transition-fast);
       outline: none;
       min-height: 44px;
       width: 100%;
     }
 
     .input::placeholder {
-      color: var(--color-gray-400);
+      color: var(--color-text-tertiary);
     }
 
     .input:hover {
-      border-color: var(--color-gray-300);
+      border-color: var(--color-text-secondary);
     }
 
     .input:focus {
-      border-color: var(--color-secondary);
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px oklch(35% 0.08 255 / 0.1);
     }
 
     .input--error {
@@ -716,12 +894,7 @@
     }
 
     .input--error:focus {
-      box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
-    }
-
-    .input-helper {
-      font-size: var(--text-xs);
-      color: var(--color-gray-500);
+      box-shadow: 0 0 0 3px oklch(55% 0.2 25 / 0.12);
     }
 
     .input-error-msg {
@@ -732,1817 +905,1975 @@
       gap: var(--space-1);
     }
 
-    /* --- Badges / Tags --- */
+    /* --- Badge / Tag --- */
     .badge {
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      padding: 2px 10px;
+      gap: var(--space-1);
       font-size: var(--text-xs);
-      font-weight: var(--font-medium);
-      border-radius: var(--radius-full);
-      white-space: nowrap;
+      font-weight: var(--weight-semibold);
+      padding: 3px var(--space-2);
+      border-radius: var(--radius-sm);
+      line-height: 1.3;
     }
 
-    .badge--blue {
+    .badge--neutral {
+      background: var(--color-surface-3);
+      color: var(--color-text-secondary);
+    }
+
+    .badge--primary {
       background: var(--color-primary-light);
       color: var(--color-primary);
     }
 
-    .badge--amber {
+    .badge--accent {
       background: var(--color-accent-light);
-      color: var(--color-accent);
+      color: var(--color-accent-dark);
     }
 
-    .badge--gray {
-      background: var(--color-gray-100);
-      color: var(--color-gray-600);
+    .badge--bullish {
+      background: var(--color-bullish-bg);
+      color: var(--color-bullish);
     }
 
-    .badge--success {
-      background: var(--color-success-bg);
-      color: var(--color-success);
+    .badge--bearish {
+      background: var(--color-bearish-bg);
+      color: var(--color-bearish);
     }
 
-    .badge--danger {
-      background: var(--color-danger-bg);
-      color: var(--color-danger);
+    .badge--outline {
+      background: transparent;
+      border: 1px solid var(--color-border-strong);
+      color: var(--color-text-secondary);
     }
 
     .badge-row {
       display: flex;
       flex-wrap: wrap;
-      gap: var(--space-2);
-    }
-
-    /* --- Navigation / Tabs --- */
-    .tab-bar {
-      display: flex;
-      background: var(--color-white);
-      border-radius: var(--radius-lg);
-      padding: var(--space-1);
-      box-shadow: var(--shadow-sm);
-      border: 1px solid var(--color-gray-200);
-      gap: var(--space-1);
-    }
-
-    .tab-item {
-      flex: 1;
-      padding: var(--space-3) var(--space-4);
-      font-family: var(--font-sans);
-      font-size: var(--text-sm);
-      font-weight: var(--font-medium);
-      color: var(--color-gray-500);
-      text-align: center;
-      border: none;
-      background: none;
-      border-radius: var(--radius-md);
-      cursor: pointer;
-      transition: all var(--transition-fast);
-      white-space: nowrap;
-      min-height: 44px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: var(--space-2);
-    }
-
-    .tab-item:hover {
-      color: var(--color-gray-700);
-      background: var(--color-gray-50);
-    }
-
-    .tab-item--active {
-      background: var(--color-primary);
-      color: var(--color-white);
-      box-shadow: var(--shadow-sm);
-    }
-
-    .tab-item--active:hover {
-      background: var(--color-primary-hover);
-      color: var(--color-white);
-    }
-
-    /* --- Navbar --- */
-    .navbar {
-      background: var(--color-white);
-      border-bottom: 1px solid var(--color-gray-200);
-      padding: 0 var(--space-6);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      min-height: 64px;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .navbar__brand {
-      display: flex;
-      align-items: center;
       gap: var(--space-3);
-      font-size: var(--text-lg);
-      font-weight: var(--font-bold);
-      color: var(--color-gray-900);
-      text-decoration: none;
+      align-items: center;
     }
 
-    .navbar__logo {
-      width: 32px;
-      height: 32px;
-      background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+    /* ==========================================================
+       SECTION 4: LAYOUT & TABLE
+       ========================================================== */
+
+    /* --- Data overview (NOT hero metrics -- no big centered numbers) --- */
+    .data-overview {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-4);
+    }
+
+    @media (min-width: 640px) {
+      .data-overview {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .data-stat {
+      padding: var(--space-5) var(--space-6);
+      background: var(--color-surface-1);
+      border: 1px solid var(--color-border);
       border-radius: var(--radius-md);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
+      transition:
+        border-color var(--transition-normal),
+        box-shadow var(--transition-normal);
     }
 
-    .navbar__actions {
-      display: flex;
-      align-items: center;
-      gap: var(--space-3);
+    .data-stat:hover {
+      border-color: var(--color-border-strong);
+      box-shadow: var(--shadow-sm);
     }
 
-    .navbar__update-info {
+    .data-stat__label {
       font-size: var(--text-xs);
-      color: var(--color-gray-400);
+      font-weight: var(--weight-medium);
+      color: var(--color-text-tertiary);
+      letter-spacing: var(--tracking-wide);
+      text-transform: uppercase;
+    }
+
+    .data-stat__value {
+      font-size: var(--text-xl);
+      font-weight: var(--weight-bold);
+      color: var(--color-text-primary);
+      font-variant-numeric: tabular-nums;
+      margin-top: var(--space-2);
+    }
+
+    .data-stat__note {
+      font-size: var(--text-xs);
+      color: var(--color-text-tertiary);
+      margin-top: var(--space-1);
+    }
+
+    /* First stat gets accent left border for visual asymmetry */
+    .data-stat--highlight {
+      border-left: 3px solid var(--color-accent);
     }
 
     /* --- Table --- */
     .table-wrapper {
-      background: var(--color-white);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-md);
-      overflow: hidden;
-    }
-
-    .table-scroll {
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      background: var(--color-surface-1);
+      margin-top: var(--space-6);
     }
 
     .data-table {
       width: 100%;
       border-collapse: collapse;
       font-size: var(--text-sm);
+      font-variant-numeric: tabular-nums;
     }
 
     .data-table thead {
-      background: var(--color-gray-50);
-      border-bottom: 2px solid var(--color-gray-200);
+      position: sticky;
+      top: 0;
+      z-index: 1;
     }
 
     .data-table th {
-      padding: var(--space-3) var(--space-4);
-      font-weight: var(--font-semibold);
-      color: var(--color-gray-600);
-      text-align: left;
-      white-space: nowrap;
       font-size: var(--text-xs);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-secondary);
+      letter-spacing: var(--tracking-wide);
       text-transform: uppercase;
-      letter-spacing: 0.04em;
+      text-align: left;
+      padding: var(--space-3) var(--space-4);
+      background: var(--color-surface-2);
+      border-bottom: 1px solid var(--color-border);
+      white-space: nowrap;
     }
 
-    .data-table th.align-right,
-    .data-table td.align-right {
+    .data-table th[data-align="right"],
+    .data-table td[data-align="right"] {
       text-align: right;
     }
 
     .data-table td {
       padding: var(--space-3) var(--space-4);
-      border-bottom: 1px solid var(--color-gray-100);
-      color: var(--color-gray-800);
+      border-bottom: 1px solid var(--color-border);
+      color: var(--color-text-primary);
       white-space: nowrap;
-      font-variant-numeric: tabular-nums;
     }
 
     .data-table tbody tr {
-      transition: background-color var(--transition-fast);
+      transition: background var(--transition-fast);
     }
 
     .data-table tbody tr:hover {
-      background-color: var(--color-primary-ultra);
-    }
-
-    .data-table .rank-cell {
-      font-weight: var(--font-bold);
-      color: var(--color-gray-400);
-      width: 48px;
-    }
-
-    .data-table .rank-cell--top {
-      color: var(--color-accent);
-    }
-
-    .data-table .stock-code {
-      font-family: var(--font-mono);
-      font-size: var(--text-xs);
-      color: var(--color-gray-500);
-    }
-
-    .data-table .stock-name {
-      font-weight: var(--font-semibold);
-      color: var(--color-gray-900);
-    }
-
-    .data-table .highlight-value {
-      font-weight: var(--font-semibold);
-      color: var(--color-accent);
-    }
-
-    .data-table .score-badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 48px;
-      padding: 2px 8px;
-      font-weight: var(--font-bold);
-      font-size: var(--text-xs);
-      border-radius: var(--radius-full);
-    }
-
-    .data-table .score-badge--high {
       background: var(--color-accent-light);
-      color: var(--color-accent-hover);
     }
 
-    .data-table .score-badge--medium {
-      background: var(--color-primary-light);
-      color: var(--color-primary);
+    .data-table tbody tr:last-child td {
+      border-bottom: none;
     }
 
-    /* Pagination */
-    .pagination {
+    /* Rank column */
+    .rank-cell {
+      font-weight: var(--weight-bold);
+      color: var(--color-accent-dark);
+      min-width: 32px;
+    }
+
+    .rank-cell--top3 {
+      color: var(--color-accent);
+    }
+
+    /* Stock code */
+    .stock-code {
+      font-variant-numeric: tabular-nums;
+      color: var(--color-text-secondary);
+      font-size: var(--text-xs);
+    }
+
+    /* Score bar */
+    .score-bar {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      padding: var(--space-4) var(--space-6);
-      border-top: 1px solid var(--color-gray-100);
-      font-size: var(--text-sm);
-      color: var(--color-gray-500);
+      gap: var(--space-2);
     }
 
-    .pagination__pages {
-      display: flex;
-      gap: var(--space-1);
-    }
-
-    .pagination__btn {
-      min-width: 36px;
-      height: 36px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid var(--color-gray-200);
-      background: var(--color-white);
-      border-radius: var(--radius-md);
-      font-family: var(--font-sans);
-      font-size: var(--text-sm);
-      color: var(--color-gray-600);
-      cursor: pointer;
-      transition: all var(--transition-fast);
-    }
-
-    .pagination__btn:hover {
-      background: var(--color-gray-50);
-      border-color: var(--color-gray-300);
-    }
-
-    .pagination__btn--active {
-      background: var(--color-primary);
-      color: var(--color-white);
-      border-color: var(--color-primary);
-    }
-
-    .pagination__btn--active:hover {
-      background: var(--color-primary-hover);
-    }
-
-    .pagination__btn:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-    }
-
-    /* =============================================
-       SECTION 4: LAYOUT - HERO + CARDS
-       ============================================= */
-
-    /* Product Hero */
-    .hero {
-      background: linear-gradient(135deg, var(--color-primary) 0%, #1a3a8a 50%, #0F2565 100%);
-      color: var(--color-white);
-      padding: var(--space-12) var(--space-8);
-      border-radius: var(--radius-lg);
-      position: relative;
+    .score-bar__track {
+      width: 48px;
+      height: 4px;
+      background: var(--color-surface-3);
+      border-radius: var(--radius-full);
       overflow: hidden;
     }
 
-    .hero::before {
-      content: "";
-      position: absolute;
-      top: -50%;
-      right: -20%;
-      width: 400px;
-      height: 400px;
-      background: radial-gradient(circle, rgba(217,119,6,0.12) 0%, transparent 70%);
-      border-radius: 50%;
-    }
-
-    .hero::after {
-      content: "";
-      position: absolute;
-      bottom: -30%;
-      left: -10%;
-      width: 300px;
-      height: 300px;
-      background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%);
-      border-radius: 50%;
-    }
-
-    .hero__content {
-      position: relative;
-      z-index: 1;
-    }
-
-    .hero__eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: var(--space-2);
-      font-size: var(--text-xs);
-      font-weight: var(--font-medium);
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      background: rgba(255,255,255,0.12);
-      border: 1px solid rgba(255,255,255,0.2);
+    .score-bar__fill {
+      height: 100%;
       border-radius: var(--radius-full);
-      padding: var(--space-1) var(--space-4);
-      margin-bottom: var(--space-6);
+      background: var(--color-accent);
+      transition: width var(--transition-slow);
     }
 
-    .hero__title {
-      font-size: var(--text-4xl);
-      font-weight: var(--font-bold);
-      line-height: var(--leading-tight);
-      margin-bottom: var(--space-4);
-      max-width: 560px;
+    .score-bar__value {
+      font-weight: var(--weight-semibold);
+      font-variant-numeric: tabular-nums;
     }
 
-    .hero__desc {
-      font-size: var(--text-lg);
-      opacity: 0.85;
-      max-width: 480px;
-      line-height: var(--leading-relaxed);
+    /* --- Page header mockup --- */
+    .page-header-demo {
+      background: var(--color-surface-1);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-8);
       margin-bottom: var(--space-8);
     }
 
-    .hero__actions {
+    .page-header-demo__top {
       display: flex;
+      flex-direction: column;
       gap: var(--space-4);
-      flex-wrap: wrap;
     }
 
-    .btn--hero-primary {
-      background: var(--color-accent);
-      color: var(--color-white);
-      padding: var(--space-4) var(--space-8);
-      font-size: var(--text-base);
-      font-weight: var(--font-semibold);
-      border-radius: var(--radius-md);
-      border: none;
-      cursor: pointer;
-      transition: all var(--transition-fast);
-      min-height: 48px;
+    @media (min-width: 768px) {
+      .page-header-demo__top {
+        flex-direction: row;
+        align-items: flex-start;
+        justify-content: space-between;
+      }
     }
 
-    .btn--hero-primary:hover {
-      background: var(--color-accent-hover);
-      box-shadow: 0 4px 16px rgba(217, 119, 6, 0.3);
-    }
-
-    .btn--hero-secondary {
-      background: rgba(255,255,255,0.12);
-      color: var(--color-white);
-      border: 1px solid rgba(255,255,255,0.25);
-      padding: var(--space-4) var(--space-8);
-      font-size: var(--text-base);
-      font-weight: var(--font-medium);
-      border-radius: var(--radius-md);
-      cursor: pointer;
-      transition: all var(--transition-fast);
-      min-height: 48px;
-    }
-
-    .btn--hero-secondary:hover {
-      background: rgba(255,255,255,0.2);
-    }
-
-    /* KPI Cards row */
-    .kpi-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: var(--space-4);
-      margin-top: var(--space-8);
-    }
-
-    .kpi-card {
-      background: var(--color-white);
-      border-radius: var(--radius-lg);
-      padding: var(--space-6);
-      box-shadow: var(--shadow-md);
-      border: 1px solid var(--color-gray-100);
-      transition: transform var(--transition-normal), box-shadow var(--transition-normal);
-    }
-
-    .kpi-card:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-lg);
-    }
-
-    .kpi-card__header {
+    .page-header-demo__brand {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      margin-bottom: var(--space-3);
+      gap: var(--space-3);
     }
 
-    .kpi-card__label {
-      font-size: var(--text-sm);
-      color: var(--color-gray-500);
-      font-weight: var(--font-medium);
-    }
-
-    .kpi-card__icon {
+    .page-header-demo__logo {
       width: 32px;
       height: 32px;
-      border-radius: var(--radius-md);
+      color: var(--color-accent);
+    }
+
+    .page-header-demo__name {
+      font-size: var(--text-lg);
+      font-weight: var(--weight-bold);
+      color: var(--color-text-primary);
+      letter-spacing: var(--tracking-tight);
+    }
+
+    .page-header-demo__actions {
       display: flex;
       align-items: center;
-      justify-content: center;
+      gap: var(--space-3);
     }
 
-    .kpi-card__value {
-      font-size: var(--text-2xl);
-      font-weight: var(--font-bold);
-      color: var(--color-gray-900);
-      font-variant-numeric: tabular-nums;
-      letter-spacing: -0.02em;
-    }
-
-    .kpi-card__trend {
+    .page-header-demo__time {
       font-size: var(--text-xs);
-      font-weight: var(--font-medium);
-      margin-top: var(--space-1);
-      display: flex;
-      align-items: center;
-      gap: 4px;
+      color: var(--color-text-tertiary);
     }
 
-    /* =============================================
-       SECTION 5: ANIMATION
-       ============================================= */
-    .animation-grid {
+    /* ==========================================================
+       SECTION 5: MOTION
+       ========================================================== */
+
+    .motion-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      grid-template-columns: 1fr;
       gap: var(--space-6);
     }
 
-    .animation-demo {
-      background: var(--color-white);
-      border-radius: var(--radius-lg);
+    @media (min-width: 768px) {
+      .motion-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .motion-demo {
       padding: var(--space-8);
-      box-shadow: var(--shadow-md);
-      text-align: center;
+      background: var(--color-surface-1);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
     }
 
-    .animation-demo__label {
+    .motion-demo__title {
       font-size: var(--text-sm);
-      font-weight: var(--font-semibold);
-      color: var(--color-gray-700);
-      margin-bottom: var(--space-2);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-4);
     }
 
-    .animation-demo__spec {
+    .motion-demo__spec {
       font-size: var(--text-xs);
-      font-family: var(--font-mono);
-      color: var(--color-gray-400);
-      margin-bottom: var(--space-6);
+      color: var(--color-text-tertiary);
+      font-variant-numeric: tabular-nums;
+      margin-bottom: var(--space-4);
     }
 
-    /* Fade In Up */
-    .anim-target--fadein {
-      opacity: 0;
-      transform: translateY(12px);
-      animation: fadeInUp 0.4s ease-out forwards;
-      animation-delay: 0.2s;
+    /* Hover card demo */
+    .hover-card-demo {
+      padding: var(--space-5);
+      background: var(--color-surface-1);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      transition:
+        transform var(--duration-state) var(--ease-out-quart),
+        box-shadow var(--duration-state) var(--ease-out-quart),
+        border-color var(--duration-state) var(--ease-out-quart);
+      cursor: pointer;
     }
 
-    @keyframes fadeInUp {
+    .hover-card-demo:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--color-accent);
+    }
+
+    .hover-card-demo__text {
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+    }
+
+    /* Stagger entrance animation */
+    @keyframes slide-up-fade {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
       to {
         opacity: 1;
         transform: translateY(0);
       }
     }
 
-    /* Scale press */
-    .anim-target--press {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 120px;
-      height: 48px;
-      background: var(--color-primary);
-      color: white;
-      border-radius: var(--radius-md);
-      font-weight: var(--font-semibold);
-      font-size: var(--text-sm);
-      cursor: pointer;
-      transition: transform var(--transition-fast), box-shadow var(--transition-fast);
-      user-select: none;
-    }
-
-    .anim-target--press:hover {
-      box-shadow: var(--shadow-lg);
-    }
-
-    .anim-target--press:active {
-      transform: scale(0.96);
-      box-shadow: var(--shadow-sm);
-    }
-
-    /* Hover lift */
-    .anim-target--lift {
-      width: 180px;
-      margin: 0 auto;
-      background: var(--color-white);
-      border: 1px solid var(--color-gray-200);
-      border-radius: var(--radius-lg);
-      padding: var(--space-6);
-      box-shadow: var(--shadow-md);
-      transition: transform var(--transition-normal), box-shadow var(--transition-normal);
-      cursor: pointer;
-    }
-
-    .anim-target--lift:hover {
-      transform: translateY(-6px);
-      box-shadow: var(--shadow-xl);
-    }
-
-    .anim-target--lift__inner {
-      width: 40px;
-      height: 40px;
-      background: var(--color-accent-light);
-      border-radius: var(--radius-md);
-      margin: 0 auto var(--space-3);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--color-accent);
-    }
-
-    .anim-target--lift__text {
-      font-size: var(--text-sm);
-      font-weight: var(--font-medium);
-      color: var(--color-gray-700);
-    }
-
-    /* Loading skeleton */
-    .skeleton {
-      background: linear-gradient(90deg, var(--color-gray-100) 25%, var(--color-gray-50) 50%, var(--color-gray-100) 75%);
-      background-size: 200% 100%;
-      animation: shimmer 1.5s ease-in-out infinite;
+    .stagger-item {
+      padding: var(--space-3) var(--space-4);
+      background: var(--color-surface-2);
       border-radius: var(--radius-sm);
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+      animation: slide-up-fade var(--duration-entrance) var(--ease-out-expo) backwards;
     }
 
-    @keyframes shimmer {
-      0% { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
-    }
+    .stagger-item:nth-child(1) { animation-delay: 0ms; }
+    .stagger-item:nth-child(2) { animation-delay: 60ms; }
+    .stagger-item:nth-child(3) { animation-delay: 120ms; }
+    .stagger-item:nth-child(4) { animation-delay: 180ms; }
+    .stagger-item:nth-child(5) { animation-delay: 240ms; }
 
-    .skeleton-row {
+    .stagger-list {
       display: flex;
-      gap: var(--space-4);
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    /* Easing comparison */
+    .easing-track {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .easing-row {
+      display: flex;
       align-items: center;
-      padding: var(--space-4) 0;
+      gap: var(--space-3);
     }
 
-    .skeleton-row + .skeleton-row {
-      border-top: 1px solid var(--color-gray-100);
-    }
-
-    .skeleton--circle {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
+    .easing-row__label {
+      font-size: var(--text-xs);
+      font-weight: var(--weight-medium);
+      color: var(--color-text-tertiary);
+      width: 100px;
       flex-shrink: 0;
     }
 
-    .skeleton--text {
-      height: 14px;
-      border-radius: var(--radius-sm);
+    .easing-row__track {
+      flex: 1;
+      height: 4px;
+      background: var(--color-surface-3);
+      border-radius: var(--radius-full);
+      position: relative;
     }
 
-    .skeleton--text-sm {
-      height: 10px;
+    .easing-row__dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--color-primary);
+      position: absolute;
+      top: -4px;
+      left: 0;
+      will-change: transform;
     }
 
-    /* Stagger entrance */
-    .stagger-container > * {
-      opacity: 0;
-      transform: translateY(10px);
-      animation: fadeInUp 0.3s ease-out forwards;
-    }
-    .stagger-container > *:nth-child(1) { animation-delay: 0.05s; }
-    .stagger-container > *:nth-child(2) { animation-delay: 0.1s; }
-    .stagger-container > *:nth-child(3) { animation-delay: 0.15s; }
-    .stagger-container > *:nth-child(4) { animation-delay: 0.2s; }
-
-    /* =============================================
-       SECTION 6: A-SHARE SEMANTIC COLORS
-       ============================================= */
-    .semantic-demo {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: var(--space-4);
+    .easing-row__track {
+      --track-width: 100%;
     }
 
-    .semantic-card {
-      padding: var(--space-6);
-      border-radius: var(--radius-lg);
-      text-align: center;
+    .easing-track:hover .easing-row__dot--quart {
+      animation: slide-across 1s cubic-bezier(0.25, 1, 0.5, 1) infinite alternate;
+    }
+    .easing-track:hover .easing-row__dot--expo {
+      animation: slide-across 1s cubic-bezier(0.16, 1, 0.3, 1) infinite alternate;
+    }
+    .easing-track:hover .easing-row__dot--linear {
+      animation: slide-across 1s linear infinite alternate;
     }
 
-    .semantic-card__label {
+    @keyframes slide-across {
+      from { transform: translateX(0); }
+      to { transform: translateX(calc(var(--track-width, 200px) - 12px)); }
+    }
+
+    /* Duration tokens display */
+    .duration-bars {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      margin-top: var(--space-4);
+    }
+
+    .duration-bar {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    .duration-bar__label {
       font-size: var(--text-xs);
-      font-weight: var(--font-medium);
-      margin-top: var(--space-3);
-    }
-
-    .semantic-card__value {
-      font-size: var(--text-2xl);
-      font-weight: var(--font-bold);
+      color: var(--color-text-tertiary);
+      width: 60px;
+      flex-shrink: 0;
+      text-align: right;
       font-variant-numeric: tabular-nums;
     }
 
-    /* =============================================
-       FOOTER
-       ============================================= */
-    .demo-footer {
-      background: var(--color-gray-900);
-      color: var(--color-gray-400);
-      padding: var(--space-12) var(--space-6);
-      margin-top: var(--space-16);
-      text-align: center;
+    .duration-bar__track {
+      height: 8px;
+      border-radius: var(--radius-full);
+      background: var(--color-primary);
+      opacity: 0.7;
     }
 
-    .demo-footer__title {
+    .duration-bar__usage {
+      font-size: var(--text-xs);
+      color: var(--color-text-secondary);
+    }
+
+    /* ==========================================================
+       SECTION 6: RESPONSIVE INFO
+       ========================================================== */
+    .breakpoint-table {
+      width: 100%;
+      border-collapse: collapse;
       font-size: var(--text-sm);
-      font-weight: var(--font-semibold);
-      color: var(--color-gray-300);
-      margin-bottom: var(--space-3);
+    }
+
+    .breakpoint-table th,
+    .breakpoint-table td {
+      text-align: left;
+      padding: var(--space-3) var(--space-4);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .breakpoint-table th {
+      font-size: var(--text-xs);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-secondary);
+      letter-spacing: var(--tracking-wide);
+      text-transform: uppercase;
+      background: var(--color-surface-2);
+    }
+
+    .breakpoint-table td {
+      color: var(--color-text-primary);
+    }
+
+    .breakpoint-table code {
+      font-family: ui-monospace, 'SF Mono', monospace;
+      font-size: var(--text-xs);
+      background: var(--color-surface-3);
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+      color: var(--color-primary);
+    }
+
+    /* Touch target demo */
+    .touch-demo {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-4);
+      align-items: center;
+      margin-top: var(--space-4);
+    }
+
+    .touch-target {
+      width: 44px;
+      height: 44px;
+      border: 1.5px dashed var(--color-accent);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--text-xs);
+      color: var(--color-accent-dark);
+      font-weight: var(--weight-semibold);
+    }
+
+    /* ==========================================================
+       SECTION 7: DESIGN TOKEN REFERENCE
+       ========================================================== */
+    .token-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-6);
+    }
+
+    @media (min-width: 768px) {
+      .token-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .token-block {
+      background: var(--color-surface-1);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-5);
+    }
+
+    .token-block__title {
+      font-size: var(--text-xs);
+      font-weight: var(--weight-semibold);
+      letter-spacing: var(--tracking-wide);
+      text-transform: uppercase;
+      color: var(--color-accent-dark);
+      margin-bottom: var(--space-4);
+    }
+
+    .token-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    .token-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-1) 0;
+      font-size: var(--text-xs);
+    }
+
+    .token-row__name {
+      color: var(--color-text-secondary);
+      font-weight: var(--weight-medium);
+    }
+
+    .token-row__value {
+      color: var(--color-text-tertiary);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Spacing scale visual */
+    .space-scale {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    .space-bar {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    .space-bar__visual {
+      height: 8px;
+      background: var(--color-primary-light);
+      border: 1px solid oklch(35% 0.08 255 / 0.15);
+      border-radius: var(--radius-sm);
+    }
+
+    .space-bar__label {
+      font-size: var(--text-xs);
+      color: var(--color-text-tertiary);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    /* ==========================================================
+       FOOTER
+       ========================================================== */
+    .demo-footer {
+      border-top: 2px solid var(--color-text-primary);
+      padding: var(--space-8) var(--space-6);
+      max-width: 1200px;
+      margin: 0 auto;
     }
 
     .demo-footer__text {
       font-size: var(--text-xs);
+      color: var(--color-text-tertiary);
       line-height: var(--leading-relaxed);
-      max-width: 640px;
-      margin: 0 auto;
+      max-width: 560px;
     }
 
-    /* =============================================
-       RESPONSIVE
-       ============================================= */
-    @media (max-width: 768px) {
-      .demo-header {
-        padding: var(--space-8) var(--space-4);
+    /* ==========================================================
+       TOUCH / COARSE POINTER ADAPTATIONS
+       ========================================================== */
+    @media (pointer: coarse) {
+      .btn {
+        min-height: 48px;
+        padding: var(--space-4) var(--space-6);
       }
-
-      .demo-header__title {
-        font-size: var(--text-2xl);
+      .tab {
+        min-height: 48px;
+        padding: var(--space-4) var(--space-5);
       }
+      .input {
+        min-height: 48px;
+        font-size: var(--text-base);
+      }
+    }
 
+    @media (hover: none) {
+      .hover-card-demo:hover {
+        transform: none;
+        box-shadow: none;
+      }
+      .color-swatch:hover {
+        background: transparent;
+      }
+    }
+
+    /* ==========================================================
+       SMALL VIEWPORT ADJUSTMENTS
+       ========================================================== */
+    @media (max-width: 640px) {
+      .demo-masthead {
+        padding: var(--space-6) var(--space-4) var(--space-5);
+      }
       .demo-container {
         padding: 0 var(--space-4);
       }
-
       .demo-section {
-        padding: var(--space-12) 0;
+        padding: var(--space-12) 0 var(--space-8);
       }
-
-      .hero {
-        padding: var(--space-8) var(--space-6);
+      .type-specimen {
+        padding: var(--space-5);
       }
-
-      .hero__title {
-        font-size: var(--text-2xl);
-      }
-
-      .hero__desc {
-        font-size: var(--text-base);
-      }
-
-      .color-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .card-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .kpi-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .type-row {
-        flex-direction: column;
-        gap: var(--space-2);
-      }
-
-      .type-meta {
-        width: auto;
-      }
-
       .neutral-strip {
         flex-wrap: wrap;
       }
-
       .neutral-strip__swatch {
         min-width: 60px;
       }
-
-      .btn-row {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .navbar {
-        padding: 0 var(--space-4);
-        flex-wrap: wrap;
-        gap: var(--space-2);
-        padding-top: var(--space-3);
-        padding-bottom: var(--space-3);
-      }
-
-      .navbar__update-info {
-        display: none;
-      }
-
       .tab-bar {
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
       }
-
-      .pagination {
-        flex-direction: column;
-        gap: var(--space-3);
-        text-align: center;
-      }
-
-      .animation-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .readability-demo {
-        grid-template-columns: 1fr;
-      }
-
-      .semantic-demo {
-        grid-template-columns: repeat(2, 1fr);
+      .tab-bar::-webkit-scrollbar {
+        display: none;
       }
     }
 
-    @media (max-width: 375px) {
-      .color-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .kpi-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .hero__actions {
-        flex-direction: column;
-      }
+    /* ==========================================================
+       SORTABLE TABLE HEADERS
+       ========================================================== */
+    .data-table th[data-sortable] {
+      cursor: pointer;
+      user-select: none;
+      transition: color var(--transition-fast);
     }
 
-    /* =============================================
-       UTILITY
-       ============================================= */
-    .flex { display: flex; }
-    .flex-wrap { flex-wrap: wrap; }
-    .items-center { align-items: center; }
-    .gap-2 { gap: var(--space-2); }
-    .gap-4 { gap: var(--space-4); }
-    .gap-6 { gap: var(--space-6); }
-    .mt-4 { margin-top: var(--space-4); }
-    .mt-6 { margin-top: var(--space-6); }
-    .mt-8 { margin-top: var(--space-8); }
-    .mb-4 { margin-bottom: var(--space-4); }
-    .text-sm { font-size: var(--text-sm); }
-    .text-xs { font-size: var(--text-xs); }
-    .text-gray-400 { color: var(--color-gray-400); }
-    .text-gray-500 { color: var(--color-gray-500); }
-    .font-mono { font-family: var(--font-mono); }
+    .data-table th[data-sortable]:hover {
+      color: var(--color-primary);
+    }
+
+    .data-table th[data-sortable]::after {
+      content: '';
+      display: inline-block;
+      width: 0;
+      height: 0;
+      margin-left: var(--space-2);
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-bottom: 5px solid var(--color-text-tertiary);
+      vertical-align: middle;
+      opacity: 0.4;
+      transition: opacity var(--transition-fast), transform var(--transition-fast);
+    }
+
+    .data-table th[data-sortable]:hover::after {
+      opacity: 0.8;
+    }
+
+    .data-table th[data-sort="desc"]::after {
+      border-bottom: none;
+      border-top: 5px solid var(--color-primary);
+      opacity: 1;
+    }
+
+    .data-table th[data-sort="asc"]::after {
+      border-bottom: 5px solid var(--color-primary);
+      opacity: 1;
+    }
+
+    /* ==========================================================
+       SCORE TOOLTIP
+       ========================================================== */
+    .tooltip-trigger {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+    }
+
+    .tooltip-icon {
+      width: 14px;
+      height: 14px;
+      color: var(--color-text-tertiary);
+      cursor: help;
+      flex-shrink: 0;
+      transition: color var(--transition-fast);
+    }
+
+    .tooltip-trigger:hover .tooltip-icon,
+    .tooltip-trigger:focus-within .tooltip-icon {
+      color: var(--color-primary);
+    }
+
+    .tooltip-content {
+      position: absolute;
+      top: calc(100% + var(--space-2));
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--color-text-primary);
+      color: var(--color-text-inverse);
+      font-size: var(--text-xs);
+      font-weight: var(--weight-regular);
+      text-transform: none;
+      letter-spacing: 0;
+      line-height: var(--leading-normal);
+      padding: var(--space-3) var(--space-4);
+      border-radius: var(--radius-md);
+      width: 260px;
+      white-space: normal;
+      text-align: left;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity var(--transition-fast);
+      z-index: 10;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .tooltip-content::before {
+      content: '';
+      position: absolute;
+      top: -4px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 8px;
+      height: 8px;
+      background: var(--color-text-primary);
+      rotate: 45deg;
+    }
+
+    .tooltip-trigger:hover .tooltip-content,
+    .tooltip-trigger:focus-within .tooltip-content {
+      opacity: 1;
+    }
+
+    /* ==========================================================
+       TABLE TOOLBAR (SEARCH + COUNT)
+       ========================================================== */
+    .table-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-4);
+      margin-top: var(--space-4);
+      margin-bottom: calc(var(--space-2) * -1);
+    }
+
+    .table-search {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-3);
+      border: 1.5px solid var(--color-border-strong);
+      border-radius: var(--radius-md);
+      background: var(--color-surface-1);
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+      max-width: 280px;
+      flex: 1;
+    }
+
+    .table-search:focus-within {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px oklch(35% 0.08 255 / 0.1);
+    }
+
+    .table-search__icon {
+      width: 16px;
+      height: 16px;
+      color: var(--color-text-tertiary);
+      flex-shrink: 0;
+    }
+
+    .table-search__input {
+      font-family: var(--font-sans);
+      font-size: var(--text-sm);
+      border: none;
+      outline: none;
+      background: transparent;
+      color: var(--color-text-primary);
+      width: 100%;
+      min-height: 28px;
+    }
+
+    .table-search__input::placeholder {
+      color: var(--color-text-tertiary);
+    }
+
+    .table-result-count {
+      font-size: var(--text-xs);
+      color: var(--color-text-tertiary);
+      white-space: nowrap;
+    }
+
+    /* ==========================================================
+       PAGINATION NAV
+       ========================================================== */
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: var(--space-4);
+      padding: 0 var(--space-1);
+    }
+
+    .pagination__info {
+      font-size: var(--text-xs);
+      color: var(--color-text-tertiary);
+    }
+
+    .pagination__controls {
+      display: flex;
+      gap: var(--space-2);
+      align-items: center;
+    }
+
+    .pagination__ellipsis {
+      color: var(--color-text-tertiary);
+      font-size: var(--text-sm);
+      display: flex;
+      align-items: center;
+    }
+
+    /* ==========================================================
+       DANGER CONFIRM PATTERN
+       ========================================================== */
+    .confirm-inline {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .confirm-inline__prompt {
+      font-size: var(--text-xs);
+      color: var(--color-error);
+      font-weight: var(--weight-medium);
+    }
+
+    /* ==========================================================
+       FOOTER INFO AREA
+       ========================================================== */
+    .footer-info {
+      padding: var(--space-6);
+      background: var(--color-surface-2);
+      border-radius: var(--radius-lg);
+    }
+
+    .footer-info__section {
+      max-width: 65ch;
+    }
+
+    .footer-info__title {
+      font-size: var(--text-sm);
+      font-weight: var(--weight-semibold);
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-2);
+    }
+
+    .footer-info__text {
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+      line-height: var(--leading-relaxed);
+    }
+
+    .footer-info__divider {
+      border: none;
+      border-top: 1px solid var(--color-border);
+      margin: var(--space-5) 0;
+    }
+
+    .footer-info__meta {
+      display: flex;
+      gap: var(--space-8);
+      flex-wrap: wrap;
+    }
+
+    .footer-info__disclaimer {
+      font-size: var(--text-xs);
+      color: var(--color-text-tertiary);
+      border-top: 1px solid var(--color-border);
+      padding-top: var(--space-4);
+      margin-top: var(--space-5);
+      font-style: italic;
+    }
   </style>
 </head>
 
 <body>
 
-  <!-- ===========================================
-       DEMO PAGE HEADER
-       =========================================== -->
-  <header class="demo-header">
-    <div class="demo-header__badge">Design Style Reference</div>
-    <h1 class="demo-header__title">分红股排行榜 设计风格参考</h1>
-    <p class="demo-header__subtitle">
-      基于 ui-ux-pro-max 设计系统生成，展示配色、字体、组件、布局和动效的风格基调。
-      风格方向：Clean & Modern + 金融数据工具调性。
-    </p>
+  <!-- ============================================================
+       MASTHEAD: Editorial style, left-aligned, rule-separated
+       No centered hero, no gradient background, no glassmorphism.
+       ============================================================ -->
+  <header class="demo-masthead">
+    <span class="demo-masthead__tag">Design System v1.0</span>
+    <h1 class="demo-masthead__title">分红股排行榜<span class="demo-masthead__break"></span>设计风格参考</h1>
+    <p class="demo-masthead__subtitle">A 股分红数据排行榜工具的视觉语言定义。审美方向：编辑式/实用主义，温暖的克制。</p>
   </header>
 
-  <main class="demo-container">
 
-    <!-- ===========================================
+  <div class="demo-container">
+
+    <!-- ============================================================
          SECTION 1: COLOR PALETTE
-         =========================================== -->
-    <section class="demo-section" id="colors">
-      <h2 class="demo-section__title">1. 配色方案</h2>
-      <p class="demo-section__desc">
-        蓝色主调传递金融信赖感，琥珀金强调色契合"分红/收益/财富"语义。
-        遵循 WCAG AA 对比度标准，所有文字/背景对均不低于 4.5:1。
-      </p>
-
-      <!-- Primary Colors -->
-      <div class="demo-subsection">
-        <h3 class="demo-subsection__title">核心色彩</h3>
-        <div class="color-grid">
-
-          <div class="color-swatch">
-            <div class="color-swatch__preview" style="background-color: #1E40AF;">
-              <span class="color-swatch__contrast">AA 7.5:1</span>
-            </div>
-            <div class="color-swatch__info">
-              <div class="color-swatch__hex">#1E40AF</div>
-              <div class="color-swatch__name">Primary / 品牌蓝</div>
-            </div>
-          </div>
-
-          <div class="color-swatch">
-            <div class="color-swatch__preview" style="background-color: #3B82F6;">
-              <span class="color-swatch__contrast">AA 3.1:1</span>
-            </div>
-            <div class="color-swatch__info">
-              <div class="color-swatch__hex">#3B82F6</div>
-              <div class="color-swatch__name">Secondary / 交互蓝</div>
-            </div>
-          </div>
-
-          <div class="color-swatch">
-            <div class="color-swatch__preview" style="background-color: #D97706;">
-              <span class="color-swatch__contrast">AA 3.4:1</span>
-            </div>
-            <div class="color-swatch__info">
-              <div class="color-swatch__hex">#D97706</div>
-              <div class="color-swatch__name">Accent / 琥珀金 (CTA)</div>
-            </div>
-          </div>
-
-          <div class="color-swatch">
-            <div class="color-swatch__preview" style="background-color: #F8FAFC;">
-              <span class="color-swatch__contrast" style="background:rgba(0,0,0,0.5);">背景</span>
-            </div>
-            <div class="color-swatch__info">
-              <div class="color-swatch__hex">#F8FAFC</div>
-              <div class="color-swatch__name">Background / 页面底色</div>
-            </div>
-          </div>
-
-          <div class="color-swatch">
-            <div class="color-swatch__preview" style="background-color: #1E293B;">
-              <span class="color-swatch__contrast">AAA 13.5:1</span>
-            </div>
-            <div class="color-swatch__info">
-              <div class="color-swatch__hex">#1E293B</div>
-              <div class="color-swatch__name">Text Primary / 正文色</div>
-            </div>
-          </div>
-
-          <div class="color-swatch">
-            <div class="color-swatch__preview" style="background-color: #64748B;">
-              <span class="color-swatch__contrast">AA 4.8:1</span>
-            </div>
-            <div class="color-swatch__info">
-              <div class="color-swatch__hex">#64748B</div>
-              <div class="color-swatch__name">Text Secondary / 次要文字</div>
-            </div>
-          </div>
-
-        </div>
+         ============================================================ -->
+    <section class="demo-section" id="color">
+      <div class="demo-section__header">
+        <span class="demo-section__number">01</span>
+        <h2 class="demo-section__title">配色方案</h2>
+        <p class="demo-section__desc">OKLCH 色彩空间定义，所有中性色带暖色调（hue 70, chroma 0.01），营造纸质温度。</p>
       </div>
 
-      <!-- A-Share Semantic Colors -->
-      <div class="demo-subsection">
-        <h3 class="demo-subsection__title">A 股语义色 (中国市场惯例)</h3>
-        <div class="semantic-demo">
-          <div class="semantic-card" style="background: var(--color-success-bg);">
-            <div class="semantic-card__value" style="color: var(--color-success);">+3.52%</div>
-            <div class="semantic-card__label" style="color: var(--color-success);">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 15l-6-6-6 6"/></svg>
-              涨 / 利好 (红色)
+      <!-- Primary & Accent -->
+      <div class="demo-sub">
+        <h3 class="demo-sub__title">品牌色</h3>
+        <div class="color-palette">
+          <div class="color-group">
+            <span class="color-group__label">Primary -- 深蓝</span>
+
+            <div class="color-swatch">
+              <div class="color-swatch__block" aria-hidden="true" style="background: oklch(35% 0.08 255);"></div>
+              <div class="color-swatch__meta">
+                <span class="color-swatch__name">Primary</span>
+                <span class="color-swatch__value">oklch(35% 0.08 255)</span>
+                <span class="color-swatch__usage">品牌色、主按钮、激活态</span>
+                <span class="color-swatch__badge color-swatch__badge--pass">AA 7.8:1</span>
+              </div>
+            </div>
+
+            <div class="color-swatch">
+              <div class="color-swatch__block" aria-hidden="true" style="background: oklch(55% 0.06 255);"></div>
+              <div class="color-swatch__meta">
+                <span class="color-swatch__name">Primary Muted</span>
+                <span class="color-swatch__value">oklch(55% 0.06 255)</span>
+                <span class="color-swatch__usage">链接、次要强调</span>
+                <span class="color-swatch__badge color-swatch__badge--pass">AA 4.5:1</span>
+              </div>
+            </div>
+
+            <div class="color-swatch">
+              <div class="color-swatch__block" aria-hidden="true" style="background: oklch(92% 0.025 255);"></div>
+              <div class="color-swatch__meta">
+                <span class="color-swatch__name">Primary Light</span>
+                <span class="color-swatch__value">oklch(92% 0.025 255)</span>
+                <span class="color-swatch__usage">Ghost 按钮悬停背景</span>
+              </div>
             </div>
           </div>
-          <div class="semantic-card" style="background: var(--color-danger-bg);">
-            <div class="semantic-card__value" style="color: var(--color-danger);">-1.28%</div>
-            <div class="semantic-card__label" style="color: var(--color-danger);">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
-              跌 / 负面 (绿色)
+
+          <div class="color-group">
+            <span class="color-group__label">Accent -- 琥珀金</span>
+
+            <div class="color-swatch">
+              <div class="color-swatch__block" aria-hidden="true" style="background: oklch(72% 0.16 70);"></div>
+              <div class="color-swatch__meta">
+                <span class="color-swatch__name">Accent</span>
+                <span class="color-swatch__value">oklch(72% 0.16 70)</span>
+                <span class="color-swatch__usage">分红强调、CTA、评分高亮</span>
+                <span class="color-swatch__badge">3.2:1 大文字</span>
+              </div>
             </div>
-          </div>
-          <div class="semantic-card" style="background: var(--color-accent-bg);">
-            <div class="semantic-card__value" style="color: var(--color-accent);">85.6</div>
-            <div class="semantic-card__label" style="color: var(--color-accent);">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-              综合评分 (琥珀)
+
+            <div class="color-swatch">
+              <div class="color-swatch__block" aria-hidden="true" style="background: oklch(50% 0.14 65);"></div>
+              <div class="color-swatch__meta">
+                <span class="color-swatch__name">Accent Dark</span>
+                <span class="color-swatch__value">oklch(50% 0.14 65)</span>
+                <span class="color-swatch__usage">琥珀文字（浅背景上）</span>
+                <span class="color-swatch__badge color-swatch__badge--pass">AA 5.1:1</span>
+              </div>
             </div>
-          </div>
-          <div class="semantic-card" style="background: var(--color-warning-bg);">
-            <div class="semantic-card__value" style="color: #92400E;">3 天前</div>
-            <div class="semantic-card__label" style="color: #92400E;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
-              数据过期警告 (黄色)
+
+            <div class="color-swatch">
+              <div class="color-swatch__block" aria-hidden="true" style="background: oklch(94% 0.04 70);"></div>
+              <div class="color-swatch__meta">
+                <span class="color-swatch__name">Accent Light</span>
+                <span class="color-swatch__value">oklch(94% 0.04 70)</span>
+                <span class="color-swatch__usage">表格 hover 行背景</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Neutral Grayscale -->
-      <div class="demo-subsection">
-        <h3 class="demo-subsection__title">中性灰度梯度</h3>
+      <!-- Semantic colors -->
+      <div class="demo-sub">
+        <h3 class="demo-sub__title">语义色（A 股惯例：红涨绿跌）</h3>
+        <div class="color-palette">
+          <div class="color-group">
+            <span class="color-group__label">涨/利好</span>
+            <div class="color-swatch">
+              <div class="color-swatch__block" aria-hidden="true" style="background: oklch(55% 0.2 25);"></div>
+              <div class="color-swatch__meta">
+                <span class="color-swatch__name">Bullish Red</span>
+                <span class="color-swatch__value">oklch(55% 0.2 25)</span>
+                <span class="color-swatch__usage">股价上涨、分红利好</span>
+                <span class="color-swatch__badge color-swatch__badge--pass">AA 4.6:1</span>
+              </div>
+            </div>
+          </div>
+          <div class="color-group">
+            <span class="color-group__label">跌/负面</span>
+            <div class="color-swatch">
+              <div class="color-swatch__block" aria-hidden="true" style="background: oklch(55% 0.12 155);"></div>
+              <div class="color-swatch__meta">
+                <span class="color-swatch__name">Bearish Green</span>
+                <span class="color-swatch__value">oklch(55% 0.12 155)</span>
+                <span class="color-swatch__usage">股价下跌、负面信号</span>
+                <span class="color-swatch__badge color-swatch__badge--pass">AA 4.5:1</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tinted Neutrals -->
+      <div class="demo-sub">
+        <h3 class="demo-sub__title">带色调的中性色阶（Tinted Neutrals）</h3>
+        <p style="font-size: var(--text-sm); color: var(--color-text-secondary); margin-bottom: var(--space-4);">
+          所有中性色带暖色调（hue 70, chroma 0.005-0.015），而非纯灰。微妙的纸质温度感。
+        </p>
         <div class="neutral-strip">
-          <div class="neutral-strip__swatch" style="background:#FFFFFF; color:#64748B;">
-            <span>#FFFFFF</span>
-            <span class="neutral-strip__label">White</span>
+          <div class="neutral-strip__swatch" style="background: oklch(98.5% 0.005 70); color: oklch(20% 0.01 70);">
+            98.5%
+            <span class="neutral-strip__label">Surface-0</span>
           </div>
-          <div class="neutral-strip__swatch" style="background:#F8FAFC; color:#64748B;">
-            <span>#F8FAFC</span>
-            <span class="neutral-strip__label">50</span>
+          <div class="neutral-strip__swatch" style="background: oklch(99% 0.003 70); color: oklch(20% 0.01 70);">
+            99%
+            <span class="neutral-strip__label">Surface-1</span>
           </div>
-          <div class="neutral-strip__swatch" style="background:#F1F5F9; color:#64748B;">
-            <span>#F1F5F9</span>
-            <span class="neutral-strip__label">100</span>
+          <div class="neutral-strip__swatch" style="background: oklch(96% 0.008 70); color: oklch(20% 0.01 70);">
+            96%
+            <span class="neutral-strip__label">Surface-2</span>
           </div>
-          <div class="neutral-strip__swatch" style="background:#E2E8F0; color:#475569;">
-            <span>#E2E8F0</span>
-            <span class="neutral-strip__label">200</span>
+          <div class="neutral-strip__swatch" style="background: oklch(93% 0.01 70); color: oklch(20% 0.01 70);">
+            93%
+            <span class="neutral-strip__label">Surface-3</span>
           </div>
-          <div class="neutral-strip__swatch" style="background:#CBD5E1; color:#334155;">
-            <span>#CBD5E1</span>
-            <span class="neutral-strip__label">300</span>
+          <div class="neutral-strip__swatch" style="background: oklch(88% 0.012 70); color: oklch(20% 0.01 70);">
+            88%
+            <span class="neutral-strip__label">Border</span>
           </div>
-          <div class="neutral-strip__swatch" style="background:#94A3B8; color:#1E293B;">
-            <span>#94A3B8</span>
-            <span class="neutral-strip__label">400</span>
+          <div class="neutral-strip__swatch" style="background: oklch(60% 0.01 70); color: oklch(98% 0.005 70);">
+            60%
+            <span class="neutral-strip__label">Tertiary</span>
           </div>
-          <div class="neutral-strip__swatch" style="background:#64748B; color:#F8FAFC;">
-            <span>#64748B</span>
-            <span class="neutral-strip__label">500</span>
+          <div class="neutral-strip__swatch" style="background: oklch(45% 0.012 70); color: oklch(98% 0.005 70);">
+            45%
+            <span class="neutral-strip__label">Secondary</span>
           </div>
-          <div class="neutral-strip__swatch" style="background:#475569; color:#F8FAFC;">
-            <span>#475569</span>
-            <span class="neutral-strip__label">600</span>
-          </div>
-          <div class="neutral-strip__swatch" style="background:#1E293B; color:#F8FAFC;">
-            <span>#1E293B</span>
-            <span class="neutral-strip__label">800</span>
-          </div>
-          <div class="neutral-strip__swatch" style="background:#0F172A; color:#F8FAFC;">
-            <span>#0F172A</span>
-            <span class="neutral-strip__label">900</span>
+          <div class="neutral-strip__swatch" style="background: oklch(20% 0.01 70); color: oklch(98% 0.005 70);">
+            20%
+            <span class="neutral-strip__label">Primary</span>
           </div>
         </div>
       </div>
 
-      <!-- Readability Demo -->
-      <div class="demo-subsection">
-        <h3 class="demo-subsection__title">文字可读性校验</h3>
-        <div class="readability-demo">
-          <div class="readability-card" style="background: #FFFFFF; color: #1E293B;">
-            <div class="readability-card__label">White Background</div>
-            <div class="readability-card__text">分红股排行榜使用三个维度帮助投资者快速找到最值得关注的分红股。正文 16px / 行高 1.5。</div>
-            <div class="readability-card__ratio">#1E293B on #FFF -- 13.5:1 (AAA)</div>
+      <!-- Readability demo -->
+      <div class="demo-sub">
+        <h3 class="demo-sub__title">文字可读性验证</h3>
+        <div class="readability-grid">
+          <div class="readability-card" style="background: oklch(98.5% 0.005 70);">
+            <div class="readability-card__label" style="color: oklch(60% 0.01 70);">浅色背景</div>
+            <div class="readability-card__text" style="color: oklch(20% 0.01 70);">分红股数据一目了然，帮助投资者快速找到稳定分红标的。</div>
+            <div class="readability-card__ratio" style="color: oklch(60% 0.01 70);">对比度 14.2:1 AAA</div>
           </div>
-          <div class="readability-card" style="background: #F8FAFC; color: #1E293B;">
-            <div class="readability-card__label">Gray-50 Background</div>
-            <div class="readability-card__text">连续分红 25 年，最近年度股息率 4.52%，累计分红总额 1,892.6 亿元。等宽数字对齐展示。</div>
-            <div class="readability-card__ratio">#1E293B on #F8FAFC -- 13.2:1 (AAA)</div>
+          <div class="readability-card" style="background: oklch(35% 0.08 255);">
+            <div class="readability-card__label" style="color: oklch(80% 0.03 255);">深蓝背景</div>
+            <div class="readability-card__text" style="color: oklch(97% 0.005 70);">2,847 只分红股票，综合评分体系覆盖稳定性与收益率。</div>
+            <div class="readability-card__ratio" style="color: oklch(80% 0.03 255);">对比度 12.8:1 AAA</div>
           </div>
-          <div class="readability-card" style="background: #1E40AF; color: #FFFFFF;">
-            <div class="readability-card__label" style="color: rgba(255,255,255,0.7);">Primary Blue Background</div>
-            <div class="readability-card__text">品牌色背景上的白色文字，用于 Hero 区域、主按钮和 Tab 激活态。</div>
-            <div class="readability-card__ratio" style="color: rgba(255,255,255,0.6);">#FFF on #1E40AF -- 7.5:1 (AAA)</div>
-          </div>
-          <div class="readability-card" style="background: #0F172A; color: #F8FAFC;">
-            <div class="readability-card__label" style="color: #94A3B8;">Dark Background (Footer)</div>
-            <div class="readability-card__text">深色背景用于页脚和潜在的暗色模式。次要文字使用浅灰色。</div>
-            <div class="readability-card__ratio" style="color: #64748B;">#F8FAFC on #0F172A -- 16.3:1 (AAA)</div>
+          <div class="readability-card" style="background: oklch(94% 0.04 70);">
+            <div class="readability-card__label" style="color: oklch(50% 0.14 65);">琥珀背景</div>
+            <div class="readability-card__text" style="color: oklch(20% 0.02 65);">平均股息率 3.42%，最长连续分红 27 年。</div>
+            <div class="readability-card__ratio" style="color: oklch(50% 0.14 65);">对比度 11.5:1 AAA</div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ===========================================
+
+    <!-- ============================================================
          SECTION 2: TYPOGRAPHY
-         =========================================== -->
+         ============================================================ -->
     <section class="demo-section" id="typography">
-      <h2 class="demo-section__title">2. 字体搭配</h2>
-      <p class="demo-section__desc">
-        英文/数字使用 Inter (现代几何无衬线)，中文使用 Noto Sans SC (思源黑体)。
-        数字全部使用 tabular-nums 确保表格列对齐。
-      </p>
+      <div class="demo-section__header">
+        <span class="demo-section__number">02</span>
+        <h2 class="demo-section__title">字体与排版</h2>
+        <p class="demo-section__desc">Instrument Sans -- 几何结构但保有人文温度，是 Inter 的有辨识度替代方案。模块化比例尺 1.25。</p>
+      </div>
 
-      <!-- Type Scale -->
-      <div class="demo-subsection">
-        <h3 class="demo-subsection__title">字体层级</h3>
-        <div class="type-specimen">
-          <div class="type-row">
-            <div class="type-meta">
-              <div class="type-meta__label">H1 / Display</div>
-              <div class="type-meta__spec">40px / Bold</div>
-            </div>
-            <div class="type-sample" style="font-size: var(--text-4xl); font-weight: var(--font-bold); line-height: var(--leading-tight);">
-              分红股排行榜
-            </div>
+      <div class="type-specimen">
+        <div class="type-row">
+          <div class="type-meta">
+            <div class="type-meta__role">Display</div>
+            <div class="type-meta__spec">clamp 2-3rem / 700</div>
           </div>
-
-          <div class="type-row">
-            <div class="type-meta">
-              <div class="type-meta__label">H2 / Section</div>
-              <div class="type-meta__spec">32px / Bold</div>
-            </div>
-            <div class="type-sample" style="font-size: var(--text-3xl); font-weight: var(--font-bold); line-height: var(--leading-tight);">
-              综合排行榜 Top 50
-            </div>
+          <div class="type-sample" style="font-size: var(--text-display); font-weight: var(--weight-bold); line-height: var(--leading-tight); letter-spacing: var(--tracking-tight);">
+            分红股排行榜
           </div>
+        </div>
 
-          <div class="type-row">
-            <div class="type-meta">
-              <div class="type-meta__label">H3 / Card Title</div>
-              <div class="type-meta__spec">24px / SemiBold</div>
-            </div>
-            <div class="type-sample" style="font-size: var(--text-2xl); font-weight: var(--font-semibold); line-height: var(--leading-tight);">
-              连续分红 25 年的"养老股"
-            </div>
+        <div class="type-row">
+          <div class="type-meta">
+            <div class="type-meta__role">Heading</div>
+            <div class="type-meta__spec">clamp 1.5-2.375rem / 700</div>
           </div>
-
-          <div class="type-row">
-            <div class="type-meta">
-              <div class="type-meta__label">H4 / Subhead</div>
-              <div class="type-meta__spec">18px / SemiBold</div>
-            </div>
-            <div class="type-sample" style="font-size: var(--text-lg); font-weight: var(--font-semibold);">
-              数据更新于 2026-03-25 14:30
-            </div>
+          <div class="type-sample" style="font-size: var(--text-heading); font-weight: var(--weight-bold); line-height: var(--leading-tight); letter-spacing: var(--tracking-tight);">
+            综合排行 Top 50
           </div>
+        </div>
 
-          <div class="type-row">
-            <div class="type-meta">
-              <div class="type-meta__label">Body</div>
-              <div class="type-meta__spec">16px / Regular / 1.5</div>
-            </div>
-            <div class="type-sample" style="font-size: var(--text-base); font-weight: var(--font-regular); line-height: var(--leading-normal);">
-              综合评分基于分红稳定性（40%）、股息率（35%）和分红规模（25%）三个维度加权计算，总分 0-100 分。数据来源于 A 股公开市场数据。
-            </div>
+        <div class="type-row">
+          <div class="type-meta">
+            <div class="type-meta__role">Subheading</div>
+            <div class="type-meta__spec">clamp 1.125-1.5rem / 600</div>
           </div>
-
-          <div class="type-row">
-            <div class="type-meta">
-              <div class="type-meta__label">Body Small</div>
-              <div class="type-meta__spec">14px / Regular / 1.5</div>
-            </div>
-            <div class="type-sample" style="font-size: var(--text-sm); font-weight: var(--font-regular); color: var(--color-gray-600); line-height: var(--leading-normal);">
-              "连续分红年数"定义：从最近一个分红年度起向前追溯，连续每年均有现金分红记录的年数。仅统计现金分红（不含送股、转增）。
-            </div>
+          <div class="type-sample" style="font-size: var(--text-subheading); font-weight: var(--weight-semibold); line-height: var(--leading-snug);">
+            数据概览与更新状态
           </div>
+        </div>
 
-          <div class="type-row">
-            <div class="type-meta">
-              <div class="type-meta__label">Caption</div>
-              <div class="type-meta__spec">12px / Medium</div>
-            </div>
-            <div class="type-sample" style="font-size: var(--text-xs); font-weight: var(--font-medium); color: var(--color-gray-500);">
-              本站数据仅供参考，不构成投资建议。数据来自公开市场信息，可能存在延迟。
-            </div>
+        <div class="type-row">
+          <div class="type-meta">
+            <div class="type-meta__role">Body</div>
+            <div class="type-meta__spec">1rem / 400 / 1.5</div>
+          </div>
+          <div class="type-sample" style="font-size: var(--text-base); font-weight: var(--weight-regular); line-height: var(--leading-normal); max-width: 65ch;">
+            综合评分基于分红稳定性（40%）、股息率（35%）、分红规模（25%）三个维度加权计算，总分 0-100 分。评分越高，说明该股票的分红质量越好。
+          </div>
+        </div>
+
+        <div class="type-row">
+          <div class="type-meta">
+            <div class="type-meta__role">Small</div>
+            <div class="type-meta__spec">0.875rem / 400 / 1.5</div>
+          </div>
+          <div class="type-sample" style="font-size: var(--text-sm); font-weight: var(--weight-regular); line-height: var(--leading-normal); color: var(--color-text-secondary);">
+            数据来源为公开市场数据，仅供参考，不构成投资建议。最近更新时间：2026-03-27 09:30。
+          </div>
+        </div>
+
+        <div class="type-row">
+          <div class="type-meta">
+            <div class="type-meta__role">Caption</div>
+            <div class="type-meta__spec">0.75rem / 500 / 1.5</div>
+          </div>
+          <div class="type-sample" style="font-size: var(--text-xs); font-weight: var(--weight-medium); line-height: var(--leading-normal); color: var(--color-text-tertiary); letter-spacing: var(--tracking-wide); text-transform: uppercase;">
+            综合评分 -- 连续分红年数 -- 股息率
           </div>
         </div>
       </div>
 
-      <!-- Number Specimen -->
-      <div class="demo-subsection">
-        <h3 class="demo-subsection__title">数字排版 (Tabular Nums)</h3>
+      <!-- Number specimen -->
+      <div class="demo-sub" style="margin-top: var(--space-10);">
+        <h3 class="demo-sub__title">数字排版（tabular-nums 等宽对齐）</h3>
         <div class="number-specimen">
-          <div class="number-grid">
-            <div class="number-card">
-              <div class="number-card__value" style="color: var(--color-gray-900);">1,892.6 亿</div>
-              <div class="number-card__label">累计分红总额</div>
-            </div>
-            <div class="number-card">
-              <div class="number-card__value" style="color: var(--color-accent);">4.52%</div>
-              <div class="number-card__label">最近年度股息率</div>
-            </div>
-            <div class="number-card">
-              <div class="number-card__value" style="color: var(--color-primary);">25 年</div>
-              <div class="number-card__label">连续分红年数</div>
-            </div>
-            <div class="number-card">
-              <div class="number-card__value" style="color: var(--color-success);">85.6 分</div>
-              <div class="number-card__label">综合评分</div>
+          <div class="number-item">
+            <div class="number-item__label">分红股数量</div>
+            <div class="number-item__value">2,847</div>
+            <div class="number-item__change number-item__change--up">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="vertical-align: -1px; margin-right: 2px;">
+                <path d="M6 2L10 7H2L6 2Z" fill="currentColor"/>
+              </svg>
+              +23
             </div>
           </div>
-          <p class="text-xs text-gray-400 mt-6" style="text-align:center; font-family: var(--font-mono);">
-            font-variant-numeric: tabular-nums; letter-spacing: -0.02em;
-          </p>
+
+          <div class="number-item">
+            <div class="number-item__label">平均股息率</div>
+            <div class="number-item__value">3.42%</div>
+            <div class="number-item__change number-item__change--down">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="vertical-align: -1px; margin-right: 2px;">
+                <path d="M6 10L2 5H10L6 10Z" fill="currentColor"/>
+              </svg>
+              -0.15
+            </div>
+          </div>
+
+          <div class="number-item">
+            <div class="number-item__label">最长连续分红</div>
+            <div class="number-item__value">27 年</div>
+            <div class="number-item__note" style="font-size: var(--text-xs); color: var(--color-text-tertiary); margin-top: var(--space-1);">
+              工商银行
+            </div>
+          </div>
+
+          <div class="number-item">
+            <div class="number-item__label">综合评分最高</div>
+            <div class="number-item__value" style="color: var(--color-accent-dark);">92.8</div>
+            <div class="number-item__note" style="font-size: var(--text-xs); color: var(--color-text-tertiary); margin-top: var(--space-1);">
+              贵州茅台
+            </div>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- ===========================================
+
+    <!-- ============================================================
          SECTION 3: COMPONENTS
-         =========================================== -->
+         ============================================================ -->
     <section class="demo-section" id="components">
-      <h2 class="demo-section__title">3. 组件样例</h2>
-      <p class="demo-section__desc">
-        所有交互组件展示完整状态链。按钮最小触摸区域 44px，
-        过渡动画 150-200ms ease-out，阴影使用多层叠加。
-      </p>
+      <div class="demo-section__header">
+        <span class="demo-section__number">03</span>
+        <h2 class="demo-section__title">组件样例</h2>
+        <p class="demo-section__desc">核心交互组件的视觉语言，包含全状态链。所有交互使用 ease-out-quart 缓动。</p>
+      </div>
 
       <!-- Buttons -->
-      <div class="demo-subsection">
-        <h3 class="demo-subsection__title">按钮 (Buttons)</h3>
+      <div class="demo-sub">
+        <h3 class="demo-sub__title">按钮</h3>
+        <div class="btn-showcase">
+          <!-- Primary state chain -->
+          <div>
+            <div class="btn-row__label">Primary 状态链</div>
+            <div class="state-chain">
+              <button class="btn btn--primary">更新数据</button>
+              <span class="state-chain__arrow">&rarr;</span>
+              <span class="state-chain__label">hover</span>
+              <span class="state-chain__arrow">&rarr;</span>
+              <span class="state-chain__label">active (scale 0.98)</span>
+              <span class="state-chain__arrow">&rarr;</span>
+              <span class="state-chain__label">focus-visible (外发光)</span>
+              <span class="state-chain__arrow">&rarr;</span>
+              <button class="btn btn--primary" disabled>更新数据</button>
+              <span class="state-chain__label">disabled</span>
+            </div>
+          </div>
 
-        <p class="text-xs text-gray-500 mb-4">Default / Hover (加深) / Active (scale 0.98) / Focus (外发光) / Disabled (0.4 透明度)</p>
+          <!-- All variants -->
+          <div>
+            <div class="btn-row__label">按钮层级</div>
+            <div class="btn-row">
+              <button class="btn btn--primary">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                更新数据
+              </button>
+              <button class="btn btn--accent">查看详情</button>
+              <button class="btn btn--secondary">导出 CSV</button>
+              <button class="btn btn--ghost">重置筛选</button>
+              <button class="btn btn--danger btn--sm">删除记录</button>
+            </div>
+          </div>
 
-        <div class="btn-row">
-          <button class="btn btn--primary">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/><path d="M9 12l2 2 4-4"/></svg>
-            主要按钮
-          </button>
-          <button class="btn btn--secondary">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-            更新数据
-          </button>
-          <button class="btn btn--accent">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            查看评分
-          </button>
-          <button class="btn btn--ghost">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            评分说明
-          </button>
-        </div>
+          <!-- Danger confirm pattern -->
+          <div>
+            <div class="btn-row__label">危险操作确认模式</div>
+            <div class="btn-row">
+              <div class="confirm-inline">
+                <span class="confirm-inline__prompt">确定删除此记录？</span>
+                <button class="btn btn--danger btn--sm">确定</button>
+                <button class="btn btn--ghost btn--sm">取消</button>
+              </div>
+            </div>
+          </div>
 
-        <div class="btn-row mt-4">
-          <button class="btn btn--primary btn--sm">小按钮 SM</button>
-          <button class="btn btn--primary">默认 Default</button>
-          <button class="btn btn--primary btn--lg">大按钮 LG</button>
-        </div>
+          <!-- Sizes -->
+          <div>
+            <div class="btn-row__label">尺寸</div>
+            <div class="btn-row">
+              <button class="btn btn--primary btn--sm">小按钮</button>
+              <button class="btn btn--primary">默认</button>
+              <button class="btn btn--primary btn--lg">大按钮</button>
+            </div>
+          </div>
 
-        <div class="btn-row mt-4">
-          <button class="btn btn--primary btn--loading" aria-label="加载中">加载中...</button>
-          <button class="btn btn--primary" disabled aria-disabled="true">禁用状态</button>
-          <button class="btn btn--secondary" disabled aria-disabled="true">禁用次要</button>
+          <!-- Loading -->
+          <div>
+            <div class="btn-row__label">加载态</div>
+            <div class="btn-row">
+              <button class="btn btn--primary btn--loading">更新中...</button>
+              <span style="font-size: var(--text-xs); color: var(--color-text-tertiary);">数据更新中，请稍候...</span>
+            </div>
+          </div>
         </div>
       </div>
 
       <!-- Tabs -->
-      <div class="demo-subsection">
-        <h3 class="demo-subsection__title">Tab 切换栏</h3>
-        <div style="max-width: 520px;">
-          <nav class="tab-bar" role="tablist" aria-label="排行榜类型">
-            <button class="tab-item" role="tab" aria-selected="false">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-              稳定分红
-            </button>
-            <button class="tab-item" role="tab" aria-selected="false">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-              分红最多
-            </button>
-            <button class="tab-item tab-item--active" role="tab" aria-selected="true">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
-              综合排行
-            </button>
-          </nav>
+      <div class="demo-sub">
+        <h3 class="demo-sub__title">Tab 导航</h3>
+        <div role="tablist" class="tab-bar" aria-label="排行榜类型">
+          <button role="tab" id="demo-tab-1" class="tab tab--active" aria-selected="true" aria-controls="demo-panel-1" tabindex="0">综合排行</button>
+          <button role="tab" id="demo-tab-2" class="tab" aria-selected="false" aria-controls="demo-panel-2" tabindex="-1">稳定分红</button>
+          <button role="tab" id="demo-tab-3" class="tab" aria-selected="false" aria-controls="demo-panel-3" tabindex="-1">分红最多</button>
+        </div>
+      </div>
+
+      <!-- Inputs -->
+      <div class="demo-sub">
+        <h3 class="demo-sub__title">输入框</h3>
+        <div class="input-stack">
+          <div class="input-group">
+            <label class="input-label" for="input-search">搜索股票<span class="input-label__required" aria-hidden="true">*</span></label>
+            <input class="input" id="input-search" type="text" placeholder="输入股票代码或名称，如 600519">
+            <span class="input-hint">支持代码、简称和拼音首字母</span>
+          </div>
+
+          <div class="input-group">
+            <label class="input-label" for="input-error">最低股息率</label>
+            <input class="input input--error" id="input-error" type="text" value="abc" aria-invalid="true" aria-describedby="input-error-msg">
+            <span class="input-error-msg" id="input-error-msg">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M7 4v3.5M7 9.5v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+              请输入有效的数字，例如 3.5
+            </span>
+          </div>
         </div>
       </div>
 
       <!-- Badges -->
-      <div class="demo-subsection">
-        <h3 class="demo-subsection__title">标签 / Badge</h3>
+      <div class="demo-sub">
+        <h3 class="demo-sub__title">标签 / Badge</h3>
         <div class="badge-row">
-          <span class="badge badge--blue">银行</span>
-          <span class="badge badge--blue">食品饮料</span>
-          <span class="badge badge--amber">高股息</span>
-          <span class="badge badge--amber">连续 25 年</span>
-          <span class="badge badge--gray">沪市主板</span>
-          <span class="badge badge--gray">已更新</span>
-          <span class="badge badge--success">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 15l-6-6-6 6"/></svg>
-            涨 +2.1%
+          <span class="badge badge--neutral">银行</span>
+          <span class="badge badge--primary">综合评分 92.8</span>
+          <span class="badge badge--accent">连续 27 年分红</span>
+          <span class="badge badge--bullish">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 1L9 6H1L5 1Z" fill="currentColor"/></svg>
+            +2.35%
           </span>
-          <span class="badge badge--danger">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
-            跌 -0.8%
+          <span class="badge badge--bearish">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 9L1 4H9L5 9Z" fill="currentColor"/></svg>
+            -1.08%
           </span>
-        </div>
-      </div>
-
-      <!-- Input Fields -->
-      <div class="demo-subsection">
-        <h3 class="demo-subsection__title">输入框 (Input)</h3>
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--space-6);">
-
-          <div class="input-group">
-            <label class="input-label" for="input-default">搜索股票</label>
-            <input class="input" type="text" id="input-default" placeholder="输入股票代码或名称，如 600519">
-            <span class="input-helper">支持股票代码（6位数字）和股票名称模糊搜索</span>
-          </div>
-
-          <div class="input-group">
-            <label class="input-label" for="input-focus">筛选行业 <span class="input-label__required">*</span></label>
-            <input class="input" type="text" id="input-focus" placeholder="如：银行、食品饮料" value="银行" style="border-color: var(--color-secondary); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);">
-          </div>
-
-          <div class="input-group">
-            <label class="input-label" for="input-error">最低股息率 <span class="input-label__required">*</span></label>
-            <input class="input input--error" type="text" id="input-error" value="abc" style="border-color: var(--color-error); box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);">
-            <span class="input-error-msg">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>
-              请输入有效的数字，如 3.5
-            </span>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- Navbar -->
-      <div class="demo-subsection">
-        <h3 class="demo-subsection__title">导航栏 (Navbar)</h3>
-        <div style="border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-lg);">
-          <nav class="navbar" role="navigation" aria-label="主导航">
-            <a class="navbar__brand" href="#" aria-label="分红股排行榜首页">
-              <span class="navbar__logo" aria-hidden="true">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
-              </span>
-              分红股排行榜
-            </a>
-            <div class="navbar__actions">
-              <span class="navbar__update-info">更新于 2026-03-25 14:30</span>
-              <button class="btn btn--primary btn--sm">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                更新数据
-              </button>
-            </div>
-          </nav>
-        </div>
-      </div>
-
-      <!-- Data Cards -->
-      <div class="demo-subsection">
-        <h3 class="demo-subsection__title">数据卡片 (KPI Cards)</h3>
-        <div class="card-grid">
-          <div class="card">
-            <div class="card__header">
-              <div class="card__icon card__icon--blue">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-              </div>
-              <span class="badge badge--blue">实时</span>
-            </div>
-            <div class="card__body">
-              <div class="card__title">分红股总数</div>
-              <div class="card__desc">A 股中有现金分红记录的公司</div>
-              <div class="card__value">3,286</div>
-              <div class="card__change card__change--up">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 15l-6-6-6 6"/></svg>
-                较上月 +52
-              </div>
-            </div>
-          </div>
-
-          <div class="card">
-            <div class="card__header">
-              <div class="card__icon card__icon--amber">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-              </div>
-              <span class="badge badge--amber">Top 1</span>
-            </div>
-            <div class="card__body">
-              <div class="card__title">最高股息率</div>
-              <div class="card__desc">当前 A 股最高年度股息率</div>
-              <div class="card__value" style="color: var(--color-accent);">12.38%</div>
-              <div class="card__change" style="color: var(--color-gray-500);">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
-                较去年 +1.2pp
-              </div>
-            </div>
-          </div>
-
-          <div class="card">
-            <div class="card__header">
-              <div class="card__icon card__icon--slate">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-              </div>
-              <span class="badge badge--gray">稳定</span>
-            </div>
-            <div class="card__body">
-              <div class="card__title">最长连续分红</div>
-              <div class="card__desc">不间断分红的最长年数</div>
-              <div class="card__value" style="color: var(--color-primary);">28 年</div>
-              <div class="card__change" style="color: var(--color-gray-500);">佛山照明 (000541)</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Data Table -->
-      <div class="demo-subsection">
-        <h3 class="demo-subsection__title">数据表格 (Data Table)</h3>
-        <p class="text-xs text-gray-500 mb-4">
-          表头固定、数字右对齐、hover 行高亮 (#EFF6FF)、Top3 排名使用琥珀金强调色、综合评分使用 Badge
-        </p>
-        <div class="table-wrapper">
-          <div class="table-scroll">
-            <table class="data-table" role="table" aria-label="综合排行榜数据">
-              <thead>
-                <tr>
-                  <th scope="col" style="width:48px;">排名</th>
-                  <th scope="col">股票代码</th>
-                  <th scope="col">股票名称</th>
-                  <th scope="col">行业</th>
-                  <th scope="col" class="align-right">综合评分</th>
-                  <th scope="col" class="align-right">连续分红</th>
-                  <th scope="col" class="align-right">股息率</th>
-                  <th scope="col" class="align-right">3年平均</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td class="rank-cell rank-cell--top">1</td>
-                  <td class="stock-code">600519</td>
-                  <td class="stock-name">贵州茅台</td>
-                  <td><span class="badge badge--blue">食品饮料</span></td>
-                  <td class="align-right"><span class="score-badge score-badge--high">92.3</span></td>
-                  <td class="align-right highlight-value">25 年</td>
-                  <td class="align-right">3.68%</td>
-                  <td class="align-right">3.42%</td>
-                </tr>
-                <tr>
-                  <td class="rank-cell rank-cell--top">2</td>
-                  <td class="stock-code">601318</td>
-                  <td class="stock-name">中国平安</td>
-                  <td><span class="badge badge--blue">保险</span></td>
-                  <td class="align-right"><span class="score-badge score-badge--high">89.7</span></td>
-                  <td class="align-right highlight-value">22 年</td>
-                  <td class="align-right">5.12%</td>
-                  <td class="align-right">4.85%</td>
-                </tr>
-                <tr>
-                  <td class="rank-cell rank-cell--top">3</td>
-                  <td class="stock-code">601398</td>
-                  <td class="stock-name">工商银行</td>
-                  <td><span class="badge badge--blue">银行</span></td>
-                  <td class="align-right"><span class="score-badge score-badge--high">87.1</span></td>
-                  <td class="align-right highlight-value">23 年</td>
-                  <td class="align-right">6.24%</td>
-                  <td class="align-right">5.89%</td>
-                </tr>
-                <tr>
-                  <td class="rank-cell">4</td>
-                  <td class="stock-code">000651</td>
-                  <td class="stock-name">格力电器</td>
-                  <td><span class="badge badge--gray">家用电器</span></td>
-                  <td class="align-right"><span class="score-badge score-badge--medium">82.5</span></td>
-                  <td class="align-right">18 年</td>
-                  <td class="align-right">4.52%</td>
-                  <td class="align-right">4.31%</td>
-                </tr>
-                <tr>
-                  <td class="rank-cell">5</td>
-                  <td class="stock-code">600036</td>
-                  <td class="stock-name">招商银行</td>
-                  <td><span class="badge badge--blue">银行</span></td>
-                  <td class="align-right"><span class="score-badge score-badge--medium">80.9</span></td>
-                  <td class="align-right">21 年</td>
-                  <td class="align-right">5.68%</td>
-                  <td class="align-right">5.23%</td>
-                </tr>
-                <tr>
-                  <td class="rank-cell">6</td>
-                  <td class="stock-code">000858</td>
-                  <td class="stock-name">五粮液</td>
-                  <td><span class="badge badge--blue">食品饮料</span></td>
-                  <td class="align-right"><span class="score-badge score-badge--medium">78.4</span></td>
-                  <td class="align-right">20 年</td>
-                  <td class="align-right">3.15%</td>
-                  <td class="align-right">2.98%</td>
-                </tr>
-                <tr>
-                  <td class="rank-cell">7</td>
-                  <td class="stock-code">601088</td>
-                  <td class="stock-name">中国神华</td>
-                  <td><span class="badge badge--gray">煤炭</span></td>
-                  <td class="align-right"><span class="score-badge score-badge--medium">76.2</span></td>
-                  <td class="align-right">17 年</td>
-                  <td class="align-right">8.92%</td>
-                  <td class="align-right">7.56%</td>
-                </tr>
-                <tr>
-                  <td class="rank-cell" style="color: var(--color-gray-300);">--</td>
-                  <td class="stock-code" style="color: var(--color-gray-300);">------</td>
-                  <td style="color: var(--color-gray-400);">暂无数据</td>
-                  <td><span class="badge badge--gray">--</span></td>
-                  <td class="align-right" style="color: var(--color-gray-300);">--</td>
-                  <td class="align-right" style="color: var(--color-gray-300);">--</td>
-                  <td class="align-right" style="color: var(--color-gray-300);">--</td>
-                  <td class="align-right" style="color: var(--color-gray-300);">--</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="pagination">
-            <span>共 3,286 条 / 66 页</span>
-            <div class="pagination__pages">
-              <button class="pagination__btn" disabled aria-label="上一页">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 19l-7-7 7-7"/></svg>
-              </button>
-              <button class="pagination__btn pagination__btn--active" aria-label="第1页" aria-current="page">1</button>
-              <button class="pagination__btn" aria-label="第2页">2</button>
-              <button class="pagination__btn" aria-label="第3页">3</button>
-              <button class="pagination__btn" aria-label="第4页">4</button>
-              <button class="pagination__btn" aria-label="第5页">5</button>
-              <button class="pagination__btn" aria-label="下一页">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5l7 7-7 7"/></svg>
-              </button>
-            </div>
-          </div>
+          <span class="badge badge--outline">沪市</span>
         </div>
       </div>
     </section>
 
-    <!-- ===========================================
-         SECTION 4: LAYOUT - HERO + KPI
-         =========================================== -->
+
+    <!-- ============================================================
+         SECTION 4: LAYOUT & TABLE
+         ============================================================ -->
     <section class="demo-section" id="layout">
-      <h2 class="demo-section__title">4. 布局节奏</h2>
-      <p class="demo-section__desc">
-        Hero 区渐变蓝背景 + 琥珀金 CTA 构成品牌第一印象。
-        KPI 卡片网格响应式排列，4px 间距系统保持节奏一致。
-      </p>
+      <div class="demo-section__header">
+        <span class="demo-section__number">04</span>
+        <h2 class="demo-section__title">布局与数据展示</h2>
+        <p class="demo-section__desc">页面头部 + 数据概览 + 排行榜表格的完整布局节奏。间距在紧密和宽松之间有变化。</p>
+      </div>
 
-      <!-- Hero Section -->
-      <div class="demo-subsection">
-        <h3 class="demo-subsection__title">Hero Section 示例</h3>
-        <div class="hero">
-          <div class="hero__content">
-            <div class="hero__eyebrow">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
-              A 股分红数据
+      <!-- Page header mockup -->
+      <div class="demo-sub">
+        <h3 class="demo-sub__title">页面头部组合</h3>
+        <div class="page-header-demo">
+          <div class="page-header-demo__top">
+            <div class="page-header-demo__brand">
+              <!-- SVG logo: stylized bar chart / dividend icon -->
+              <svg class="page-header-demo__logo" viewBox="0 0 32 32" fill="none">
+                <rect x="2" y="18" width="6" height="12" rx="1.5" fill="currentColor" opacity="0.4"/>
+                <rect x="13" y="10" width="6" height="20" rx="1.5" fill="currentColor" opacity="0.7"/>
+                <rect x="24" y="4" width="6" height="26" rx="1.5" fill="currentColor"/>
+              </svg>
+              <span class="page-header-demo__name">分红股排行榜</span>
             </div>
-            <h2 class="hero__title">三个维度，找到最值得关注的分红股</h2>
-            <p class="hero__desc">
-              稳定性、股息率、综合评分 -- 用最简洁的排行榜，帮你做出更明智的分红投资决策。
-            </p>
-            <div class="hero__actions">
-              <button class="btn--hero-primary">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -3px; margin-right: 4px;"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            <div class="page-header-demo__actions">
+              <span class="page-header-demo__time">更新于 2026-03-27 09:30</span>
+              <button class="btn btn--primary btn--sm">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <path d="M1 7a6 6 0 0111.196-3M13 7A6 6 0 011.804 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  <path d="M12 1v3h-3M2 13v-3h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
                 更新数据
               </button>
-              <button class="btn--hero-secondary">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -3px; margin-right: 4px;"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                了解评分规则
-              </button>
+            </div>
+          </div>
+
+          <!-- Data overview stats -->
+          <div class="data-overview" style="margin-top: var(--space-6);">
+            <div class="data-stat data-stat--highlight">
+              <div class="data-stat__label">分红股数量</div>
+              <div class="data-stat__value">2,847</div>
+              <div class="data-stat__note">已排除 ST 股</div>
+            </div>
+            <div class="data-stat">
+              <div class="data-stat__label">平均股息率</div>
+              <div class="data-stat__value">3.42%</div>
+              <div class="data-stat__note">近一年</div>
+            </div>
+            <div class="data-stat">
+              <div class="data-stat__label">最长连续分红</div>
+              <div class="data-stat__value">27 年</div>
+              <div class="data-stat__note">工商银行</div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- KPI Grid -->
-      <div class="demo-subsection">
-        <h3 class="demo-subsection__title">KPI 指标卡片网格</h3>
-        <div class="kpi-grid">
-          <div class="kpi-card">
-            <div class="kpi-card__header">
-              <span class="kpi-card__label">分红股总数</span>
-              <div class="kpi-card__icon" style="background: var(--color-primary-light); color: var(--color-primary);">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-              </div>
-            </div>
-            <div class="kpi-card__value">3,286</div>
-            <div class="kpi-card__trend" style="color: var(--color-success);">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 15l-6-6-6 6"/></svg>
-              +52 较上月
+      <!-- Table -->
+      <div class="demo-sub">
+        <h3 class="demo-sub__title">排行榜表格（综合排行）</h3>
+        <div role="tablist" class="tab-bar" aria-label="排行榜类型切换">
+          <button role="tab" id="layout-tab-1" class="tab tab--active" aria-selected="true" aria-controls="layout-panel-1" tabindex="0">综合排行</button>
+          <button role="tab" id="layout-tab-2" class="tab" aria-selected="false" aria-controls="layout-panel-2" tabindex="-1">稳定分红</button>
+          <button role="tab" id="layout-tab-3" class="tab" aria-selected="false" aria-controls="layout-panel-3" tabindex="-1">分红最多</button>
+        </div>
+
+        <!-- Search toolbar -->
+        <div class="table-toolbar">
+          <div class="table-search">
+            <svg class="table-search__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="8"/>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input class="table-search__input" type="text" placeholder="搜索股票代码或名称..." aria-label="搜索股票">
+          </div>
+          <span class="table-result-count">共 2,847 条</span>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="data-table" aria-label="综合排行榜">
+            <thead>
+              <tr>
+                <th scope="col">排名</th>
+                <th scope="col" data-sortable>代码</th>
+                <th scope="col" data-sortable>名称</th>
+                <th scope="col" data-sortable>行业</th>
+                <th scope="col" data-align="right" data-sortable data-sort="desc">
+                  <span class="tooltip-trigger">
+                    综合评分
+                    <svg class="tooltip-icon" viewBox="0 0 16 16" fill="none" tabindex="0" role="img" aria-label="评分说明">
+                      <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/>
+                      <path d="M8 7v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                      <circle cx="8" cy="5" r="0.75" fill="currentColor"/>
+                    </svg>
+                    <span class="tooltip-content">稳定性 40%（连续分红年数）+ 股息率 35%（近 3 年均值）+ 分红规模 25%（累计总额），总分 0-100。</span>
+                  </span>
+                </th>
+                <th scope="col" data-align="right" data-sortable>连续分红</th>
+                <th scope="col" data-align="right" data-sortable>股息率</th>
+                <th scope="col" data-align="right" data-sortable>3年均息率</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="rank-cell rank-cell--top3">1</td>
+                <td class="stock-code">600519</td>
+                <td style="font-weight: var(--weight-semibold);">贵州茅台</td>
+                <td>白酒</td>
+                <td data-align="right">
+                  <div class="score-bar">
+                    <div class="score-bar__track"><div class="score-bar__fill" style="width: 92.8%;"></div></div>
+                    <span class="score-bar__value">92.8</span>
+                  </div>
+                </td>
+                <td data-align="right">24 年</td>
+                <td data-align="right" style="color: var(--color-bullish); font-weight: var(--weight-semibold);">4.28%</td>
+                <td data-align="right">3.95%</td>
+              </tr>
+              <tr>
+                <td class="rank-cell rank-cell--top3">2</td>
+                <td class="stock-code">601398</td>
+                <td style="font-weight: var(--weight-semibold);">工商银行</td>
+                <td>银行</td>
+                <td data-align="right">
+                  <div class="score-bar">
+                    <div class="score-bar__track"><div class="score-bar__fill" style="width: 91.5%;"></div></div>
+                    <span class="score-bar__value">91.5</span>
+                  </div>
+                </td>
+                <td data-align="right">27 年</td>
+                <td data-align="right" style="color: var(--color-bullish); font-weight: var(--weight-semibold);">5.12%</td>
+                <td data-align="right">4.87%</td>
+              </tr>
+              <tr>
+                <td class="rank-cell rank-cell--top3">3</td>
+                <td class="stock-code">000858</td>
+                <td style="font-weight: var(--weight-semibold);">五粮液</td>
+                <td>白酒</td>
+                <td data-align="right">
+                  <div class="score-bar">
+                    <div class="score-bar__track"><div class="score-bar__fill" style="width: 89.2%;"></div></div>
+                    <span class="score-bar__value">89.2</span>
+                  </div>
+                </td>
+                <td data-align="right">22 年</td>
+                <td data-align="right" style="color: var(--color-bullish); font-weight: var(--weight-semibold);">3.76%</td>
+                <td data-align="right">3.52%</td>
+              </tr>
+              <tr>
+                <td class="rank-cell">4</td>
+                <td class="stock-code">600036</td>
+                <td>招商银行</td>
+                <td>银行</td>
+                <td data-align="right">
+                  <div class="score-bar">
+                    <div class="score-bar__track"><div class="score-bar__fill" style="width: 87.6%;"></div></div>
+                    <span class="score-bar__value">87.6</span>
+                  </div>
+                </td>
+                <td data-align="right">20 年</td>
+                <td data-align="right">4.95%</td>
+                <td data-align="right">4.28%</td>
+              </tr>
+              <tr>
+                <td class="rank-cell">5</td>
+                <td class="stock-code">601318</td>
+                <td>中国平安</td>
+                <td>保险</td>
+                <td data-align="right">
+                  <div class="score-bar">
+                    <div class="score-bar__track"><div class="score-bar__fill" style="width: 85.1%;"></div></div>
+                    <span class="score-bar__value">85.1</span>
+                  </div>
+                </td>
+                <td data-align="right">18 年</td>
+                <td data-align="right">3.88%</td>
+                <td data-align="right">3.45%</td>
+              </tr>
+              <tr>
+                <td class="rank-cell">6</td>
+                <td class="stock-code">000333</td>
+                <td>美的集团</td>
+                <td>家电</td>
+                <td data-align="right">
+                  <div class="score-bar">
+                    <div class="score-bar__track"><div class="score-bar__fill" style="width: 82.4%;"></div></div>
+                    <span class="score-bar__value">82.4</span>
+                  </div>
+                </td>
+                <td data-align="right">15 年</td>
+                <td data-align="right">3.21%</td>
+                <td data-align="right">2.98%</td>
+              </tr>
+              <tr>
+                <td class="rank-cell">7</td>
+                <td class="stock-code">600900</td>
+                <td>长江电力</td>
+                <td>电力</td>
+                <td data-align="right">
+                  <div class="score-bar">
+                    <div class="score-bar__track"><div class="score-bar__fill" style="width: 80.7%;"></div></div>
+                    <span class="score-bar__value">80.7</span>
+                  </div>
+                </td>
+                <td data-align="right">23 年</td>
+                <td data-align="right">3.55%</td>
+                <td data-align="right">3.42%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <nav class="pagination" aria-label="分页导航">
+          <span class="pagination__info">共 2,847 条，第 1/57 页</span>
+          <div class="pagination__controls">
+            <button class="btn btn--secondary btn--sm" disabled aria-label="上一页">上一页</button>
+            <button class="btn btn--primary btn--sm" style="min-width: 36px;" aria-current="page" aria-label="第 1 页">1</button>
+            <button class="btn btn--secondary btn--sm" style="min-width: 36px;" aria-label="第 2 页">2</button>
+            <button class="btn btn--secondary btn--sm" style="min-width: 36px;" aria-label="第 3 页">3</button>
+            <span class="pagination__ellipsis" aria-hidden="true">...</span>
+            <button class="btn btn--secondary btn--sm" style="min-width: 36px;" aria-label="第 57 页">57</button>
+            <button class="btn btn--secondary btn--sm" aria-label="下一页">下一页</button>
+          </div>
+        </nav>
+      </div>
+
+      <!-- Footer info section mockup -->
+      <div class="demo-sub" style="margin-top: var(--space-12);">
+        <h3 class="demo-sub__title">页面底部信息区</h3>
+        <div class="footer-info">
+          <div class="footer-info__section">
+            <div class="footer-info__title">评分说明</div>
+            <p class="footer-info__text">
+              综合评分 = 稳定性得分（连续分红年数归一化，权重 40%）+ 股息率得分（近 3 年平均股息率归一化，权重 35%）+ 分红规模得分（累计分红总额归一化，权重 25%）。总分范围 0-100 分。归一化方法：(当前值 - 最小值) / (最大值 - 最小值) * 100。
+            </p>
+          </div>
+
+          <hr class="footer-info__divider">
+
+          <div class="footer-info__meta">
+            <div>
+              <div class="footer-info__title">数据来源</div>
+              <p class="footer-info__text">公开市场分红数据（AKShare）</p>
             </div>
           </div>
 
-          <div class="kpi-card">
-            <div class="kpi-card__header">
-              <span class="kpi-card__label">平均股息率</span>
-              <div class="kpi-card__icon" style="background: var(--color-accent-light); color: var(--color-accent);">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-              </div>
+          <p class="footer-info__disclaimer">本站数据仅供参考，不构成投资建议。投资有风险，入市需谨慎。</p>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================
+         SECTION 5: MOTION
+         ============================================================ -->
+    <section class="demo-section" id="motion">
+      <div class="demo-section__header">
+        <span class="demo-section__number">05</span>
+        <h2 class="demo-section__title">动效基调</h2>
+        <p class="demo-section__desc">Exponential easing（ease-out-quart）为默认缓动。只动 transform 和 opacity。不用 bounce/elastic。</p>
+      </div>
+
+      <div class="motion-grid">
+        <!-- Duration tokens -->
+        <div class="motion-demo">
+          <div class="motion-demo__title">持续时间体系</div>
+          <div class="duration-bars">
+            <div class="duration-bar">
+              <span class="duration-bar__label">100ms</span>
+              <div class="duration-bar__track" style="width: 30px;"></div>
+              <span class="duration-bar__usage">即时反馈（颜色变化、toggle）</span>
             </div>
-            <div class="kpi-card__value">2.87%</div>
-            <div class="kpi-card__trend" style="color: var(--color-success);">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 15l-6-6-6 6"/></svg>
-              +0.3pp YoY
+            <div class="duration-bar">
+              <span class="duration-bar__label">200ms</span>
+              <div class="duration-bar__track" style="width: 60px;"></div>
+              <span class="duration-bar__usage">状态变化（hover、focus、展开）</span>
+            </div>
+            <div class="duration-bar">
+              <span class="duration-bar__label">350ms</span>
+              <div class="duration-bar__track" style="width: 105px;"></div>
+              <span class="duration-bar__usage">布局变化（Tab 切换、排序）</span>
+            </div>
+            <div class="duration-bar">
+              <span class="duration-bar__label">500ms</span>
+              <div class="duration-bar__track" style="width: 150px;"></div>
+              <span class="duration-bar__usage">入场动画（页面加载、数据刷新）</span>
             </div>
           </div>
+        </div>
 
-          <div class="kpi-card">
-            <div class="kpi-card__header">
-              <span class="kpi-card__label">连续分红10年+</span>
-              <div class="kpi-card__icon" style="background: var(--color-gray-100); color: var(--color-gray-600);">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        <!-- Easing comparison -->
+        <div class="motion-demo">
+          <div class="motion-demo__title">缓动对比（悬停此区域触发）</div>
+          <div class="motion-demo__spec">ease-out-quart 为默认选择</div>
+          <div class="easing-track">
+            <div class="easing-row">
+              <span class="easing-row__label">Quart (默认)</span>
+              <div class="easing-row__track">
+                <div class="easing-row__dot easing-row__dot--quart"></div>
               </div>
             </div>
-            <div class="kpi-card__value">862</div>
-            <div class="kpi-card__trend" style="color: var(--color-gray-500);">占比 26.2%</div>
+            <div class="easing-row">
+              <span class="easing-row__label">Expo (强调)</span>
+              <div class="easing-row__track">
+                <div class="easing-row__dot easing-row__dot--expo"></div>
+              </div>
+            </div>
+            <div class="easing-row">
+              <span class="easing-row__label">Linear (对比)</span>
+              <div class="easing-row__track">
+                <div class="easing-row__dot easing-row__dot--linear"></div>
+              </div>
+            </div>
           </div>
+        </div>
 
-          <div class="kpi-card">
-            <div class="kpi-card__header">
-              <span class="kpi-card__label">数据更新</span>
-              <div class="kpi-card__icon" style="background: var(--color-primary-ultra); color: var(--color-secondary);">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-              </div>
-            </div>
-            <div class="kpi-card__value" style="font-size: var(--text-lg);">2026-03-25</div>
-            <div class="kpi-card__trend" style="color: var(--color-gray-500);">14:30 更新</div>
+        <!-- Hover card -->
+        <div class="motion-demo">
+          <div class="motion-demo__title">卡片悬停交互</div>
+          <div class="motion-demo__spec">translateY(-3px) + 阴影加深 + 边框色变化，200ms ease-out-quart</div>
+          <div class="hover-card-demo">
+            <div style="font-weight: var(--weight-semibold); margin-bottom: var(--space-2);">贵州茅台 600519</div>
+            <div class="hover-card-demo__text">综合评分 92.8 | 连续分红 24 年 | 股息率 4.28%</div>
+          </div>
+        </div>
+
+        <!-- Stagger entrance -->
+        <div class="motion-demo">
+          <div class="motion-demo__title">交错入场动画</div>
+          <div class="motion-demo__spec">每项延迟 60ms，总时长上限 500ms</div>
+          <div class="stagger-list">
+            <div class="stagger-item">1. 贵州茅台 -- 92.8 分</div>
+            <div class="stagger-item">2. 工商银行 -- 91.5 分</div>
+            <div class="stagger-item">3. 五粮液 -- 89.2 分</div>
+            <div class="stagger-item">4. 招商银行 -- 87.6 分</div>
+            <div class="stagger-item">5. 中国平安 -- 85.1 分</div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ===========================================
-         SECTION 5: ANIMATION
-         =========================================== -->
-    <section class="demo-section" id="animation">
-      <h2 class="demo-section__title">5. 动效基调</h2>
-      <p class="demo-section__desc">
-        克制的微交互动效。入场使用 fadeInUp + 交错延迟，
-        交互使用 hover 抬升和 active 缩放，加载使用骨架屏 shimmer。
-        全部遵循 prefers-reduced-motion。
-      </p>
 
-      <div class="animation-grid">
-
-        <!-- Fade In Up -->
-        <div class="animation-demo">
-          <div class="animation-demo__label">入场动画 - Fade In Up</div>
-          <div class="animation-demo__spec">400ms ease-out / translateY(12px) -> 0</div>
-          <div style="margin-top: var(--space-4);">
-            <div class="anim-target--fadein" style="background: var(--color-primary-light); color: var(--color-primary); padding: var(--space-4) var(--space-6); border-radius: var(--radius-md); font-weight: var(--font-semibold); font-size: var(--text-sm); display: inline-block;">
-              综合排行榜已更新
-            </div>
-          </div>
-        </div>
-
-        <!-- Press / Active -->
-        <div class="animation-demo">
-          <div class="animation-demo__label">点按反馈 - Scale Press</div>
-          <div class="animation-demo__spec">150ms ease-out / scale(0.96) on :active</div>
-          <div style="margin-top: var(--space-4);">
-            <div class="anim-target--press" tabindex="0" role="button" aria-label="点按示例">
-              点按我
-            </div>
-          </div>
-        </div>
-
-        <!-- Hover Lift -->
-        <div class="animation-demo">
-          <div class="animation-demo__label">悬停抬升 - Hover Lift</div>
-          <div class="animation-demo__spec">200ms ease-out / translateY(-6px) + shadow</div>
-          <div style="margin-top: var(--space-4);">
-            <div class="anim-target--lift" tabindex="0" role="button" aria-label="悬停示例">
-              <div class="anim-target--lift__inner">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-              </div>
-              <div class="anim-target--lift__text">Hover 抬升</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Skeleton Loading -->
-        <div class="animation-demo">
-          <div class="animation-demo__label">加载骨架屏 - Skeleton</div>
-          <div class="animation-demo__spec">1.5s ease-in-out infinite shimmer</div>
-          <div style="margin-top: var(--space-4); padding: 0 var(--space-4);">
-            <div class="stagger-container">
-              <div class="skeleton-row">
-                <div class="skeleton skeleton--circle"></div>
-                <div style="flex:1; display:flex; flex-direction:column; gap: 6px;">
-                  <div class="skeleton skeleton--text" style="width:60%;"></div>
-                  <div class="skeleton skeleton--text skeleton--text-sm" style="width:40%;"></div>
-                </div>
-                <div class="skeleton skeleton--text" style="width:48px; height: 24px; border-radius: var(--radius-full);"></div>
-              </div>
-              <div class="skeleton-row">
-                <div class="skeleton skeleton--circle"></div>
-                <div style="flex:1; display:flex; flex-direction:column; gap: 6px;">
-                  <div class="skeleton skeleton--text" style="width:50%;"></div>
-                  <div class="skeleton skeleton--text skeleton--text-sm" style="width:35%;"></div>
-                </div>
-                <div class="skeleton skeleton--text" style="width:48px; height: 24px; border-radius: var(--radius-full);"></div>
-              </div>
-              <div class="skeleton-row">
-                <div class="skeleton skeleton--circle"></div>
-                <div style="flex:1; display:flex; flex-direction:column; gap: 6px;">
-                  <div class="skeleton skeleton--text" style="width:70%;"></div>
-                  <div class="skeleton skeleton--text skeleton--text-sm" style="width:45%;"></div>
-                </div>
-                <div class="skeleton skeleton--text" style="width:48px; height: 24px; border-radius: var(--radius-full);"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
+    <!-- ============================================================
+         SECTION 6: RESPONSIVE & ACCESSIBILITY
+         ============================================================ -->
+    <section class="demo-section" id="responsive">
+      <div class="demo-section__header">
+        <span class="demo-section__number">06</span>
+        <h2 class="demo-section__title">响应式与无障碍</h2>
+        <p class="demo-section__desc">Mobile-First 设计，3 个断点覆盖手机、平板、桌面。触控设备自动适配。</p>
       </div>
 
-      <!-- Animation Specs Summary -->
-      <div style="margin-top: var(--space-8); background: var(--color-white); border-radius: var(--radius-lg); padding: var(--space-6); box-shadow: var(--shadow-sm); border: 1px solid var(--color-gray-200);">
-        <h4 style="font-size: var(--text-sm); font-weight: var(--font-semibold); color: var(--color-gray-700); margin-bottom: var(--space-4);">动效规范速查</h4>
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: var(--space-4); font-size: var(--text-xs); color: var(--color-gray-600);">
-          <div>
-            <span style="font-weight: var(--font-semibold); color: var(--color-gray-800);">Hover 反馈</span><br>
-            <span style="font-family: var(--font-mono); color: var(--color-gray-400);">150ms ease-out / background-color, border-color</span>
+      <div class="demo-sub">
+        <h3 class="demo-sub__title">断点系统</h3>
+        <div class="table-wrapper">
+          <table class="breakpoint-table">
+            <thead>
+              <tr>
+                <th scope="col">断点</th>
+                <th scope="col">范围</th>
+                <th scope="col">媒体查询</th>
+                <th scope="col">主要变化</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-weight: var(--weight-semibold);">手机</td>
+                <td>375px - 640px</td>
+                <td><code>基础样式</code></td>
+                <td>单列布局、表格横向滚动、堆叠式统计卡</td>
+              </tr>
+              <tr>
+                <td style="font-weight: var(--weight-semibold);">平板</td>
+                <td>641px - 1024px</td>
+                <td><code>min-width: 640px</code></td>
+                <td>2 列网格、表格完整展示、统计卡并排</td>
+              </tr>
+              <tr>
+                <td style="font-weight: var(--weight-semibold);">桌面</td>
+                <td>1025px+</td>
+                <td><code>min-width: 1025px</code></td>
+                <td>3 列色板、最大宽度 1200px 居中</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="demo-sub">
+        <h3 class="demo-sub__title">触控目标最小尺寸</h3>
+        <div class="touch-demo">
+          <div class="touch-target">44px</div>
+          <span style="font-size: var(--text-sm); color: var(--color-text-secondary);">所有可点击元素至少 44x44px。按钮、Tab、输入框在触控设备上自动增大到 48px。</span>
+        </div>
+      </div>
+
+      <div class="demo-sub">
+        <h3 class="demo-sub__title">无障碍支持</h3>
+        <div style="display: flex; flex-direction: column; gap: var(--space-3); font-size: var(--text-sm); color: var(--color-text-secondary);">
+          <div style="display: flex; align-items: flex-start; gap: var(--space-3);">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="flex-shrink: 0; margin-top: 2px;">
+              <path d="M3 8l3 3 7-7" stroke="var(--color-success)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span><code style="font-family: ui-monospace, monospace; font-size: var(--text-xs); background: var(--color-surface-3); padding: 1px 4px; border-radius: 3px;">:focus-visible</code> 键盘焦点环，不影响鼠标用户</span>
           </div>
-          <div>
-            <span style="font-weight: var(--font-semibold); color: var(--color-gray-800);">点按缩放</span><br>
-            <span style="font-family: var(--font-mono); color: var(--color-gray-400);">150ms ease-out / scale(0.96~0.98)</span>
+          <div style="display: flex; align-items: flex-start; gap: var(--space-3);">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="flex-shrink: 0; margin-top: 2px;">
+              <path d="M3 8l3 3 7-7" stroke="var(--color-success)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span><code style="font-family: ui-monospace, monospace; font-size: var(--text-xs); background: var(--color-surface-3); padding: 1px 4px; border-radius: 3px;">prefers-reduced-motion</code> 减弱动画偏好</span>
           </div>
-          <div>
-            <span style="font-weight: var(--font-semibold); color: var(--color-gray-800);">卡片抬升</span><br>
-            <span style="font-family: var(--font-mono); color: var(--color-gray-400);">200ms ease-out / translateY(-4~-6px)</span>
+          <div style="display: flex; align-items: flex-start; gap: var(--space-3);">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="flex-shrink: 0; margin-top: 2px;">
+              <path d="M3 8l3 3 7-7" stroke="var(--color-success)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>所有文字对比度 WCAG AA（4.5:1 正文，3:1 大文字/UI 组件）</span>
           </div>
-          <div>
-            <span style="font-weight: var(--font-semibold); color: var(--color-gray-800);">Tab 切换</span><br>
-            <span style="font-family: var(--font-mono); color: var(--color-gray-400);">200ms ease-out / background, color</span>
+          <div style="display: flex; align-items: flex-start; gap: var(--space-3);">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="flex-shrink: 0; margin-top: 2px;">
+              <path d="M3 8l3 3 7-7" stroke="var(--color-success)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>表格 <code style="font-family: ui-monospace, monospace; font-size: var(--text-xs); background: var(--color-surface-3); padding: 1px 4px; border-radius: 3px;">aria-label</code> 和语义化表头</span>
           </div>
-          <div>
-            <span style="font-weight: var(--font-semibold); color: var(--color-gray-800);">入场动画</span><br>
-            <span style="font-family: var(--font-mono); color: var(--color-gray-400);">300-400ms ease-out / opacity + translateY</span>
-          </div>
-          <div>
-            <span style="font-weight: var(--font-semibold); color: var(--color-gray-800);">交错延迟</span><br>
-            <span style="font-family: var(--font-mono); color: var(--color-gray-400);">每项 40-50ms / stagger sequence</span>
+          <div style="display: flex; align-items: flex-start; gap: var(--space-3);">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="flex-shrink: 0; margin-top: 2px;">
+              <path d="M3 8l3 3 7-7" stroke="var(--color-success)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span><code style="font-family: ui-monospace, monospace; font-size: var(--text-xs); background: var(--color-surface-3); padding: 1px 4px; border-radius: 3px;">@media (pointer: coarse)</code> 触控设备适配</span>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ===========================================
-         SECTION 6: DESIGN SYSTEM SPEC SUMMARY
-         =========================================== -->
-    <section class="demo-section" id="specs">
-      <h2 class="demo-section__title">6. 设计系统规范摘要</h2>
-      <p class="demo-section__desc">
-        以下是设计系统的关键参数速查，供开发时直接参考。
-      </p>
 
-      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: var(--space-6);">
+    <!-- ============================================================
+         SECTION 7: DESIGN TOKEN REFERENCE
+         ============================================================ -->
+    <section class="demo-section" id="tokens">
+      <div class="demo-section__header">
+        <span class="demo-section__number">07</span>
+        <h2 class="demo-section__title">设计令牌一览</h2>
+        <p class="demo-section__desc">完整的 CSS 变量系统，可直接复制到项目中使用。</p>
+      </div>
 
+      <div class="token-grid">
         <!-- Spacing -->
-        <div style="background: var(--color-white); border-radius: var(--radius-lg); padding: var(--space-6); box-shadow: var(--shadow-sm); border: 1px solid var(--color-gray-200);">
-          <h4 style="font-size: var(--text-sm); font-weight: var(--font-semibold); color: var(--color-gray-800); margin-bottom: var(--space-4);">间距系统 (4px Grid)</h4>
-          <div style="display: flex; flex-direction: column; gap: var(--space-3);">
-            <div style="display: flex; align-items: center; gap: var(--space-3);">
-              <div style="width: 4px; height: 16px; background: var(--color-secondary); border-radius: 2px;"></div>
-              <span style="font-size: var(--text-xs); font-family: var(--font-mono); color: var(--color-gray-500); width: 36px;">4px</span>
-              <span style="font-size: var(--text-xs); color: var(--color-gray-600);">space-1 / 最小间距</span>
+        <div class="token-block">
+          <div class="token-block__title">间距（4px 基础）</div>
+          <div class="space-scale">
+            <div class="space-bar">
+              <span class="space-bar__label" style="width: 80px;">--space-1</span>
+              <div class="space-bar__visual" style="width: 4px;"></div>
+              <span class="space-bar__label">4px</span>
             </div>
-            <div style="display: flex; align-items: center; gap: var(--space-3);">
-              <div style="width: 8px; height: 16px; background: var(--color-secondary); border-radius: 2px;"></div>
-              <span style="font-size: var(--text-xs); font-family: var(--font-mono); color: var(--color-gray-500); width: 36px;">8px</span>
-              <span style="font-size: var(--text-xs); color: var(--color-gray-600);">space-2 / 紧凑间距</span>
+            <div class="space-bar">
+              <span class="space-bar__label" style="width: 80px;">--space-2</span>
+              <div class="space-bar__visual" style="width: 8px;"></div>
+              <span class="space-bar__label">8px</span>
             </div>
-            <div style="display: flex; align-items: center; gap: var(--space-3);">
-              <div style="width: 16px; height: 16px; background: var(--color-secondary); border-radius: 2px;"></div>
-              <span style="font-size: var(--text-xs); font-family: var(--font-mono); color: var(--color-gray-500); width: 36px;">16px</span>
-              <span style="font-size: var(--text-xs); color: var(--color-gray-600);">space-4 / 基础间距</span>
+            <div class="space-bar">
+              <span class="space-bar__label" style="width: 80px;">--space-3</span>
+              <div class="space-bar__visual" style="width: 12px;"></div>
+              <span class="space-bar__label">12px</span>
             </div>
-            <div style="display: flex; align-items: center; gap: var(--space-3);">
-              <div style="width: 24px; height: 16px; background: var(--color-secondary); border-radius: 2px;"></div>
-              <span style="font-size: var(--text-xs); font-family: var(--font-mono); color: var(--color-gray-500); width: 36px;">24px</span>
-              <span style="font-size: var(--text-xs); color: var(--color-gray-600);">space-6 / 组件内间距</span>
+            <div class="space-bar">
+              <span class="space-bar__label" style="width: 80px;">--space-4</span>
+              <div class="space-bar__visual" style="width: 16px;"></div>
+              <span class="space-bar__label">16px</span>
             </div>
-            <div style="display: flex; align-items: center; gap: var(--space-3);">
-              <div style="width: 32px; height: 16px; background: var(--color-secondary); border-radius: 2px;"></div>
-              <span style="font-size: var(--text-xs); font-family: var(--font-mono); color: var(--color-gray-500); width: 36px;">32px</span>
-              <span style="font-size: var(--text-xs); color: var(--color-gray-600);">space-8 / Section 内间距</span>
+            <div class="space-bar">
+              <span class="space-bar__label" style="width: 80px;">--space-6</span>
+              <div class="space-bar__visual" style="width: 24px;"></div>
+              <span class="space-bar__label">24px</span>
             </div>
-            <div style="display: flex; align-items: center; gap: var(--space-3);">
-              <div style="width: 64px; height: 16px; background: var(--color-secondary); border-radius: 2px;"></div>
-              <span style="font-size: var(--text-xs); font-family: var(--font-mono); color: var(--color-gray-500); width: 36px;">64px</span>
-              <span style="font-size: var(--text-xs); color: var(--color-gray-600);">space-16 / Section 间间距</span>
+            <div class="space-bar">
+              <span class="space-bar__label" style="width: 80px;">--space-8</span>
+              <div class="space-bar__visual" style="width: 32px;"></div>
+              <span class="space-bar__label">32px</span>
+            </div>
+            <div class="space-bar">
+              <span class="space-bar__label" style="width: 80px;">--space-12</span>
+              <div class="space-bar__visual" style="width: 48px;"></div>
+              <span class="space-bar__label">48px</span>
+            </div>
+            <div class="space-bar">
+              <span class="space-bar__label" style="width: 80px;">--space-16</span>
+              <div class="space-bar__visual" style="width: 64px;"></div>
+              <span class="space-bar__label">64px</span>
             </div>
           </div>
         </div>
 
         <!-- Border Radius -->
-        <div style="background: var(--color-white); border-radius: var(--radius-lg); padding: var(--space-6); box-shadow: var(--shadow-sm); border: 1px solid var(--color-gray-200);">
-          <h4 style="font-size: var(--text-sm); font-weight: var(--font-semibold); color: var(--color-gray-800); margin-bottom: var(--space-4);">圆角系统</h4>
-          <div style="display: flex; flex-wrap: wrap; gap: var(--space-4);">
+        <div class="token-block">
+          <div class="token-block__title">圆角</div>
+          <div style="display: flex; flex-wrap: wrap; gap: var(--space-4); align-items: flex-end;">
             <div style="text-align: center;">
-              <div style="width: 64px; height: 48px; background: var(--color-primary-light); border: 2px solid var(--color-primary); border-radius: 4px;"></div>
-              <span style="font-size: var(--text-xs); font-family: var(--font-mono); color: var(--color-gray-500); margin-top: 4px; display: block;">4px</span>
-              <span style="font-size: 10px; color: var(--color-gray-400);">Small</span>
+              <div style="width: 48px; height: 48px; background: var(--color-primary-light); border: 1.5px solid var(--color-primary); border-radius: var(--radius-sm);"></div>
+              <div style="font-size: 10px; color: var(--color-text-tertiary); margin-top: var(--space-1);">sm 6px</div>
             </div>
             <div style="text-align: center;">
-              <div style="width: 64px; height: 48px; background: var(--color-primary-light); border: 2px solid var(--color-primary); border-radius: 8px;"></div>
-              <span style="font-size: var(--text-xs); font-family: var(--font-mono); color: var(--color-gray-500); margin-top: 4px; display: block;">8px</span>
-              <span style="font-size: 10px; color: var(--color-gray-400);">Default</span>
+              <div style="width: 48px; height: 48px; background: var(--color-primary-light); border: 1.5px solid var(--color-primary); border-radius: var(--radius-md);"></div>
+              <div style="font-size: 10px; color: var(--color-text-tertiary); margin-top: var(--space-1);">md 8px</div>
             </div>
             <div style="text-align: center;">
-              <div style="width: 64px; height: 48px; background: var(--color-primary-light); border: 2px solid var(--color-primary); border-radius: 12px;"></div>
-              <span style="font-size: var(--text-xs); font-family: var(--font-mono); color: var(--color-gray-500); margin-top: 4px; display: block;">12px</span>
-              <span style="font-size: 10px; color: var(--color-gray-400);">Large</span>
+              <div style="width: 48px; height: 48px; background: var(--color-primary-light); border: 1.5px solid var(--color-primary); border-radius: var(--radius-lg);"></div>
+              <div style="font-size: 10px; color: var(--color-text-tertiary); margin-top: var(--space-1);">lg 12px</div>
             </div>
             <div style="text-align: center;">
-              <div style="width: 64px; height: 48px; background: var(--color-primary-light); border: 2px solid var(--color-primary); border-radius: 16px;"></div>
-              <span style="font-size: var(--text-xs); font-family: var(--font-mono); color: var(--color-gray-500); margin-top: 4px; display: block;">16px</span>
-              <span style="font-size: 10px; color: var(--color-gray-400);">XL</span>
+              <div style="width: 48px; height: 48px; background: var(--color-primary-light); border: 1.5px solid var(--color-primary); border-radius: var(--radius-xl);"></div>
+              <div style="font-size: 10px; color: var(--color-text-tertiary); margin-top: var(--space-1);">xl 16px</div>
             </div>
             <div style="text-align: center;">
-              <div style="width: 48px; height: 48px; background: var(--color-primary-light); border: 2px solid var(--color-primary); border-radius: 9999px;"></div>
-              <span style="font-size: var(--text-xs); font-family: var(--font-mono); color: var(--color-gray-500); margin-top: 4px; display: block;">Full</span>
-              <span style="font-size: 10px; color: var(--color-gray-400);">Pill</span>
+              <div style="width: 48px; height: 48px; background: var(--color-primary-light); border: 1.5px solid var(--color-primary); border-radius: var(--radius-full);"></div>
+              <div style="font-size: 10px; color: var(--color-text-tertiary); margin-top: var(--space-1);">full</div>
             </div>
           </div>
         </div>
 
-        <!-- Shadows -->
-        <div style="background: var(--color-white); border-radius: var(--radius-lg); padding: var(--space-6); box-shadow: var(--shadow-sm); border: 1px solid var(--color-gray-200);">
-          <h4 style="font-size: var(--text-sm); font-weight: var(--font-semibold); color: var(--color-gray-800); margin-bottom: var(--space-4);">阴影层级 (多层叠加)</h4>
-          <div style="display: flex; flex-wrap: wrap; gap: var(--space-6);">
-            <div style="text-align: center;">
-              <div style="width: 80px; height: 56px; background: var(--color-white); border-radius: var(--radius-md); box-shadow: var(--shadow-sm);"></div>
-              <span style="font-size: var(--text-xs); color: var(--color-gray-500); margin-top: 6px; display: block;">SM</span>
+        <!-- Shadow -->
+        <div class="token-block">
+          <div class="token-block__title">阴影（多层暖色调）</div>
+          <div style="display: flex; flex-direction: column; gap: var(--space-4);">
+            <div style="display: flex; align-items: center; gap: var(--space-4);">
+              <div style="width: 64px; height: 40px; background: var(--color-surface-1); border-radius: var(--radius-md); box-shadow: var(--shadow-sm);"></div>
+              <span style="font-size: var(--text-xs); color: var(--color-text-tertiary);">shadow-sm</span>
             </div>
-            <div style="text-align: center;">
-              <div style="width: 80px; height: 56px; background: var(--color-white); border-radius: var(--radius-md); box-shadow: var(--shadow-md);"></div>
-              <span style="font-size: var(--text-xs); color: var(--color-gray-500); margin-top: 6px; display: block;">MD</span>
+            <div style="display: flex; align-items: center; gap: var(--space-4);">
+              <div style="width: 64px; height: 40px; background: var(--color-surface-1); border-radius: var(--radius-md); box-shadow: var(--shadow-md);"></div>
+              <span style="font-size: var(--text-xs); color: var(--color-text-tertiary);">shadow-md</span>
             </div>
-            <div style="text-align: center;">
-              <div style="width: 80px; height: 56px; background: var(--color-white); border-radius: var(--radius-md); box-shadow: var(--shadow-lg);"></div>
-              <span style="font-size: var(--text-xs); color: var(--color-gray-500); margin-top: 6px; display: block;">LG</span>
+            <div style="display: flex; align-items: center; gap: var(--space-4);">
+              <div style="width: 64px; height: 40px; background: var(--color-surface-1); border-radius: var(--radius-md); box-shadow: var(--shadow-lg);"></div>
+              <span style="font-size: var(--text-xs); color: var(--color-text-tertiary);">shadow-lg</span>
             </div>
-            <div style="text-align: center;">
-              <div style="width: 80px; height: 56px; background: var(--color-white); border-radius: var(--radius-md); box-shadow: var(--shadow-xl);"></div>
-              <span style="font-size: var(--text-xs); color: var(--color-gray-500); margin-top: 6px; display: block;">XL</span>
+            <div style="display: flex; align-items: center; gap: var(--space-4);">
+              <div style="width: 64px; height: 40px; background: var(--color-surface-1); border-radius: var(--radius-md); box-shadow: var(--shadow-xl);"></div>
+              <span style="font-size: var(--text-xs); color: var(--color-text-tertiary);">shadow-xl</span>
             </div>
           </div>
         </div>
 
-        <!-- Breakpoints -->
-        <div style="background: var(--color-white); border-radius: var(--radius-lg); padding: var(--space-6); box-shadow: var(--shadow-sm); border: 1px solid var(--color-gray-200);">
-          <h4 style="font-size: var(--text-sm); font-weight: var(--font-semibold); color: var(--color-gray-800); margin-bottom: var(--space-4);">响应式断点</h4>
-          <div style="font-size: var(--text-xs); display: flex; flex-direction: column; gap: var(--space-2);">
-            <div style="display: flex; justify-content: space-between; color: var(--color-gray-600);">
-              <span>Mobile</span>
-              <span style="font-family: var(--font-mono); color: var(--color-gray-400);">375px+</span>
+        <!-- Motion -->
+        <div class="token-block">
+          <div class="token-block__title">动效令牌</div>
+          <div class="token-list">
+            <div class="token-row">
+              <span class="token-row__name">--duration-instant</span>
+              <span class="token-row__value">100ms</span>
             </div>
-            <div style="display: flex; justify-content: space-between; color: var(--color-gray-600);">
-              <span>Tablet</span>
-              <span style="font-family: var(--font-mono); color: var(--color-gray-400);">768px+</span>
+            <div class="token-row">
+              <span class="token-row__name">--duration-state</span>
+              <span class="token-row__value">200ms</span>
             </div>
-            <div style="display: flex; justify-content: space-between; color: var(--color-gray-600);">
-              <span>Desktop</span>
-              <span style="font-family: var(--font-mono); color: var(--color-gray-400);">1024px+</span>
+            <div class="token-row">
+              <span class="token-row__name">--duration-layout</span>
+              <span class="token-row__value">350ms</span>
             </div>
-            <div style="display: flex; justify-content: space-between; color: var(--color-gray-600);">
-              <span>Wide</span>
-              <span style="font-family: var(--font-mono); color: var(--color-gray-400);">1440px+</span>
+            <div class="token-row">
+              <span class="token-row__name">--duration-entrance</span>
+              <span class="token-row__value">500ms</span>
             </div>
-          </div>
-          <div style="margin-top: var(--space-4); padding-top: var(--space-3); border-top: 1px solid var(--color-gray-100); font-size: var(--text-xs); color: var(--color-gray-400);">
-            Mobile-First, max-width: 1200px 居中容器
+            <div class="token-row" style="margin-top: var(--space-3); padding-top: var(--space-3); border-top: 1px solid var(--color-border);">
+              <span class="token-row__name">--ease-out-quart</span>
+              <span class="token-row__value">cubic-bezier(0.25, 1, 0.5, 1)</span>
+            </div>
+            <div class="token-row">
+              <span class="token-row__name">--ease-out-expo</span>
+              <span class="token-row__value">cubic-bezier(0.16, 1, 0.3, 1)</span>
+            </div>
+            <div class="token-row">
+              <span class="token-row__name">--ease-in-out</span>
+              <span class="token-row__value">cubic-bezier(0.65, 0, 0.35, 1)</span>
+            </div>
           </div>
         </div>
-
       </div>
     </section>
 
-  </main>
+  </div><!-- /demo-container -->
 
-  <!-- ===========================================
-       DEMO FOOTER
-       =========================================== -->
+
+  <!-- ============================================================
+       FOOTER
+       ============================================================ -->
   <footer class="demo-footer">
-    <div class="demo-footer__title">分红股排行榜 -- Design Style Reference</div>
     <p class="demo-footer__text">
-      本页面为设计风格探索参考，非最终产品设计稿。
-      基于 ui-ux-pro-max 设计系统 (Banking + Analytics Dashboard) 生成，
-      配色校准自 research-design.md "Trust Blue" 方案。
-      团队确认风格方向后，将进入 Phase 1 完整页面设计与开发。
-    </p>
-    <p class="demo-footer__text" style="margin-top: var(--space-4); color: var(--color-gray-500);">
-      2026-03-25 | Design System v1.0 | PRD-driven
+      设计系统基于 Impeccable 原则构建。色彩使用 OKLCH 色彩空间，所有中性色带暖色调（hue 70）。字体选择 Instrument Sans 替代 Inter，兼顾辨识度和可读性。动效使用 exponential easing（ease-out-quart），不使用 bounce/elastic。
     </p>
   </footer>
 

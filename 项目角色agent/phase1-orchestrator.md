@@ -431,4 +431,4 @@ Round N 审查：
 3. **设计细节由设计 Agent 决策**：间距、响应式断点等细节不上升给用户
 4. **断点续传**：如果流程中断，从 phase1-status.md 中读取进度，跳过已完成的步骤
 5. 审查报告保存为 `phase1-review.md`（追加模式，每轮一个 section）
-6. **page-design-agent 具备 ui-ux-pro-max skill**：审查中可以引用 ui-ux-pro-max 的设计规范来判断交互友好度和视觉质量
+6. **page-design-agent 具备 Impeccable 设计 skills**：审查中可以引用 Impeccable 的 frontend-design 原则和反模式清单来判断交互友好度和视觉质量（Anti AI Slop Test）

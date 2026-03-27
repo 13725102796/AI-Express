@@ -480,15 +480,15 @@ Step 5: 提交
 ## 8. 场景六：UI/UX 开发
 
 > **适用场景**：页面开发、设计系统构建、交互优化
-> **核心 Skill**：`ui-ux-pro-max` + `/feature-dev`
+> **核心 Skill**：`impeccable`（/frontend-design + /audit + /critique）+ `/feature-dev`
 
 ### 8.1 流程
 
 ```
 Step 1: 设计系统生成
-  → 描述需求时自动触发 ui-ux-pro-max
-  → 行业规则自动匹配（Tech/Finance/Healthcare/E-commerce 等）
-  → 产出：设计风格 + 配色方案 + 字体搭配 + 技术栈建议
+  → /teach-impeccable 采集项目设计上下文（一次性）
+  → 基于 Impeccable 原则创造性设计（反 AI 味、OKLCH、exponential easing）
+  → 产出：设计风格 + 配色方案 + 字体搭配 + Anti AI Slop 自检
 
 Step 2: 功能实现
   → /feature-dev "实现 XXX 页面/组件"
@@ -650,7 +650,7 @@ Step 4: 交付验收
 | **规划** | `/claude-mem:make-plan` | 分阶段实施计划 | Orchestrator 模式，subagent 做文档发现，强调从文档拷贝而非发明 API |
 | **探索** | `/claude-mem:smart-explore` | 代码结构搜索 | 3 层 MCP 工具：smart_search → smart_outline → smart_unfold，比 Read 省 4-8x token |
 | **设计** | `/feature-dev` | 引导式功能开发 | 7 阶段，含 3 个人工等待点（消歧/选方案/批准实现） |
-| **UI 设计** | `ui-ux-pro-max` | 设计系统生成 | 自然语言触发，按行业规则匹配风格/配色/字体 |
+| **UI 设计** | `impeccable` | 设计质量守护 | 20 个专精命令（/audit /critique /polish /colorize 等），反 AI 味，OKLCH 色彩，7 大参考文档 |
 | **实现** | `/claude-mem:do` | 执行分阶段计划 | Orchestrator 全委托 subagent，每阶段 4 步验证后才提交 |
 | **自动迭代** | `/ralph-loop` | 自主循环直到完成 | stop hook 机制，相同 prompt 反馈循环，AI 读文件/git 感知上轮成果 |
 | **长周期** | `autonomous-skill` | 跨会话自主执行 | 双 agent（Initializer + Executor），.autonomous/ 目录持久化，自动续接 |
@@ -672,7 +672,7 @@ Step 4: 交付验收
 | 修一个 Bug | `smart-explore` → `/review-pr code errors` | 结构化定位 + 代码/错误审查 |
 | 优化性能/质量 | `/ralph-loop` + `/review-pr` | 自动迭代 + 全面审查 |
 | 重构代码 | `make-plan` → `do` → `/review-pr all` | 规划 + 执行 + 全维度审查 |
-| 做 UI 页面 | `ui-ux-pro-max` → `/feature-dev` | 设计系统 + 功能开发 |
+| 做 UI 页面 | `impeccable`（/audit /critique）→ `/feature-dev` | 设计审计+评审 → 功能开发 |
 | 跑一个大任务 | `autonomous-skill` | 跨会话自主执行，自动续接 |
 | 查之前怎么做的 | `/claude-mem:mem-search` | 搜索跨会话记忆 |
 | 提交前审查代码 | `/review-pr` | 基于 git diff 的本地审查 |

@@ -191,7 +191,7 @@ research-market.md（产研报告）已生成在 [输出路径]，请：
 PRD.md 已生成在 [输出路径]，research-design.md（设计色彩报告）已生成在 [输出路径]，请：
 1. 读取 PRD.md，提取风格要素（调性、用户画像、设计指引）
 2. 读取 research-design.md 作为灵感参考（推荐配色方案、行业色彩惯例、字体趋势、风格参考案例、设计红线）
-3. 以 ui-ux-pro-max 设计系统为主，设计色彩报告仅作为行业参考，构造风格探索提示词
+3. 以 Impeccable 设计原则为主（反 AI 味、OKLCH 色彩、exponential easing），设计色彩报告仅作为行业参考
 4. 调用 设计 Agent CLI 生成风格参考 demo.html
 5. demo.html 应包含：配色方案展示、字体搭配预览、组件样例、动效基调
 6. 质量自检后保存 demo.html 到上述输出路径
