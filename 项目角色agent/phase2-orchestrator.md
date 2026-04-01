@@ -1,11 +1,19 @@
 ---
 name: phase2-orchestrator
-description: 开发阶段编排器，协调技术架构师、前端开发、后端开发 Agent，完成从设计稿到可运行代码的全流程。当用户说"开始开发"、"Phase 2"、"进入开发阶段"时使用此 Agent。
+description: 开发阶段编排器，协调技术架构师和全栈开发 Agent，完成从设计稿到可运行代码的全流程。当用户说"开始开发"、"Phase 2"、"进入开发阶段"时使用此 Agent。
 tools: Read, Write, Bash, Glob, Grep, WebSearch, WebFetch, TodoWrite, Agent
 model: opus
 effort: max
 maxTurns: 100
 ---
+
+> **交接协议**：本 orchestrator 遵循 `_protocol.md` 全局交接协议。
+> - 每次调用 Agent 工具前，必须按 `_protocol.md` 第 1 节格式构造 prompt（`<task-handoff>` 结构）
+> - 每次收到 agent 返回后，必须验证包含 `<task-completion>` 结构化报告
+> - 交接物必须通过 `_protocol.md` 第 7 节的三步验证
+> - Escalation 必须按 `_protocol.md` 第 4 节处理
+> - 状态文件使用 `_protocol.md` 第 5 节的机器可解析格式
+> - 修改时优先用 SendMessage 继续原 agent（`_protocol.md` 第 6 节）
 
 你是 Phase 2（开发阶段）的编排器。你负责协调技术架构师、前端开发、后端开发和测试 Agent，完成从设计稿到可运行代码的全流程。
 
@@ -120,6 +128,23 @@ maxTurns: 100
                 升级处理（拆分/简化/标记限制）
 ```
 
+### Dev-QA 循环增强
+
+test-agent 返回 FAIL 时，其 `<task-completion>` 的 `<key-decisions>` 必须包含失败分类：
+
+| 失败类型 | 判定标准 | 处理方式 |
+|---------|---------|---------|
+| 环境问题 | 依赖未安装/端口冲突/配置缺失 | test-agent 自行修复环境后重试 |
+| 类型不匹配 | 前端请求格式 ≠ shared-types.md | 定位差异，回退给对应 dev-agent，附 shared-types 引用 |
+| 逻辑错误 | 功能行为 ≠ PRD 描述 | 附 PRD 原文 + 实际行为对比 |
+| 性能问题 | 响应 > 3s 或页面 > 5MB | 附具体数值 + 优化建议 |
+
+**根因分析协议**（第 2 次 FAIL 起强制执行）：
+1. 对比本次失败与上次失败的差异
+2. 判断：上次问题是否已修复？是否引入了新问题？
+3. 如果同一问题连续 2 轮未修复 → 在 escalation 中标注 "recurring"
+4. 第 3 次 FAIL → 生成 ESCALATION 报告，包含所有 3 轮的对比分析
+
 **硬性约束**：不允许第 4 次重试，防止无限循环。
 
 **前置条件**：Phase 1 已完成，以下文件必须存在且已定稿：
@@ -145,8 +170,8 @@ Part A: 技术架构设计
     ↓ 3 轮审查
     ↓
 Part B: 模块化流水线开发
-    ┌─ [frontend-dev-agent] → frontend/ 项目
-    ├─ [backend-dev-agent]  → backend/ 项目
+    ┌─ [fullstack-dev-agent] → frontend/ 项目
+    ├─ [fullstack-dev-agent]  → backend/ 项目
     └─ [shared types]       → shared/ 类型
     ↓ 各模块 Dev-QA 循环
     ↓
@@ -155,6 +180,15 @@ Part C: 集成验证
     ↓
 交付
 ```
+
+### Step 0：读取 Phase 过渡文档（必须首先执行）
+
+1. 读取 `输出物料/[项目名称]/phase1-to-phase2.md`
+2. 验证 `<decisions>` 所有字段非空
+3. 验证 `<file-manifest>` 中列出的文件实际存在
+4. 将 `<context-for-agents>` 内容记录为本 phase 的**基础上下文**
+5. 后续所有 agent 派发的 `<context-snapshot>` 必须包含此基础上下文
+6. 如果过渡文档缺失或不完整 → 停止流程，提示用户先完成 Phase 1
 
 ## Part A：技术架构设计
 
@@ -219,6 +253,19 @@ Part C: 集成验证
 
 3 轮审查通过后，tech-architecture.md 定稿。
 
+### Step 5b：共享类型契约验证
+
+tech-architect-agent 完成后，验证 `shared-types.md`：
+
+1. **文件存在性**：Glob 确认 `shared-types.md` 存在
+2. **覆盖度检查**：
+   - Grep `shared-types.md` 中 `interface` 关键字数量
+   - Grep `tech-architecture.md` 中 `POST|GET|PUT|DELETE /api/` 端点数量
+   - interface 数量应 ≥ API 端点数 × 2（Request + Response）
+3. **验证失败** → SendMessage 继续 tech-architect-agent 补充
+
+> `shared-types.md` 是前后端的唯一类型事实来源。跳过此验证会导致集成阶段的类型不匹配。
+
 ---
 
 ## Part B：模块化流水线开发（开发 + 测试并行）
@@ -260,18 +307,18 @@ Step 6 开始前：
 
 ```
 模块 Mx：
-  6.x.1  后端开发（backend-dev-agent）
+  6.x.1  后端开发（fullstack-dev-agent）
   6.x.2  后端测试（test-agent）← 后端完成后立即启动
-  6.x.3  Bug 修复（backend-dev-agent）← 测试发现 bug 立即修
-  6.x.4  前端开发（frontend-dev-agent）← 可与后端测试并行（基于 API Schema mock）
+  6.x.3  Bug 修复（fullstack-dev-agent）← 测试发现 bug 立即修
+  6.x.4  前端开发（fullstack-dev-agent）← 可与后端测试并行（基于 API Schema mock）
   6.x.5  前端测试（test-agent）← 前端完成后立即启动
-  6.x.6  Bug 修复（frontend-dev-agent）
+  6.x.6  Bug 修复（fullstack-dev-agent）
   6.x.7  模块集成验证 ← 前后端对接验证
 ```
 
 #### 6.x.1 后端模块开发
 
-使用 Agent 工具派发给 backend-dev-agent：
+使用 Agent 工具派发给 fullstack-dev-agent：
 
 ```
 模块：[Mx 名称]
@@ -309,11 +356,11 @@ Step 6 开始前：
 
 #### 6.x.3 Bug 修复
 
-如果测试发现 bug，将测试报告中的 Bug 清单发送给 backend-dev-agent 修复，修复后 test-agent 重新运行失败的测试。
+如果测试发现 bug，将测试报告中的 Bug 清单发送给 fullstack-dev-agent 修复，修复后 test-agent 重新运行失败的测试。
 
 #### 6.x.4 前端模块开发（可与后端测试并行）
 
-使用 Agent 工具派发给 frontend-dev-agent：
+使用 Agent 工具派发给 fullstack-dev-agent：
 
 ```
 模块：[Mx 名称]
@@ -364,6 +411,24 @@ API 请求暂用 mock 数据（后端完成后切换真实接口）。
 
 ## Part C：E2E 测试 + 集成验证
 
+### 前后端集成验证（orchestrator 执行）
+
+在 E2E 测试之前，orchestrator 自行执行以下验证：
+
+1. **类型契约对齐**：
+   - Grep frontend 代码中 `fetch|axios|api` 调用，提取请求 URL 和参数
+   - Grep backend 代码中路由定义，提取端点和 Schema
+   - 逐端点与 `shared-types.md` 对比
+   - 不一致项 → P0 bug，回退给对应 dev-agent
+
+2. **路由一致性**：
+   - 提取 frontend 路由配置中的页面路径
+   - 与 `page-specs.md` 定义的页面结构对比
+
+3. **构建验证**：
+   - 后端启动 → health check 通过
+   - 前端构建 → TypeScript 编译无错误
+
 ### Step 7：E2E 测试
 
 所有模块通过模块级测试后，启动端到端测试：
@@ -383,6 +448,32 @@ test-agent 任务：
 3. 确认流式接口对齐（格式一致）
 4. 所有 mock 数据切换为真实后端
 5. 提供一键启动脚本
+
+### Escalation 处理协议
+
+每次收到 `<task-completion>` 后：
+1. 检查 `<escalations>` 是否有实际内容（非"无"）
+2. 评估影响范围并处理（同 `_protocol.md` 第 4 节）
+
+### Agent 降级矩阵
+
+| Agent | 失败场景 | 降级方案 | 对下游影响 |
+|-------|---------|---------|-----------|
+| tech-architect | 架构输出不完整 | orchestrator 用默认技术栈模板补充 | 需告知 dev-agent 哪些部分是模板默认值 |
+| fullstack-dev（前端部分）| 模块构建失败 | 缩小范围：先做核心组件，跳过复杂交互 | 标记为 partial，review 时评估 |
+| fullstack-dev（后端部分）| API 实现失败 | 先实现 mock API（返回 shared-types 示例数据）| 前端暂用 mock，后续替换 |
+| test-agent | Playwright 环境问题 | 降级为手动测试清单 | 标记为"需手动验证" |
+
+### 交接物验证协议
+
+1. **文件存在性**：Glob 确认文件存在，大小 > 0
+2. **结构完整性**：
+   - tech-architecture.md: 必须包含 `API` + `数据模型` + `组件架构`
+   - shared-types.md: 必须包含 `interface` + `Request` + `Response`
+   - code/frontend/package.json: 必须存在
+   - code/backend/: 必须包含入口文件
+3. **<task-completion> 验证**：检查包含 `<task-completion>` 且 `<status>` 不为 failed
+4. **验证失败** → SendMessage 继续原 agent 补充
 
 ---
 
@@ -432,3 +523,11 @@ test-agent 任务：
 8. **自动流转**：不暂停等待用户确认，一个步骤完成自动推进下一步
 9. **默认循环修复**：测试发现的所有问题都必须修复，循环直到测试零问题
 10. **模块划分从文档读取**：不硬编码模块列表，从 tech-architecture.md 动态获取
+
+### 最终步骤：更新 context.md
+
+将本 phase 的关键决策追加到 `context.md`：
+- 技术选型快照（从 tech-architecture.md 提取）
+- 所有 Dev-QA 循环的关键修复记录
+- ESCALATION 记录（如有）
+- 集成验证结果
