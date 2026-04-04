@@ -1,0 +1,2890 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>留白 Liminal -- Design Style Reference</title>
+
+  <!-- Fonts: Playfair Display (editorial serif) + Plus Jakarta Sans (humanist warmth) + Figtree (readable body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    /* ============================================
+       DESIGN TOKENS
+       留白 Liminal / Dusk Peach / Editorial Poetic
+       ============================================ */
+
+    :root {
+      /* --- Color Tokens (OKLCH) --- */
+
+      /* Primary: Warm Peach */
+      --color-primary: oklch(0.75 0.10 55);
+      --color-primary-hover: oklch(0.70 0.12 55);
+      --color-primary-active: oklch(0.65 0.13 55);
+      --color-primary-subtle: oklch(0.92 0.04 55);
+      --color-primary-faint: oklch(0.96 0.02 55);
+
+      /* Secondary: Warm Sand */
+      --color-secondary: oklch(0.78 0.05 60);
+      --color-secondary-hover: oklch(0.73 0.06 60);
+
+      /* Accent: Deep Coral */
+      --color-accent: oklch(0.65 0.14 40);
+      --color-accent-hover: oklch(0.60 0.16 40);
+      --color-accent-subtle: oklch(0.90 0.05 40);
+
+      /* Lavender (night companion) */
+      --color-lavender: oklch(0.68 0.08 300);
+      --color-lavender-subtle: oklch(0.92 0.03 300);
+
+      /* Sage */
+      --color-sage: oklch(0.70 0.08 155);
+      --color-sage-subtle: oklch(0.92 0.04 155);
+
+      /* Semantic */
+      --color-success: oklch(0.72 0.10 155);
+      --color-success-subtle: oklch(0.92 0.04 155);
+      --color-warning: oklch(0.80 0.12 90);
+      --color-warning-subtle: oklch(0.94 0.04 90);
+      --color-error: oklch(0.65 0.12 25);
+      --color-error-subtle: oklch(0.92 0.05 25);
+
+      /* Surfaces -- tinted neutrals, warm hue 55 */
+      --color-surface-0: oklch(0.98 0.008 55);
+      --color-surface-1: oklch(0.96 0.010 55);
+      --color-surface-2: oklch(0.93 0.012 55);
+      --color-surface-3: oklch(0.89 0.015 55);
+      --color-surface-invert: oklch(0.22 0.020 55);
+
+      /* Text -- tinted warm, never pure black */
+      --color-text-primary: oklch(0.25 0.025 55);
+      --color-text-secondary: oklch(0.50 0.020 55);
+      --color-text-tertiary: oklch(0.65 0.015 55);
+      --color-text-on-primary: oklch(0.98 0.005 55);
+      --color-text-on-dark: oklch(0.92 0.010 55);
+
+      /* Border */
+      --color-border: oklch(0.88 0.012 55);
+      --color-border-focus: oklch(0.75 0.10 55);
+
+      /* Emotion colors -- for fossils */
+      --emotion-lonely: oklch(0.55 0.06 250);
+      --emotion-anxious: oklch(0.68 0.10 70);
+      --emotion-sad: oklch(0.58 0.06 280);
+      --emotion-angry: oklch(0.55 0.10 30);
+      --emotion-calm: oklch(0.70 0.08 155);
+      --emotion-happy: oklch(0.75 0.12 80);
+      --emotion-confused: oklch(0.62 0.06 290);
+      --emotion-touched: oklch(0.68 0.10 25);
+
+      /* --- Spacing Tokens (4px base) --- */
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-5: 20px;
+      --space-6: 24px;
+      --space-8: 32px;
+      --space-10: 40px;
+      --space-12: 48px;
+      --space-16: 64px;
+      --space-20: 80px;
+      --space-24: 96px;
+      --space-32: 128px;
+
+      /* --- Typography Tokens --- */
+      --font-display: 'Playfair Display', 'Noto Serif SC', Georgia, serif;
+      --font-heading: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --font-body: 'Figtree', system-ui, -apple-system, sans-serif;
+
+      /* Modular Scale: ratio 1.25 (Major Third) */
+      --text-xs: 0.75rem;
+      --text-sm: 0.875rem;
+      --text-base: 1rem;
+      --text-lg: 1.125rem;
+      --text-xl: 1.25rem;
+      --text-2xl: 1.5rem;
+      --text-3xl: clamp(1.75rem, 1.5rem + 1vw, 2rem);
+      --text-4xl: clamp(2rem, 1.5rem + 2vw, 2.75rem);
+      --text-5xl: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
+      --text-6xl: clamp(3rem, 2rem + 4vw, 5rem);
+      --text-hero: clamp(3.5rem, 2.5rem + 5vw, 6.5rem);
+
+      --leading-tight: 1.15;
+      --leading-snug: 1.3;
+      --leading-normal: 1.5;
+      --leading-relaxed: 1.7;
+
+      --tracking-tight: -0.03em;
+      --tracking-normal: 0em;
+      --tracking-wide: 0.06em;
+
+      /* --- Shadow Tokens (multi-layer soft) --- */
+      --shadow-sm:
+        0 1px 2px oklch(0.25 0.02 55 / 0.04),
+        0 1px 3px oklch(0.25 0.02 55 / 0.06);
+      --shadow-md:
+        0 2px 4px oklch(0.25 0.02 55 / 0.04),
+        0 4px 8px oklch(0.25 0.02 55 / 0.06),
+        0 8px 16px oklch(0.25 0.02 55 / 0.04);
+      --shadow-lg:
+        0 4px 8px oklch(0.25 0.02 55 / 0.03),
+        0 8px 16px oklch(0.25 0.02 55 / 0.05),
+        0 16px 32px oklch(0.25 0.02 55 / 0.06);
+      --shadow-xl:
+        0 8px 16px oklch(0.25 0.02 55 / 0.04),
+        0 16px 32px oklch(0.25 0.02 55 / 0.06),
+        0 32px 64px oklch(0.25 0.02 55 / 0.08);
+      --shadow-phone:
+        0 24px 48px oklch(0.25 0.02 55 / 0.12),
+        0 12px 24px oklch(0.25 0.02 55 / 0.08),
+        0 4px 8px oklch(0.25 0.02 55 / 0.06);
+
+      /* --- Border Radius Tokens --- */
+      --radius-sm: 6px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --radius-2xl: 24px;
+      --radius-3xl: 32px;
+      --radius-full: 9999px;
+
+      /* --- Motion Tokens --- */
+      --duration-instant: 100ms;
+      --duration-fast: 200ms;
+      --duration-normal: 300ms;
+      --duration-slow: 500ms;
+      --duration-entrance: 700ms;
+      --duration-dramatic: 1000ms;
+
+      /* Exponential easing */
+      --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+      --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+      --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-in-out: cubic-bezier(0.45, 0, 0.55, 1);
+      --ease-in-out-sine: cubic-bezier(0.37, 0, 0.63, 1);
+    }
+
+    /* ============================================
+       GLOBAL RESET & BASE
+       ============================================ */
+
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      font-size: 16px;
+      scroll-behavior: smooth;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      font-family: var(--font-body);
+      font-size: var(--text-base);
+      line-height: var(--leading-relaxed);
+      color: var(--color-text-primary);
+      background: var(--color-surface-0);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+    }
+
+    /* ============================================
+       LAYOUT
+       ============================================ */
+
+    .page-wrapper {
+      width: 100%;
+    }
+
+    .container {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding-left: var(--space-6);
+      padding-right: var(--space-6);
+    }
+
+    @media (min-width: 641px) {
+      .container {
+        padding-left: var(--space-8);
+        padding-right: var(--space-8);
+      }
+    }
+
+    /* ============================================
+       1. HERO -- Emotion Spectrum River
+       A flowing chromatic band, the soul of the page
+       ============================================ */
+
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: var(--space-16) 0;
+      overflow: hidden;
+      background: var(--color-surface-0);
+    }
+
+    /* --- Emotion Spectrum: the flowing light band ---
+       A wide chromatic ribbon flowing through the center,
+       peach to lavender to sage, pulsing gently like a slow breath */
+    .hero-spectrum {
+      position: absolute;
+      left: -20%;
+      right: -20%;
+      top: 45%;
+      transform: translateY(-50%);
+      height: 260px;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .hero-spectrum-band {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        oklch(0.82 0.08 155 / 0.35) 15%,
+        oklch(0.78 0.10 55 / 0.5) 35%,
+        oklch(0.72 0.12 40 / 0.55) 50%,
+        oklch(0.75 0.08 300 / 0.45) 70%,
+        oklch(0.80 0.06 250 / 0.3) 85%,
+        transparent 100%
+      );
+      filter: blur(60px);
+      animation: spectrumBreathe 8s var(--ease-in-out-sine) infinite;
+    }
+
+    .hero-spectrum-band::after {
+      content: '';
+      position: absolute;
+      inset: -30px;
+      background: inherit;
+      filter: blur(40px);
+      opacity: 0.5;
+      animation: spectrumShift 12s var(--ease-in-out-sine) infinite reverse;
+    }
+
+    /* A second narrower, more saturated core */
+    .hero-spectrum-core {
+      position: absolute;
+      left: 10%;
+      right: 10%;
+      top: 35%;
+      height: 80px;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        oklch(0.80 0.12 155 / 0.3) 10%,
+        oklch(0.78 0.14 55 / 0.6) 30%,
+        oklch(0.72 0.16 40 / 0.5) 50%,
+        oklch(0.70 0.12 300 / 0.5) 70%,
+        oklch(0.75 0.08 250 / 0.25) 90%,
+        transparent 100%
+      );
+      filter: blur(30px);
+      animation: spectrumCorePulse 6s var(--ease-in-out-sine) infinite;
+    }
+
+    @keyframes spectrumBreathe {
+      0%, 100% {
+        opacity: 0.6;
+        transform: scaleY(0.9) scaleX(1);
+      }
+      50% {
+        opacity: 1;
+        transform: scaleY(1.15) scaleX(1.02);
+      }
+    }
+
+    @keyframes spectrumShift {
+      0%, 100% {
+        transform: translateX(0) scaleX(1);
+      }
+      50% {
+        transform: translateX(3%) scaleX(1.03);
+      }
+    }
+
+    @keyframes spectrumCorePulse {
+      0%, 100% {
+        opacity: 0.4;
+        transform: scaleY(0.8);
+      }
+      50% {
+        opacity: 0.9;
+        transform: scaleY(1.3);
+      }
+    }
+
+    /* Subtle scattered warm particles */
+    .hero-particles {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .hero-particle {
+      position: absolute;
+      border-radius: var(--radius-full);
+      animation: particleFloat linear infinite;
+      opacity: 0;
+    }
+
+    @keyframes particleFloat {
+      0% { opacity: 0; transform: translateY(0) scale(0.6); }
+      15% { opacity: 0.7; }
+      85% { opacity: 0.7; }
+      100% { opacity: 0; transform: translateY(-60vh) scale(1); }
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-brand {
+      font-family: var(--font-heading);
+      font-size: var(--text-sm);
+      font-weight: 500;
+      letter-spacing: var(--tracking-wide);
+      color: var(--color-text-tertiary);
+      margin-bottom: var(--space-12);
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: var(--text-hero);
+      font-weight: 400;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      color: var(--color-text-primary);
+      max-width: 720px;
+    }
+
+    .hero-title em {
+      font-style: italic;
+      color: var(--color-accent);
+    }
+
+    .hero-subtitle {
+      font-family: var(--font-body);
+      font-size: var(--text-xl);
+      font-weight: 300;
+      color: var(--color-text-secondary);
+      margin-top: var(--space-10);
+      max-width: 420px;
+      line-height: var(--leading-relaxed);
+    }
+
+    .hero-cta-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      margin-top: var(--space-16);
+    }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: var(--space-8);
+      left: var(--space-6);
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      color: var(--color-text-tertiary);
+      font-size: var(--text-xs);
+      font-family: var(--font-heading);
+      letter-spacing: var(--tracking-wide);
+    }
+
+    .scroll-hint-line {
+      width: 32px;
+      height: 1px;
+      background: var(--color-text-tertiary);
+      opacity: 0.5;
+      animation: scrollPulse 2.5s var(--ease-in-out) infinite;
+    }
+
+    @keyframes scrollPulse {
+      0%, 100% { width: 32px; opacity: 0.3; }
+      50% { width: 48px; opacity: 0.6; }
+    }
+
+    @media (min-width: 641px) {
+      .scroll-hint { left: var(--space-8); }
+    }
+
+    /* ============================================
+       BUTTONS (full state chain)
+       ============================================ */
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      padding: var(--space-3) var(--space-6);
+      border-radius: var(--radius-full);
+      font-family: var(--font-heading);
+      font-size: var(--text-sm);
+      font-weight: 600;
+      line-height: 1;
+      cursor: pointer;
+      border: none;
+      min-height: 44px;
+      min-width: 44px;
+      transition:
+        background var(--duration-fast) var(--ease-out-quart),
+        transform var(--duration-instant) var(--ease-out-quart),
+        box-shadow var(--duration-normal) var(--ease-out-quart);
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      text-decoration: none;
+    }
+
+    .btn:active { transform: scale(0.98); }
+
+    .btn:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px var(--color-surface-0), 0 0 0 5px var(--color-border-focus);
+    }
+
+    .btn-primary {
+      background: var(--color-accent);
+      color: var(--color-text-on-primary);
+    }
+    .btn-primary:hover {
+      background: var(--color-accent-hover);
+      box-shadow: 0 4px 16px oklch(0.65 0.14 40 / 0.3);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--color-text-secondary);
+      border: 1.5px solid var(--color-border);
+    }
+    .btn-ghost:hover {
+      background: var(--color-surface-2);
+      color: var(--color-text-primary);
+      border-color: var(--color-surface-3);
+    }
+
+    .btn[disabled] {
+      opacity: 0.4;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    /* ============================================
+       2. CONVERSATION -- Larger, warmer, alive
+       ============================================ */
+
+    .conversation-section {
+      padding: var(--space-24) 0 var(--space-20);
+      background: linear-gradient(
+        180deg,
+        var(--color-surface-0) 0%,
+        oklch(0.97 0.015 55) 40%,
+        oklch(0.96 0.018 55) 70%,
+        var(--color-surface-0) 100%
+      );
+    }
+
+    .conversation-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-12);
+      align-items: start;
+    }
+
+    @media (min-width: 768px) {
+      .conversation-layout {
+        grid-template-columns: 1fr 480px;
+        gap: var(--space-16);
+      }
+    }
+
+    .conversation-copy {
+      align-self: center;
+    }
+
+    .section-label {
+      font-family: var(--font-heading);
+      font-size: var(--text-xs);
+      font-weight: 600;
+      letter-spacing: var(--tracking-wide);
+      text-transform: uppercase;
+      color: var(--color-accent);
+      margin-bottom: var(--space-3);
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    .section-label::before {
+      content: '';
+      width: 24px;
+      height: 1.5px;
+      background: var(--color-accent);
+      border-radius: 1px;
+    }
+
+    .conv-title {
+      font-family: var(--font-display);
+      font-size: var(--text-4xl);
+      font-weight: 400;
+      line-height: var(--leading-tight);
+      color: var(--color-text-primary);
+    }
+
+    .conv-title em { font-style: italic; }
+
+    .conv-desc {
+      font-size: var(--text-lg);
+      color: var(--color-text-secondary);
+      margin-top: var(--space-4);
+      max-width: 480px;
+      line-height: var(--leading-relaxed);
+    }
+
+    .conv-quote {
+      margin-top: var(--space-10);
+      padding-left: var(--space-6);
+      border-left: 2.5px solid var(--color-primary);
+      font-family: var(--font-display);
+      font-style: italic;
+      font-size: var(--text-lg);
+      color: var(--color-text-secondary);
+      line-height: var(--leading-relaxed);
+    }
+
+    /* Chat mockup -- much larger, more alive */
+    .chat-mockup {
+      background: var(--color-surface-0);
+      border-radius: var(--radius-2xl);
+      padding: var(--space-6) var(--space-6) var(--space-4);
+      box-shadow: var(--shadow-xl);
+      position: relative;
+      overflow: hidden;
+      min-width: 0;
+    }
+
+    .chat-emotion-glow {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(
+        ellipse at 50% 100%,
+        oklch(0.85 0.06 55 / 0.15) 0%,
+        transparent 70%
+      );
+      pointer-events: none;
+      transition: opacity 2s var(--ease-in-out);
+      z-index: 0;
+    }
+
+    .chat-inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    .chat-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding-bottom: var(--space-4);
+      border-bottom: 1px solid var(--color-border);
+      margin-bottom: var(--space-5);
+    }
+
+    .chat-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-full);
+      background: var(--color-primary-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .chat-header-info { flex: 1; }
+
+    .chat-header-name {
+      font-family: var(--font-heading);
+      font-size: var(--text-base);
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+
+    .chat-header-status {
+      font-size: var(--text-xs);
+      color: var(--color-success);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 1px;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: var(--radius-full);
+      background: var(--color-success);
+      animation: breathe 3s var(--ease-in-out) infinite;
+    }
+
+    @keyframes breathe {
+      0%, 100% { opacity: 0.5; transform: scale(0.9); }
+      50% { opacity: 1; transform: scale(1); }
+    }
+
+    .chat-messages {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+      padding-bottom: var(--space-5);
+    }
+
+    .msg {
+      display: flex;
+      flex-direction: column;
+      max-width: 85%;
+    }
+
+    .msg-user { align-self: flex-end; align-items: flex-end; }
+    .msg-ai { align-self: flex-start; align-items: flex-start; }
+
+    .msg-bubble {
+      padding: var(--space-3) var(--space-5);
+      border-radius: var(--radius-xl);
+      font-size: 15px;
+      line-height: var(--leading-relaxed);
+    }
+
+    .msg-user .msg-bubble {
+      background: var(--color-primary);
+      color: var(--color-text-on-primary);
+      border-bottom-right-radius: var(--radius-sm);
+    }
+
+    .msg-ai .msg-bubble {
+      background: var(--color-surface-2);
+      color: var(--color-text-primary);
+      border-bottom-left-radius: var(--radius-sm);
+    }
+
+    .msg-time {
+      font-size: 11px;
+      color: var(--color-text-tertiary);
+      margin-top: var(--space-1);
+      padding: 0 var(--space-2);
+    }
+
+    .msg-emotion {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: var(--space-2);
+      padding: 3px var(--space-3);
+      background: var(--color-primary-faint);
+      border-radius: var(--radius-full);
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--color-accent);
+    }
+
+    .msg-emotion svg { flex-shrink: 0; }
+
+    .msg-memory-link {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      margin-top: var(--space-2);
+      padding: var(--space-1) var(--space-3);
+      font-size: 11px;
+      color: var(--color-text-tertiary);
+      font-style: italic;
+    }
+
+    .msg-memory-link svg { flex-shrink: 0; }
+
+    /* Typing indicator */
+    .typing-indicator {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      padding: var(--space-3) var(--space-5);
+      background: var(--color-surface-2);
+      border-radius: var(--radius-xl);
+      border-bottom-left-radius: var(--radius-sm);
+      align-self: flex-start;
+      width: fit-content;
+    }
+
+    .typing-beat {
+      width: 5px;
+      height: 5px;
+      border-radius: var(--radius-full);
+      background: var(--color-accent);
+      animation: heartbeatPulse 1.2s var(--ease-in-out) infinite;
+    }
+
+    .typing-beat:nth-child(2) { animation-delay: 0.15s; }
+    .typing-beat:nth-child(3) { animation-delay: 0.3s; }
+
+    @keyframes heartbeatPulse {
+      0%, 100% { transform: scale(1); opacity: 0.3; }
+      20% { transform: scale(1.5); opacity: 1; }
+      40% { transform: scale(1); opacity: 0.5; }
+      50% { transform: scale(1.3); opacity: 0.8; }
+      60% { transform: scale(1); opacity: 0.3; }
+    }
+
+    .chat-input {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-3);
+      background: var(--color-surface-1);
+      border-radius: var(--radius-2xl);
+      border: 1.5px solid var(--color-border);
+      transition: border-color var(--duration-fast) var(--ease-out-quart),
+                  box-shadow var(--duration-fast) var(--ease-out-quart);
+    }
+
+    .chat-input:focus-within {
+      border-color: var(--color-border-focus);
+      box-shadow: 0 0 0 3px oklch(0.75 0.10 55 / 0.12);
+    }
+
+    .chat-input-field {
+      flex: 1;
+      border: none;
+      background: transparent;
+      font-family: var(--font-body);
+      font-size: 15px;
+      color: var(--color-text-primary);
+      padding: var(--space-2);
+      outline: none;
+    }
+    .chat-input-field::placeholder { color: var(--color-text-tertiary); }
+
+    .chat-btn-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-full);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--duration-fast) var(--ease-out-quart);
+      flex-shrink: 0;
+    }
+
+    .chat-btn-mic { background: var(--color-surface-2); }
+    .chat-btn-mic:hover { background: var(--color-surface-3); }
+    .chat-btn-send { background: var(--color-accent); }
+    .chat-btn-send:hover { background: var(--color-accent-hover); }
+
+    /* ============================================
+       3. EMOTION FOSSILS -- True geological strata
+       Full-width layers with gradient backgrounds
+       ============================================ */
+
+    .fossils-section {
+      padding: var(--space-24) 0 var(--space-20);
+    }
+
+    .fossils-intro {
+      max-width: 600px;
+      margin-bottom: var(--space-16);
+    }
+
+    .fossils-title {
+      font-family: var(--font-display);
+      font-size: var(--text-4xl);
+      font-weight: 400;
+      line-height: var(--leading-tight);
+      color: var(--color-text-primary);
+    }
+
+    .fossils-desc {
+      font-size: var(--text-lg);
+      color: var(--color-text-secondary);
+      margin-top: var(--space-4);
+      line-height: var(--leading-relaxed);
+    }
+
+    /* Geological strata container */
+    .fossil-strata {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .fossil-layer {
+      position: relative;
+      padding: var(--space-8) var(--space-8) var(--space-8) var(--space-12);
+      border-left: 7px solid transparent;
+      cursor: default;
+      transition:
+        transform var(--duration-normal) var(--ease-out-quart),
+        box-shadow var(--duration-slow) var(--ease-out-quart);
+    }
+
+    /* Each fossil has a unique subtle gradient background */
+    .fossil-layer--grief {
+      border-left-color: oklch(0.58 0.10 30);
+      background: linear-gradient(
+        135deg,
+        oklch(0.97 0.015 30) 0%,
+        oklch(0.96 0.020 40) 40%,
+        oklch(0.97 0.010 55) 100%
+      );
+    }
+
+    .fossil-layer--anxious {
+      border-left-color: oklch(0.68 0.10 70);
+      background: linear-gradient(
+        135deg,
+        oklch(0.97 0.015 70) 0%,
+        oklch(0.96 0.020 80) 40%,
+        oklch(0.97 0.010 55) 100%
+      );
+    }
+
+    .fossil-layer--calm {
+      border-left-color: oklch(0.70 0.10 155);
+      background: linear-gradient(
+        135deg,
+        oklch(0.97 0.015 155) 0%,
+        oklch(0.96 0.020 145) 40%,
+        oklch(0.97 0.010 55) 100%
+      );
+    }
+
+    .fossil-layer--nostalgia {
+      border-left-color: oklch(0.62 0.08 290);
+      background: linear-gradient(
+        135deg,
+        oklch(0.97 0.012 290) 0%,
+        oklch(0.96 0.015 300) 40%,
+        oklch(0.97 0.010 55) 100%
+      );
+    }
+
+    /* Geological separator between layers */
+    .fossil-layer + .fossil-layer {
+      border-top: none;
+      position: relative;
+    }
+
+    .fossil-layer + .fossil-layer::before {
+      content: '';
+      position: absolute;
+      left: 7px;
+      right: 0;
+      top: 0;
+      height: 2px;
+      background: linear-gradient(
+        90deg,
+        oklch(0.90 0.015 55 / 0.8) 0%,
+        oklch(0.92 0.010 55 / 0.4) 60%,
+        transparent 100%
+      );
+    }
+
+    .fossil-layer:hover {
+      transform: translateX(4px);
+      box-shadow: inset 0 0 0 1px oklch(0.90 0.02 55 / 0.5),
+                  0 4px 20px oklch(0.50 0.03 55 / 0.08);
+    }
+
+    .fossil-layer:hover .fossil-inscription {
+      opacity: 1;
+    }
+
+    .fossil-time {
+      font-family: var(--font-heading);
+      font-size: var(--text-xs);
+      font-weight: 500;
+      color: var(--color-text-tertiary);
+      letter-spacing: var(--tracking-wide);
+      margin-bottom: var(--space-3);
+      text-transform: uppercase;
+    }
+
+    .fossil-emotions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+      margin-bottom: var(--space-4);
+    }
+
+    .fossil-tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px var(--space-3);
+      border-radius: var(--radius-full);
+      font-size: var(--text-xs);
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .fossil-summary {
+      font-size: var(--text-base);
+      color: var(--color-text-secondary);
+      line-height: var(--leading-relaxed);
+      max-width: 640px;
+    }
+
+    /* Inscription -- AI's private note, in Playfair italic */
+    .fossil-inscription {
+      margin-top: var(--space-5);
+      font-family: var(--font-display);
+      font-style: italic;
+      font-size: var(--text-base);
+      color: var(--color-accent);
+      line-height: var(--leading-relaxed);
+      opacity: 0.65;
+      transition: opacity var(--duration-normal) var(--ease-out-quart);
+      max-width: 560px;
+      padding-left: var(--space-6);
+      border-left: 2px solid oklch(0.65 0.14 40 / 0.3);
+    }
+
+    @media (max-width: 640px) {
+      .fossil-layer {
+        padding: var(--space-6) var(--space-5) var(--space-6) var(--space-8);
+      }
+    }
+
+    /* ============================================
+       4. BREATHING ANCHOR -- The showstopper
+       Interactive 4-7-8 breathing exercise
+       ============================================ */
+
+    .breathing-section {
+      background: oklch(0.16 0.018 40);
+      padding: 0;
+      position: relative;
+      overflow: hidden;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .breathing-section::before {
+      content: '';
+      position: absolute;
+      width: 140%;
+      height: 140%;
+      top: -20%;
+      left: -20%;
+      background:
+        radial-gradient(ellipse 40% 40% at 50% 50%, oklch(0.30 0.06 55 / 0.4) 0%, transparent 70%),
+        radial-gradient(ellipse 30% 50% at 35% 60%, oklch(0.25 0.05 300 / 0.2) 0%, transparent 60%),
+        radial-gradient(ellipse 25% 35% at 65% 40%, oklch(0.28 0.04 40 / 0.25) 0%, transparent 55%);
+      animation: breathAurora 20s var(--ease-in-out) infinite alternate;
+      z-index: 0;
+    }
+
+    @keyframes breathAurora {
+      0% { transform: scale(1) rotate(0deg); opacity: 0.6; }
+      50% { transform: scale(1.08) rotate(2deg); opacity: 0.9; }
+      100% { transform: scale(1.02) rotate(-1deg); opacity: 0.7; }
+    }
+
+    .breathing-section .container {
+      position: relative;
+      z-index: 1;
+    }
+
+    .breathing-layout {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: var(--space-10);
+    }
+
+    .breathing-copy { max-width: 480px; }
+
+    .breathing-label {
+      font-family: var(--font-heading);
+      font-size: var(--text-xs);
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: oklch(0.70 0.08 55);
+      margin-bottom: var(--space-4);
+    }
+
+    .breathing-title {
+      font-family: var(--font-display);
+      font-size: var(--text-5xl);
+      font-weight: 300;
+      font-style: italic;
+      line-height: 1.1;
+      color: oklch(0.92 0.015 55);
+      letter-spacing: -0.02em;
+    }
+
+    .breathing-desc {
+      font-size: var(--text-base);
+      color: oklch(0.60 0.015 55);
+      margin-top: var(--space-5);
+      line-height: var(--leading-relaxed);
+    }
+
+    /* Breathing circle centrepiece */
+    .breathing-stage {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .breathing-circle-wrap {
+      position: relative;
+      width: 280px;
+      height: 280px;
+      cursor: pointer;
+    }
+
+    @media (min-width: 641px) {
+      .breathing-circle-wrap {
+        width: 320px;
+        height: 320px;
+      }
+    }
+
+    .breathing-ring {
+      position: absolute;
+      inset: 0;
+      border-radius: var(--radius-full);
+      border: 1px dashed oklch(0.45 0.04 55 / 0.3);
+      animation: ringRotate 60s linear infinite;
+    }
+
+    @keyframes ringRotate { to { transform: rotate(360deg); } }
+
+    .breathing-ring-inner {
+      position: absolute;
+      inset: 24px;
+      border-radius: var(--radius-full);
+      border: 1px solid oklch(0.40 0.03 55 / 0.15);
+    }
+
+    .breathing-circle {
+      position: absolute;
+      inset: 48px;
+      border-radius: var(--radius-full);
+      background:
+        radial-gradient(circle at 40% 38%, oklch(0.80 0.10 55 / 0.55) 0%, transparent 50%),
+        radial-gradient(circle at 62% 62%, oklch(0.70 0.08 40 / 0.45) 0%, transparent 50%),
+        radial-gradient(circle, oklch(0.58 0.06 300 / 0.18) 0%, transparent 70%);
+      box-shadow:
+        0 0 60px oklch(0.75 0.10 55 / 0.15),
+        0 0 120px oklch(0.65 0.08 40 / 0.08),
+        inset 0 0 40px oklch(0.80 0.08 55 / 0.1);
+      transition: transform 4s var(--ease-in-out-sine), box-shadow 4s var(--ease-in-out-sine);
+    }
+
+    .breathing-circle.inhale {
+      transform: scale(1.5);
+      box-shadow:
+        0 0 80px oklch(0.78 0.12 55 / 0.25),
+        0 0 160px oklch(0.70 0.10 40 / 0.12),
+        0 0 240px oklch(0.65 0.06 300 / 0.06),
+        inset 0 0 60px oklch(0.85 0.10 55 / 0.15);
+      transition-duration: 4s;
+    }
+
+    .breathing-circle.hold {
+      transform: scale(1.5);
+      box-shadow:
+        0 0 80px oklch(0.78 0.12 55 / 0.25),
+        0 0 160px oklch(0.70 0.10 40 / 0.12),
+        0 0 240px oklch(0.65 0.06 300 / 0.06),
+        inset 0 0 60px oklch(0.85 0.10 55 / 0.15);
+      transition-duration: 7s;
+    }
+
+    .breathing-circle.exhale {
+      transform: scale(1);
+      transition-duration: 8s;
+    }
+
+    .breathing-progress {
+      position: absolute;
+      inset: 6px;
+      border-radius: var(--radius-full);
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .breathing-progress circle {
+      fill: none;
+      stroke: oklch(0.65 0.08 55 / 0.35);
+      stroke-width: 1.5;
+      stroke-linecap: round;
+      transform: rotate(-90deg);
+      transform-origin: center;
+    }
+
+    .breathing-circle-wrap.active .breathing-progress circle {
+      stroke: oklch(0.80 0.12 55 / 0.6);
+    }
+
+    .breathing-text {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-1);
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    .breathing-text-main {
+      font-family: var(--font-display);
+      font-size: var(--text-2xl);
+      font-weight: 300;
+      font-style: italic;
+      color: oklch(0.90 0.015 55);
+      letter-spacing: 0.05em;
+      transition: opacity var(--duration-slow) var(--ease-out-quart);
+    }
+
+    .breathing-text-sub {
+      font-family: var(--font-body);
+      font-size: var(--text-xs);
+      font-weight: 400;
+      color: oklch(0.55 0.015 55);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: opacity var(--duration-slow) var(--ease-out-quart);
+    }
+
+    .breathing-prompt {
+      margin-top: var(--space-8);
+      font-family: var(--font-display);
+      font-size: var(--text-lg);
+      font-style: italic;
+      color: oklch(0.55 0.02 55);
+      text-align: center;
+      min-height: 1.5em;
+      transition: opacity var(--duration-slow) var(--ease-out-quart);
+    }
+
+    .breathing-start-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-3) var(--space-8);
+      border-radius: var(--radius-full);
+      border: 1px solid oklch(0.40 0.03 55 / 0.4);
+      background: oklch(0.22 0.020 40 / 0.5);
+      backdrop-filter: blur(8px);
+      font-family: var(--font-heading);
+      font-size: var(--text-sm);
+      font-weight: 400;
+      letter-spacing: 0.04em;
+      color: oklch(0.75 0.06 55);
+      cursor: pointer;
+      margin-top: var(--space-6);
+      transition:
+        background var(--duration-normal) var(--ease-out-quart),
+        color var(--duration-normal) var(--ease-out-quart),
+        border-color var(--duration-normal) var(--ease-out-quart),
+        box-shadow var(--duration-normal) var(--ease-out-quart);
+      min-height: 44px;
+    }
+
+    .breathing-start-btn:hover {
+      background: oklch(0.28 0.025 40 / 0.6);
+      color: oklch(0.88 0.08 55);
+      border-color: oklch(0.55 0.06 55 / 0.4);
+      box-shadow: 0 0 24px oklch(0.75 0.10 55 / 0.1);
+    }
+
+    .breathing-start-btn:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px oklch(0.18 0.020 40), 0 0 0 5px oklch(0.75 0.10 55 / 0.4);
+    }
+
+    .breathing-counter {
+      position: absolute;
+      bottom: -36px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--font-heading);
+      font-size: var(--text-xs);
+      font-weight: 400;
+      letter-spacing: 0.1em;
+      color: oklch(0.45 0.015 55);
+      opacity: 0;
+      transition: opacity var(--duration-normal) var(--ease-out-quart);
+    }
+
+    .breathing-circle-wrap.active .breathing-counter { opacity: 1; }
+
+    /* ============================================
+       5. DARK MODE -- 2AM Immersive City Scene
+       ============================================ */
+
+    .dark-section {
+      background: oklch(0.18 0.020 40);
+      color: oklch(0.90 0.010 55);
+      position: relative;
+      overflow: hidden;
+      padding: var(--space-24) 0 var(--space-32);
+    }
+
+    /* City skyline -- a gentle strip at the bottom */
+    .dark-skyline {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 140px;
+      z-index: 0;
+    }
+
+    .dark-skyline-building {
+      position: absolute;
+      bottom: 0;
+      background: oklch(0.14 0.015 40);
+      border-radius: 2px 2px 0 0;
+    }
+
+    .dark-window {
+      position: absolute;
+      width: 3px;
+      height: 4px;
+      border-radius: 1px;
+      background: oklch(0.70 0.08 55 / 0.6);
+      animation: windowFlicker 8s var(--ease-in-out) infinite;
+    }
+
+    @keyframes windowFlicker {
+      0%, 100% { opacity: 0.3; }
+      30% { opacity: 0.8; }
+      60% { opacity: 0.4; }
+      80% { opacity: 0.7; }
+    }
+
+    /* Two-column layout for dark section */
+    .dark-layout {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-12);
+      align-items: center;
+    }
+
+    @media (min-width: 768px) {
+      .dark-layout {
+        grid-template-columns: 1fr 520px;
+        gap: var(--space-16);
+      }
+    }
+
+    .dark-content { max-width: 480px; }
+
+    .dark-tagline {
+      font-family: var(--font-heading);
+      font-size: var(--text-xs);
+      font-weight: 600;
+      letter-spacing: var(--tracking-wide);
+      text-transform: uppercase;
+      color: oklch(0.75 0.10 55);
+      margin-bottom: var(--space-3);
+    }
+
+    .dark-title {
+      font-family: var(--font-display);
+      font-size: var(--text-5xl);
+      font-weight: 400;
+      font-style: italic;
+      line-height: var(--leading-tight);
+      color: oklch(0.92 0.010 55);
+      margin-bottom: var(--space-6);
+    }
+
+    .dark-subtitle {
+      font-size: var(--text-lg);
+      color: oklch(0.65 0.015 55);
+      line-height: var(--leading-relaxed);
+      max-width: 440px;
+    }
+
+    /* Dark mode chat -- large and prominent */
+    .dark-chat {
+      background: oklch(0.22 0.018 40);
+      border-radius: var(--radius-2xl);
+      padding: var(--space-6) var(--space-6) var(--space-4);
+      border: 1px solid oklch(0.28 0.020 40);
+      width: 100%;
+      max-width: 520px;
+    }
+
+    .dark-chat-glow {
+      position: relative;
+    }
+
+    .dark-chat-glow::before {
+      content: '';
+      position: absolute;
+      inset: -50px;
+      background: radial-gradient(
+        ellipse at 50% 50%,
+        oklch(0.30 0.04 55 / 0.35) 0%,
+        transparent 70%
+      );
+      z-index: -1;
+      border-radius: var(--radius-3xl);
+    }
+
+    .dark-chat .msg-user .msg-bubble {
+      background: oklch(0.50 0.08 55);
+      color: oklch(0.98 0.005 55);
+    }
+
+    .dark-chat .msg-ai .msg-bubble {
+      background: oklch(0.26 0.020 40);
+      color: oklch(0.88 0.010 55);
+    }
+
+    .dark-chat .msg-time { color: oklch(0.45 0.015 55); }
+
+    .dark-chat .msg-emotion {
+      background: oklch(0.25 0.03 55);
+      color: oklch(0.70 0.10 55);
+    }
+
+    .dark-chat .chat-input {
+      background: oklch(0.20 0.015 40);
+      border-color: oklch(0.28 0.020 40);
+    }
+
+    .dark-chat .chat-input:focus-within {
+      border-color: oklch(0.45 0.06 55);
+      box-shadow: 0 0 0 3px oklch(0.75 0.10 55 / 0.08);
+    }
+
+    .dark-chat .chat-input-field { color: oklch(0.85 0.010 55); }
+    .dark-chat .chat-input-field::placeholder { color: oklch(0.45 0.015 55); }
+    .dark-chat .chat-btn-mic { background: oklch(0.28 0.020 40); }
+
+    /* ============================================
+       6. MOBILE PREVIEW -- Polished dual phones
+       ============================================ */
+
+    .mobile-section {
+      padding: var(--space-24) 0;
+      background: linear-gradient(
+        180deg,
+        var(--color-surface-0) 0%,
+        oklch(0.96 0.012 55) 50%,
+        var(--color-surface-0) 100%
+      );
+    }
+
+    .mobile-header {
+      max-width: 480px;
+      margin-bottom: var(--space-16);
+    }
+
+    .mobile-title {
+      font-family: var(--font-display);
+      font-size: var(--text-4xl);
+      font-weight: 400;
+      line-height: var(--leading-tight);
+      color: var(--color-text-primary);
+    }
+
+    .mobile-desc {
+      font-size: var(--text-lg);
+      color: var(--color-text-secondary);
+      margin-top: var(--space-4);
+      line-height: var(--leading-relaxed);
+    }
+
+    /* Phone duo layout */
+    .phone-duo {
+      display: flex;
+      gap: var(--space-12);
+      justify-content: center;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .phone-duo-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-5);
+    }
+
+    .phone-duo-label {
+      font-family: var(--font-heading);
+      font-size: var(--text-xs);
+      font-weight: 500;
+      color: var(--color-text-tertiary);
+      letter-spacing: var(--tracking-wide);
+      text-transform: uppercase;
+    }
+
+    /* Phone frame -- larger, more realistic */
+    .phone-frame {
+      width: 300px;
+      background: oklch(0.15 0.01 55);
+      border-radius: 40px;
+      padding: 12px;
+      box-shadow: var(--shadow-phone);
+      position: relative;
+    }
+
+    .phone-frame--dark { background: oklch(0.10 0.01 40); }
+
+    /* Dynamic island notch */
+    .phone-frame::before {
+      content: '';
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 24px;
+      background: oklch(0.12 0.01 55);
+      border-radius: 12px;
+      z-index: 10;
+    }
+
+    .phone-frame--dark::before { background: oklch(0.08 0.01 40); }
+
+    .phone-screen {
+      background: var(--color-surface-0);
+      border-radius: 30px;
+      overflow: hidden;
+    }
+
+    .phone-screen--dark { background: oklch(0.18 0.020 40); }
+
+    .phone-status-bar {
+      height: 44px;
+      padding: 0 var(--space-6);
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: var(--space-1);
+      font-size: 13px;
+      font-weight: 600;
+      font-family: var(--font-heading);
+    }
+
+    .phone-status-bar--dark { color: oklch(0.80 0.010 55); }
+
+    .phone-content {
+      padding: var(--space-3) var(--space-4);
+      min-height: 480px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .phone-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-2) 0 var(--space-3);
+    }
+
+    .phone-nav-title {
+      font-family: var(--font-heading);
+      font-size: var(--text-lg);
+      font-weight: 700;
+      color: var(--color-accent);
+    }
+
+    .phone-nav-title--dark { color: oklch(0.75 0.10 55); }
+
+    .phone-nav-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-full);
+      background: var(--color-surface-2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .phone-nav-icon--dark { background: oklch(0.25 0.015 40); }
+
+    .phone-messages {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      padding: var(--space-3) 0;
+    }
+
+    .phone-msg {
+      max-width: 82%;
+      padding: var(--space-2) var(--space-3);
+      font-size: 13px;
+      line-height: 1.5;
+      border-radius: var(--radius-lg);
+    }
+
+    .phone-msg-user {
+      align-self: flex-end;
+      background: var(--color-primary);
+      color: var(--color-text-on-primary);
+      border-bottom-right-radius: var(--radius-sm);
+    }
+
+    .phone-msg-ai {
+      align-self: flex-start;
+      background: var(--color-surface-2);
+      color: var(--color-text-primary);
+      border-bottom-left-radius: var(--radius-sm);
+    }
+
+    .phone-msg-user--dark {
+      background: oklch(0.50 0.08 55);
+      color: oklch(0.98 0.005 55);
+    }
+
+    .phone-msg-ai--dark {
+      background: oklch(0.26 0.020 40);
+      color: oklch(0.88 0.010 55);
+    }
+
+    /* Emotion micro-tag inside phone */
+    .phone-emotion-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 2px 6px;
+      border-radius: var(--radius-full);
+      font-size: 9px;
+      font-weight: 600;
+      margin-top: var(--space-1);
+      align-self: flex-start;
+    }
+
+    .phone-emotion-tag--light {
+      background: var(--color-primary-faint);
+      color: var(--color-accent);
+    }
+
+    .phone-emotion-tag--dark {
+      background: oklch(0.25 0.03 55);
+      color: oklch(0.70 0.10 55);
+    }
+
+    .phone-input-bar {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-3);
+      background: var(--color-surface-1);
+      border-radius: var(--radius-2xl);
+      border: 1px solid var(--color-border);
+      margin-top: var(--space-3);
+    }
+
+    .phone-input-bar--dark {
+      background: oklch(0.20 0.015 40);
+      border-color: oklch(0.28 0.020 40);
+    }
+
+    .phone-input-placeholder {
+      flex: 1;
+      font-size: 12px;
+      color: var(--color-text-tertiary);
+      padding: var(--space-1) var(--space-2);
+    }
+
+    .phone-input-placeholder--dark { color: oklch(0.45 0.015 55); }
+
+    .phone-btn-group {
+      display: flex;
+      gap: var(--space-1);
+    }
+
+    .phone-icon-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      border: none;
+    }
+
+    .phone-mic-btn { background: var(--color-surface-2); }
+    .phone-mic-btn--dark { background: oklch(0.28 0.020 40); }
+    .phone-send-btn { background: var(--color-accent); }
+
+    .phone-tab-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: var(--space-2) 0;
+      padding-bottom: calc(var(--space-2) + env(safe-area-inset-bottom, 0px));
+      border-top: 1px solid var(--color-border);
+    }
+
+    .phone-tab-bar--dark { border-color: oklch(0.25 0.015 40); }
+
+    .phone-tab {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      min-width: 44px;
+      min-height: 36px;
+      justify-content: center;
+    }
+
+    .phone-tab-label {
+      font-size: 9px;
+      font-weight: 500;
+      color: var(--color-text-tertiary);
+    }
+
+    .phone-tab.active svg { color: var(--color-accent); }
+    .phone-tab.active .phone-tab-label { color: var(--color-accent); }
+
+    .phone-tab--dark .phone-tab-label { color: oklch(0.45 0.015 55); }
+    .phone-tab--dark.active svg { color: oklch(0.75 0.10 55); }
+    .phone-tab--dark.active .phone-tab-label { color: oklch(0.75 0.10 55); }
+
+    /* ============================================
+       7. DESIGN TOKENS -- Collapsible reference
+       ============================================ */
+
+    .tokens-section {
+      padding: var(--space-16) 0 var(--space-12);
+      border-top: 1px solid var(--color-border);
+    }
+
+    .tokens-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      padding: var(--space-4) 0;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .tokens-header:focus-visible {
+      outline: 2px solid var(--color-border-focus);
+      outline-offset: 4px;
+      border-radius: var(--radius-sm);
+    }
+
+    .tokens-header-left {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+    }
+
+    .tokens-title {
+      font-family: var(--font-heading);
+      font-size: var(--text-xl);
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+
+    .tokens-subtitle {
+      font-size: var(--text-sm);
+      color: var(--color-text-tertiary);
+    }
+
+    .tokens-toggle {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-full);
+      background: var(--color-surface-2);
+      transition: transform var(--duration-normal) var(--ease-out-quart);
+    }
+
+    .tokens-toggle.open { transform: rotate(180deg); }
+
+    .tokens-body {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows var(--duration-slow) var(--ease-out-quart);
+    }
+
+    .tokens-body.open { grid-template-rows: 1fr; }
+
+    .tokens-body-inner { overflow: hidden; }
+
+    .token-category {
+      margin-bottom: var(--space-10);
+      padding-top: var(--space-6);
+    }
+
+    .token-cat-title {
+      font-family: var(--font-heading);
+      font-size: var(--text-sm);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-wide);
+      color: var(--color-text-tertiary);
+      margin-bottom: var(--space-4);
+      padding-bottom: var(--space-2);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .swatch-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: var(--space-3);
+    }
+
+    .swatch {
+      display: flex;
+      align-items: stretch;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      border: 1px solid var(--color-border);
+    }
+
+    .swatch-color {
+      width: 48px;
+      min-height: 48px;
+      flex-shrink: 0;
+    }
+
+    .swatch-info {
+      padding: var(--space-2) var(--space-3);
+      background: var(--color-surface-1);
+      flex: 1;
+    }
+
+    .swatch-name {
+      font-family: var(--font-heading);
+      font-size: var(--text-xs);
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+
+    .swatch-val {
+      font-size: 10px;
+      color: var(--color-text-tertiary);
+      margin-top: 1px;
+    }
+
+    .neutral-bar {
+      display: flex;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      border: 1px solid var(--color-border);
+      margin-top: var(--space-3);
+    }
+
+    .neutral-step {
+      flex: 1;
+      min-height: 44px;
+      display: flex;
+      align-items: flex-end;
+      padding: 3px;
+    }
+
+    .neutral-step span {
+      font-size: 8px;
+      font-weight: 600;
+    }
+
+    /* ============================================
+       FOOTER
+       ============================================ */
+
+    .site-footer {
+      padding: var(--space-10) 0 var(--space-8);
+    }
+
+    .footer-rule {
+      height: 1px;
+      background: var(--color-border);
+      margin-bottom: var(--space-8);
+    }
+
+    .footer-content {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    @media (min-width: 641px) {
+      .footer-content {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-end;
+      }
+    }
+
+    .footer-left {
+      font-size: var(--text-sm);
+      color: var(--color-text-tertiary);
+    }
+
+    .footer-right {
+      display: flex;
+      gap: var(--space-3);
+    }
+
+    .footer-tag {
+      font-size: var(--text-xs);
+      color: var(--color-text-tertiary);
+      padding: var(--space-1) var(--space-3);
+      background: var(--color-surface-2);
+      border-radius: var(--radius-full);
+    }
+
+    /* ============================================
+       SCROLL ANIMATIONS
+       ============================================ */
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+    }
+
+    .reveal.visible {
+      animation: fadeUp var(--duration-entrance) var(--ease-out-quint) forwards;
+    }
+
+    .stagger-1 { animation-delay: 0ms; }
+    .stagger-2 { animation-delay: 80ms; }
+    .stagger-3 { animation-delay: 160ms; }
+    .stagger-4 { animation-delay: 240ms; }
+    .stagger-5 { animation-delay: 320ms; }
+
+    .msg-animated { opacity: 0; }
+    .msg-animated.show {
+      animation: fadeUp var(--duration-slow) var(--ease-out-quint) forwards;
+    }
+
+    /* ============================================
+       ACCESSIBILITY
+       ============================================ */
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+
+      .reveal { opacity: 1; transform: none; }
+      .msg-animated { opacity: 1; }
+      html { scroll-behavior: auto; }
+      .hero-spectrum-band,
+      .hero-spectrum-core { animation: none; opacity: 0.5; }
+      .hero-particle { animation: none; display: none; }
+      .status-dot { animation: none; opacity: 1; }
+      .typing-beat { animation: none; opacity: 0.6; }
+      .scroll-hint-line { animation: none; }
+      .dark-window { animation: none; opacity: 0.5; }
+
+      .breathing-circle {
+        transition-duration: 0.01ms !important;
+      }
+      .breathing-section::before { animation: none; opacity: 0.5; }
+      .breathing-ring { animation: none; }
+    }
+
+    @media (pointer: coarse) {
+      .btn {
+        min-height: 48px;
+        padding: var(--space-3) var(--space-8);
+      }
+      .breathing-start-btn { min-height: 48px; }
+    }
+
+    :focus:not(:focus-visible) {
+      outline: none;
+      box-shadow: none;
+    }
+
+    /* ============================================
+       RESPONSIVE
+       ============================================ */
+
+    @media (max-width: 640px) {
+      .hero-title { font-size: clamp(2.5rem, 10vw, 3.5rem); }
+      .hero-spectrum { height: 180px; }
+      .phone-frame { width: 270px; }
+      .phone-duo { gap: var(--space-8); }
+      .swatch-grid { grid-template-columns: 1fr; }
+      .dark-title { font-size: var(--text-4xl); }
+      .dark-chat { max-width: 100%; }
+      .fossil-strata { border-radius: var(--radius-lg); }
+    }
+
+    @media print {
+      .reveal { opacity: 1; transform: none; }
+      .hero-spectrum, .hero-particles { display: none; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page-wrapper">
+
+    <!-- ============================================================
+         HERO: Emotion spectrum river flowing through whitespace
+         ============================================================ -->
+    <section class="hero" aria-label="Hero section">
+      <!-- Emotion Spectrum -- flowing chromatic band -->
+      <div class="hero-spectrum" aria-hidden="true">
+        <div class="hero-spectrum-band"></div>
+        <div class="hero-spectrum-core"></div>
+      </div>
+
+      <!-- Warm particles -->
+      <div class="hero-particles" aria-hidden="true" id="heroParticles"></div>
+
+      <div class="container hero-content">
+        <p class="hero-brand reveal">留白 Liminal</p>
+        <h1 class="hero-title reveal stagger-2">
+          给情绪<br>
+          留一个<em>呼吸</em><br>
+          的地方
+        </h1>
+        <p class="hero-subtitle reveal stagger-3">
+          不给建议，不做诊断。<br>
+          只是在深夜醒着的时候，<br>
+          有一个记得你故事的存在。
+        </p>
+        <div class="hero-cta-row reveal stagger-4">
+          <a class="btn btn-primary" href="#conversation" role="button">看看它是什么感觉</a>
+          <a class="btn btn-ghost" href="#tokens" role="button">设计令牌</a>
+        </div>
+      </div>
+
+      <div class="scroll-hint reveal stagger-5" aria-hidden="true">
+        <span class="scroll-hint-line"></span>
+        <span>向下探索</span>
+      </div>
+    </section>
+
+
+    <!-- ============================================================
+         CONVERSATION: Warm gradient background, larger chat
+         ============================================================ -->
+    <section class="conversation-section" id="conversation" aria-label="Conversation preview">
+      <div class="container">
+        <div class="conversation-layout">
+
+          <!-- Left: editorial copy -->
+          <div class="conversation-copy reveal">
+            <div class="section-label">对话体验</div>
+            <h2 class="conv-title">
+              感受不需要<em>被修复</em>
+            </h2>
+            <p class="conv-desc">
+              留白不诊断、不建议、不打鸡血。它倾听、映照、记住。每一段对话都承载着之前的记忆，你说过的任何话都不会消散。
+            </p>
+            <blockquote class="conv-quote">
+              "它记得我三天前紧张面试的事，今天主动问我结果怎么样。从来没有一个应用做到过这件事。"
+            </blockquote>
+          </div>
+
+          <!-- Right: chat mockup -- larger, richer -->
+          <div class="chat-mockup reveal stagger-2">
+            <div class="chat-emotion-glow" id="emotionGlow" aria-hidden="true"></div>
+            <div class="chat-inner">
+              <div class="chat-header">
+                <div class="chat-avatar">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="oklch(0.65 0.14 40)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" opacity="0.2"/><circle cx="12" cy="12" r="4"/></svg>
+                </div>
+                <div class="chat-header-info">
+                  <div class="chat-header-name">留白</div>
+                  <div class="chat-header-status">
+                    <span class="status-dot"></span>
+                    在听
+                  </div>
+                </div>
+              </div>
+
+              <div class="chat-messages" id="chatMessages">
+                <div class="msg msg-user msg-animated">
+                  <div class="msg-bubble">今天好累... 汇报准备了好久，结果好像没人在意</div>
+                  <span class="msg-time">23:23</span>
+                </div>
+
+                <div class="msg msg-ai msg-animated">
+                  <div class="msg-bubble">
+                    用了很多心去准备，最后却觉得像自己在唱独角戏——这种感觉不只是累，更像是委屈，对吧。
+                  </div>
+                  <span class="msg-emotion">
+                    <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="12" cy="12" r="10"/></svg>
+                    委屈 + 不被看见
+                  </span>
+                  <span class="msg-time">23:23</span>
+                </div>
+
+                <div class="msg msg-user msg-animated">
+                  <div class="msg-bubble">嗯... 就是觉得，努力好像没有意义</div>
+                  <span class="msg-time">23:24</span>
+                </div>
+
+                <div class="msg msg-ai msg-animated">
+                  <div class="msg-bubble">
+                    但你还是做了啊。上周二你说准备到很晚，那份认真是你自己的——就算今天没人鼓掌，也不能否定它。
+                  </div>
+                  <span class="msg-memory-link">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                    引用了 3 月 28 日的对话
+                  </span>
+                  <span class="msg-emotion">
+                    <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="12" cy="12" r="10"/></svg>
+                    温和确认
+                  </span>
+                  <span class="msg-time">23:24</span>
+                </div>
+
+                <div class="msg msg-user msg-animated">
+                  <div class="msg-bubble">谢谢你记得... 我自己都快忘了</div>
+                  <span class="msg-time">23:25</span>
+                </div>
+
+                <div class="typing-indicator msg-animated" id="typingIndicator" style="display: none;">
+                  <span class="typing-beat"></span>
+                  <span class="typing-beat"></span>
+                  <span class="typing-beat"></span>
+                </div>
+              </div>
+
+              <div class="chat-input">
+                <button class="chat-btn-icon chat-btn-mic" aria-label="语音输入">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-secondary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                </button>
+                <input class="chat-input-field" type="text" placeholder="想说什么都可以..." aria-label="消息输入" />
+                <button class="chat-btn-icon chat-btn-send" aria-label="发送消息">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-on-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================
+         EMOTION FOSSILS: True geological strata visualization
+         ============================================================ -->
+    <section class="fossils-section" id="fossils" aria-label="Emotion fossils">
+      <div class="container">
+        <div class="fossils-intro reveal">
+          <div class="section-label">情绪化石</div>
+          <h2 class="fossils-title">每次倾诉，凝结成一块记忆的切片</h2>
+          <p class="fossils-desc">
+            对话不再消散。每一次深度倾诉自动沉淀为一块带有温度和纹理的"化石"——在时间轴上汇聚成你独一无二的情绪地貌。
+          </p>
+        </div>
+
+        <div class="fossil-strata">
+
+          <!-- Fossil 1: grief/frustration -->
+          <div class="fossil-layer fossil-layer--grief reveal">
+            <div class="fossil-time">周三深夜 -- 23:47</div>
+            <div class="fossil-emotions">
+              <span class="fossil-tag" style="background: oklch(0.92 0.05 25); color: oklch(0.42 0.12 25);">委屈</span>
+              <span class="fossil-tag" style="background: oklch(0.92 0.04 55); color: oklch(0.45 0.10 55);">不被看见</span>
+            </div>
+            <div class="fossil-summary">
+              关于工作汇报和"努力了但没人在意"的深夜倾诉。委屈比疲惫来得更深。
+            </div>
+            <div class="fossil-inscription">
+              "这次是关于'被看见'——你在等一个认可，但那个人可能不知道你在等。"
+            </div>
+          </div>
+
+          <!-- Fossil 2: anxiety + anticipation -->
+          <div class="fossil-layer fossil-layer--anxious reveal">
+            <div class="fossil-time">周一晚 -- 22:47</div>
+            <div class="fossil-emotions">
+              <span class="fossil-tag" style="background: oklch(0.94 0.04 90); color: oklch(0.45 0.12 90);">焦虑</span>
+              <span class="fossil-tag" style="background: oklch(0.92 0.03 300); color: oklch(0.50 0.08 300);">期待</span>
+            </div>
+            <div class="fossil-summary">
+              项目 deadline 前的复杂心情。一边担心进度，一边又对结果有隐隐的兴奋。
+            </div>
+            <div class="fossil-inscription">
+              "焦虑和期待同时存在的时候，通常意味着这件事值得你在意。"
+            </div>
+          </div>
+
+          <!-- Fossil 3: release/peace -->
+          <div class="fossil-layer fossil-layer--calm reveal">
+            <div class="fossil-time">周六午后 -- 15:12</div>
+            <div class="fossil-emotions">
+              <span class="fossil-tag" style="background: oklch(0.92 0.04 155); color: oklch(0.40 0.10 155);">释然</span>
+              <span class="fossil-tag" style="background: oklch(0.92 0.04 55); color: oklch(0.45 0.10 55);">感恩</span>
+            </div>
+            <div class="fossil-summary">
+              散了很长的步，给很久没联系的朋友打了个电话。突然觉得轻松了很多。
+            </div>
+            <div class="fossil-inscription">
+              "连接不需要持续才有意义。一通真诚的电话可以重置一整周的疲惫。"
+            </div>
+          </div>
+
+          <!-- Fossil 4: nostalgia -->
+          <div class="fossil-layer fossil-layer--nostalgia reveal">
+            <div class="fossil-time">周四深夜 -- 23:58</div>
+            <div class="fossil-emotions">
+              <span class="fossil-tag" style="background: oklch(0.92 0.03 290); color: oklch(0.48 0.08 290);">怀念</span>
+              <span class="fossil-tag" style="background: oklch(0.92 0.04 55); color: oklch(0.45 0.10 55);">温柔</span>
+            </div>
+            <div class="fossil-summary">
+              翻到大学时的照片，聊了关于时间怎样改变友情但不会抹去它。
+            </div>
+            <div class="fossil-inscription">
+              "想念一个人不是软弱，是证明你们之间的东西真实到足以留在记忆里。"
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================
+         BREATHING ANCHOR: The showstopper section
+         Interactive 4-7-8 breathing exercise
+         ============================================================ -->
+    <section class="breathing-section" id="breathing" aria-label="Breathing anchor demo">
+      <div class="container">
+        <div class="breathing-layout">
+
+          <div class="breathing-copy reveal">
+            <div class="breathing-label">呼吸锚点</div>
+            <h2 class="breathing-title">先停下来</h2>
+            <p class="breathing-desc">
+              当情绪激动到打字都打不清楚的时候，<br>
+              你不需要再说什么。<br>
+              你需要的是一个帮你「先停下来」的东西。
+            </p>
+          </div>
+
+          <div class="breathing-stage">
+            <div class="breathing-circle-wrap" id="breathingWrap" role="img" aria-label="Breathing circle animation">
+              <div class="breathing-ring" aria-hidden="true"></div>
+              <div class="breathing-ring-inner" aria-hidden="true"></div>
+              <svg class="breathing-progress" viewBox="0 0 280 280" aria-hidden="true">
+                <circle cx="140" cy="140" r="134" id="breathingProgress"/>
+              </svg>
+              <div class="breathing-circle" id="breathingCircle"></div>
+              <div class="breathing-text">
+                <span class="breathing-text-main" id="breathingText">开始</span>
+                <span class="breathing-text-sub" id="breathingPhase"></span>
+              </div>
+              <div class="breathing-counter" id="breathingCounter"></div>
+            </div>
+            <div class="breathing-prompt" id="breathingPrompt">
+              点击光球，跟着节奏呼吸
+            </div>
+            <button class="breathing-start-btn" id="breathingBtn" aria-label="Start breathing exercise">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              开始
+            </button>
+          </div>
+
+          <p class="breathing-desc" style="font-size: var(--text-sm); color: oklch(0.45 0.015 55); max-width: 320px; text-align: center;">
+            4-7-8 呼吸法 -- 吸气 4 秒 -- 屏息 7 秒 -- 呼气 8 秒<br>
+            这不是冥想课程，只是朋友在旁边轻轻说：慢慢来。
+          </p>
+
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================
+         DARK MODE: 2AM immersive atmosphere
+         Two-column layout with larger chat
+         ============================================================ -->
+    <section class="dark-section" id="darkmode" aria-label="Dark mode preview">
+      <div class="dark-skyline" aria-hidden="true" id="darkSkyline"></div>
+
+      <div class="container">
+        <div class="dark-layout">
+          <div class="dark-content reveal">
+            <div class="dark-tagline">深夜模式</div>
+            <h2 class="dark-title">凌晨两点，<br>整个世界安静下来</h2>
+            <p class="dark-subtitle">
+              深夜是用户最需要陪伴的时刻。不是亮色模式的反转——是一杯热可可色的温暖，保护疲惫的眼睛，同时守住安全感。
+            </p>
+          </div>
+
+          <div class="dark-chat-glow reveal stagger-2">
+            <div class="dark-chat">
+              <div class="chat-header" style="border-color: oklch(0.28 0.020 40);">
+                <div class="chat-avatar" style="background: oklch(0.28 0.025 55);">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="oklch(0.70 0.10 55)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" opacity="0.2"/><circle cx="12" cy="12" r="4"/></svg>
+                </div>
+                <div class="chat-header-info">
+                  <div class="chat-header-name" style="color: oklch(0.88 0.010 55);">留白</div>
+                  <div class="chat-header-status" style="color: oklch(0.65 0.08 155);">
+                    <span class="status-dot" style="background: oklch(0.65 0.08 155);"></span>
+                    在听
+                  </div>
+                </div>
+              </div>
+
+              <div class="chat-messages">
+                <div class="msg msg-user">
+                  <div class="msg-bubble">睡不着。脑子里一直在重播今天发生的事</div>
+                  <span class="msg-time">2:14</span>
+                </div>
+
+                <div class="msg msg-ai">
+                  <div class="msg-bubble">
+                    深夜的回放总是特别响，因为周围什么声音都没有了。你不用现在就想明白什么——哪个部分一直在回来？
+                  </div>
+                  <span class="msg-emotion">
+                    <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="12" cy="12" r="10"/></svg>
+                    反刍 + 不安
+                  </span>
+                  <span class="msg-time">2:14</span>
+                </div>
+
+                <div class="msg msg-user">
+                  <div class="msg-bubble">朋友说的一句话... 我知道她不是故意的，但就是扎心</div>
+                  <span class="msg-time">2:15</span>
+                </div>
+
+                <div class="msg msg-ai">
+                  <div class="msg-bubble">
+                    知道对方不是故意的，并不会让疼痛消失。两件事可以同时是真的。想跟我说说她说了什么吗？
+                  </div>
+                  <span class="msg-emotion">
+                    <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="12" cy="12" r="10"/></svg>
+                    受伤 + 纠结
+                  </span>
+                  <span class="msg-time">2:15</span>
+                </div>
+
+                <div class="msg msg-user">
+                  <div class="msg-bubble">她说"你想太多了"... 可是如果能不想多我早就不想了</div>
+                  <span class="msg-time">2:16</span>
+                </div>
+              </div>
+
+              <div class="chat-input">
+                <button class="chat-btn-icon chat-btn-mic" aria-label="语音输入" style="background: oklch(0.28 0.020 40);">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="oklch(0.55 0.015 55)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                </button>
+                <input class="chat-input-field" type="text" placeholder="我还在..." aria-label="消息输入" />
+                <button class="chat-btn-icon chat-btn-send" aria-label="发送消息">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="oklch(0.98 0.005 55)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================
+         MOBILE PREVIEW: Polished dual phones, day + night
+         ============================================================ -->
+    <section class="mobile-section" id="mobile" aria-label="Mobile preview">
+      <div class="container">
+        <div class="mobile-header reveal">
+          <div class="section-label">移动端体验</div>
+          <h2 class="mobile-title">深夜的枕边，通勤的地铁</h2>
+          <p class="mobile-desc">
+            核心场景是躺在被窝里和挤在地铁上。拇指优先设计，48px 触控目标，安全区域适配。
+          </p>
+        </div>
+
+        <div class="phone-duo reveal stagger-2">
+          <!-- Day mode phone -->
+          <div class="phone-duo-item">
+            <div class="phone-frame">
+              <div class="phone-screen">
+                <div class="phone-status-bar" style="color: var(--color-text-primary);">9:41</div>
+                <div class="phone-content">
+                  <div class="phone-nav">
+                    <div class="phone-nav-title">留白</div>
+                    <div class="phone-nav-icon">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-secondary)" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09"/></svg>
+                    </div>
+                  </div>
+                  <div class="phone-messages">
+                    <div class="phone-msg phone-msg-user">最近好像什么都提不起劲</div>
+                    <div class="phone-msg phone-msg-ai">有些日子就是这样——没有原因地沉着。不用找理由也没关系。</div>
+                    <div class="phone-emotion-tag phone-emotion-tag--light">
+                      <svg width="6" height="6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="12" cy="12" r="10"/></svg>
+                      倦怠 + 空虚
+                    </div>
+                    <div class="phone-msg phone-msg-user">嗯... 就是莫名的空</div>
+                    <div class="phone-msg phone-msg-ai">空的时候不用急着填满。你现在想聊聊，还是就这样安静待一会儿？</div>
+                  </div>
+                  <div class="phone-input-bar">
+                    <span class="phone-input-placeholder">想说什么都可以...</span>
+                    <div class="phone-btn-group">
+                      <div class="phone-icon-btn phone-mic-btn">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-tertiary)" stroke-width="2.5"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+                      </div>
+                      <div class="phone-icon-btn phone-send-btn">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-on-primary)" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="phone-tab-bar">
+                  <div class="phone-tab active">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    <span class="phone-tab-label">对话</span>
+                  </div>
+                  <div class="phone-tab">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                    <span class="phone-tab-label">化石层</span>
+                  </div>
+                  <div class="phone-tab">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <span class="phone-tab-label">回忆</span>
+                  </div>
+                  <div class="phone-tab">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <span class="phone-tab-label">我的</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <span class="phone-duo-label">日间模式</span>
+          </div>
+
+          <!-- Night mode phone -->
+          <div class="phone-duo-item">
+            <div class="phone-frame phone-frame--dark">
+              <div class="phone-screen phone-screen--dark">
+                <div class="phone-status-bar phone-status-bar--dark">23:47</div>
+                <div class="phone-content">
+                  <div class="phone-nav">
+                    <div class="phone-nav-title phone-nav-title--dark">留白</div>
+                    <div class="phone-nav-icon phone-nav-icon--dark">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="oklch(0.50 0.015 55)" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09"/></svg>
+                    </div>
+                  </div>
+                  <div class="phone-messages">
+                    <div class="phone-msg phone-msg-user--dark">今天也没怎么样，就是莫名其妙的不开心</div>
+                    <div class="phone-msg phone-msg-ai--dark">嗯，有些日子就是这样——没有原因地沉着。不需要给它找一个名字。</div>
+                    <div class="phone-emotion-tag phone-emotion-tag--dark">
+                      <svg width="6" height="6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="12" cy="12" r="10"/></svg>
+                      低落 + 茫然
+                    </div>
+                    <div class="phone-msg phone-msg-user--dark">你还记得上次我说的那个甲方吗</div>
+                    <div class="phone-msg phone-msg-ai--dark">记得，上次你说他又改需求了。这次是不是又来了？</div>
+                  </div>
+                  <div class="phone-input-bar phone-input-bar--dark">
+                    <span class="phone-input-placeholder phone-input-placeholder--dark">我还在...</span>
+                    <div class="phone-btn-group">
+                      <div class="phone-icon-btn phone-mic-btn--dark">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="oklch(0.50 0.015 55)" stroke-width="2.5"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+                      </div>
+                      <div class="phone-icon-btn phone-send-btn">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="oklch(0.98 0.005 55)" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="phone-tab-bar phone-tab-bar--dark">
+                  <div class="phone-tab phone-tab--dark active">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    <span class="phone-tab-label">对话</span>
+                  </div>
+                  <div class="phone-tab phone-tab--dark">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                    <span class="phone-tab-label">化石层</span>
+                  </div>
+                  <div class="phone-tab phone-tab--dark">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <span class="phone-tab-label">回忆</span>
+                  </div>
+                  <div class="phone-tab phone-tab--dark">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <span class="phone-tab-label">我的</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <span class="phone-duo-label">深夜模式</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================
+         DESIGN TOKENS: Collapsible compact reference
+         ============================================================ -->
+    <section class="tokens-section" id="tokens" aria-label="Design tokens reference">
+      <div class="container">
+
+        <div class="tokens-header" id="tokensHeader" role="button" tabindex="0" aria-expanded="false" aria-controls="tokensBody">
+          <div class="tokens-header-left">
+            <div class="tokens-title">设计令牌系统</div>
+            <div class="tokens-subtitle">OKLCH 色彩 / 4px 间距 / 模块化字号 / Exponential Easing</div>
+          </div>
+          <div class="tokens-toggle" id="tokensToggle" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-secondary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+        </div>
+
+        <div class="tokens-body" id="tokensBody">
+          <div class="tokens-body-inner">
+
+            <!-- COLOR PALETTE -->
+            <div class="token-category">
+              <div class="token-cat-title">色彩系统 -- OKLCH</div>
+
+              <div class="swatch-grid">
+                <div class="swatch">
+                  <div class="swatch-color" style="background: oklch(0.75 0.10 55);"></div>
+                  <div class="swatch-info">
+                    <div class="swatch-name">Primary / 暖蜜桃</div>
+                    <div class="swatch-val">oklch(0.75 0.10 55)</div>
+                  </div>
+                </div>
+                <div class="swatch">
+                  <div class="swatch-color" style="background: oklch(0.65 0.14 40);"></div>
+                  <div class="swatch-info">
+                    <div class="swatch-name">Accent / 深珊瑚</div>
+                    <div class="swatch-val">oklch(0.65 0.14 40)</div>
+                  </div>
+                </div>
+                <div class="swatch">
+                  <div class="swatch-color" style="background: oklch(0.78 0.05 60);"></div>
+                  <div class="swatch-info">
+                    <div class="swatch-name">Secondary / 暖沙</div>
+                    <div class="swatch-val">oklch(0.78 0.05 60)</div>
+                  </div>
+                </div>
+                <div class="swatch">
+                  <div class="swatch-color" style="background: oklch(0.68 0.08 300);"></div>
+                  <div class="swatch-info">
+                    <div class="swatch-name">Lavender / 薰衣草</div>
+                    <div class="swatch-val">oklch(0.68 0.08 300)</div>
+                  </div>
+                </div>
+                <div class="swatch">
+                  <div class="swatch-color" style="background: oklch(0.70 0.08 155);"></div>
+                  <div class="swatch-info">
+                    <div class="swatch-name">Sage / 鼠尾草</div>
+                    <div class="swatch-val">oklch(0.70 0.08 155)</div>
+                  </div>
+                </div>
+                <div class="swatch">
+                  <div class="swatch-color" style="background: oklch(0.72 0.10 155);"></div>
+                  <div class="swatch-info">
+                    <div class="swatch-name">Success / 柔绿</div>
+                    <div class="swatch-val">oklch(0.72 0.10 155)</div>
+                  </div>
+                </div>
+                <div class="swatch">
+                  <div class="swatch-color" style="background: oklch(0.65 0.12 25);"></div>
+                  <div class="swatch-info">
+                    <div class="swatch-name">Error / 柔红</div>
+                    <div class="swatch-val">oklch(0.65 0.12 25)</div>
+                  </div>
+                </div>
+                <div class="swatch">
+                  <div class="swatch-color" style="background: oklch(0.80 0.12 90);"></div>
+                  <div class="swatch-info">
+                    <div class="swatch-name">Warning / 暖黄</div>
+                    <div class="swatch-val">oklch(0.80 0.12 90)</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tinted Neutrals bar -->
+              <div style="margin-top: var(--space-6);">
+                <div class="token-cat-title" style="margin-bottom: var(--space-2); font-size: 11px;">Tinted Neutrals (warm hue 55, chroma 0.008-0.025)</div>
+                <div class="neutral-bar">
+                  <div class="neutral-step" style="background: oklch(0.98 0.008 55);"><span style="color: oklch(0.40 0.02 55);">98</span></div>
+                  <div class="neutral-step" style="background: oklch(0.96 0.010 55);"><span style="color: oklch(0.40 0.02 55);">96</span></div>
+                  <div class="neutral-step" style="background: oklch(0.93 0.012 55);"><span style="color: oklch(0.40 0.02 55);">93</span></div>
+                  <div class="neutral-step" style="background: oklch(0.89 0.015 55);"><span style="color: oklch(0.30 0.02 55);">89</span></div>
+                  <div class="neutral-step" style="background: oklch(0.80 0.015 55);"><span style="color: oklch(0.25 0.02 55);">80</span></div>
+                  <div class="neutral-step" style="background: oklch(0.65 0.015 55);"><span style="color: oklch(0.98 0.01 55);">65</span></div>
+                  <div class="neutral-step" style="background: oklch(0.50 0.020 55);"><span style="color: oklch(0.98 0.01 55);">50</span></div>
+                  <div class="neutral-step" style="background: oklch(0.25 0.025 55);"><span style="color: oklch(0.90 0.01 55);">25</span></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- TYPOGRAPHY -->
+            <div class="token-category">
+              <div class="token-cat-title">字体系统</div>
+              <div style="display: flex; flex-direction: column; gap: var(--space-4);">
+                <div>
+                  <div style="font-family: var(--font-display); font-size: var(--text-3xl); font-weight: 400; color: var(--color-text-primary); line-height: 1.2;">Playfair Display -- 诗意标题</div>
+                  <div style="font-size: var(--text-xs); color: var(--color-text-tertiary); margin-top: var(--space-1);">Display / Serif / 化石铭文、Hero 标题、情感引语</div>
+                </div>
+                <div>
+                  <div style="font-family: var(--font-heading); font-size: var(--text-2xl); font-weight: 600; color: var(--color-text-primary); line-height: 1.3;">Plus Jakarta Sans -- 人文温暖</div>
+                  <div style="font-size: var(--text-xs); color: var(--color-text-tertiary); margin-top: var(--space-1);">Heading / Sans / 功能标题、按钮、标签、导航</div>
+                </div>
+                <div>
+                  <div style="font-family: var(--font-body); font-size: var(--text-lg); font-weight: 400; color: var(--color-text-primary); line-height: 1.6;">Figtree -- 舒适阅读，对话消息和正文首选，x-height 适中不会喧宾夺主</div>
+                  <div style="font-size: var(--text-xs); color: var(--color-text-tertiary); margin-top: var(--space-1);">Body / Sans / 对话消息、描述文本、正文</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- MOTION -->
+            <div class="token-category">
+              <div class="token-cat-title">动效系统</div>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-3);">
+                <div style="padding: var(--space-3); background: var(--color-surface-1); border-radius: var(--radius-md);">
+                  <div style="font-family: var(--font-heading); font-size: var(--text-xs); font-weight: 600; color: var(--color-text-primary);">100ms / Instant</div>
+                  <div style="font-size: 10px; color: var(--color-text-tertiary);">按钮按压、开关切换</div>
+                </div>
+                <div style="padding: var(--space-3); background: var(--color-surface-1); border-radius: var(--radius-md);">
+                  <div style="font-family: var(--font-heading); font-size: var(--text-xs); font-weight: 600; color: var(--color-text-primary);">300ms / Normal</div>
+                  <div style="font-size: 10px; color: var(--color-text-tertiary);">菜单展开、Hover 反馈</div>
+                </div>
+                <div style="padding: var(--space-3); background: var(--color-surface-1); border-radius: var(--radius-md);">
+                  <div style="font-family: var(--font-heading); font-size: var(--text-xs); font-weight: 600; color: var(--color-text-primary);">500ms / Slow</div>
+                  <div style="font-size: 10px; color: var(--color-text-tertiary);">布局变化、手风琴展开</div>
+                </div>
+                <div style="padding: var(--space-3); background: var(--color-surface-1); border-radius: var(--radius-md);">
+                  <div style="font-family: var(--font-heading); font-size: var(--text-xs); font-weight: 600; color: var(--color-text-primary);">700ms / Entrance</div>
+                  <div style="font-size: 10px; color: var(--color-text-tertiary);">页面入场、滚动揭示</div>
+                </div>
+              </div>
+              <div style="margin-top: var(--space-4); font-size: var(--text-sm); color: var(--color-text-secondary);">
+                Easing: ease-out-quart <code style="font-size: 11px; color: var(--color-text-tertiary); background: var(--color-surface-2); padding: 1px 4px; border-radius: 3px;">cubic-bezier(0.25, 1, 0.5, 1)</code>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+      <div class="container">
+        <div class="footer-rule"></div>
+        <div class="footer-content">
+          <div class="footer-left">
+            留白 Liminal -- Design Style Reference
+          </div>
+          <div class="footer-right">
+            <span class="footer-tag">OKLCH</span>
+            <span class="footer-tag">Playfair Display</span>
+            <span class="footer-tag">ease-out-quart</span>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+
+  <!-- ============================================
+       JAVASCRIPT
+       ============================================ -->
+  <script>
+    // --- Intersection Observer for scroll reveals ---
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+    // --- Chat message staggered reveal ---
+    const chatSection = document.getElementById('conversation');
+    const chatMessages = document.querySelectorAll('.msg-animated');
+    const typingIndicator = document.getElementById('typingIndicator');
+    let chatRevealed = false;
+
+    const chatObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && !chatRevealed) {
+          chatRevealed = true;
+          chatMessages.forEach((msg, i) => {
+            setTimeout(() => {
+              msg.classList.add('show');
+            }, i * 600);
+          });
+          // Show typing after last message
+          setTimeout(() => {
+            if (typingIndicator) {
+              typingIndicator.style.display = 'flex';
+              typingIndicator.classList.add('show');
+            }
+          }, chatMessages.length * 600 + 400);
+          chatObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.3 });
+
+    if (chatSection) chatObserver.observe(chatSection);
+
+    // --- Hero particles ---
+    (function createParticles() {
+      const container = document.getElementById('heroParticles');
+      if (!container) return;
+      const count = 12;
+      const colors = [
+        'oklch(0.80 0.08 55 / 0.25)',
+        'oklch(0.75 0.06 40 / 0.2)',
+        'oklch(0.70 0.05 300 / 0.15)',
+        'oklch(0.78 0.06 155 / 0.18)',
+      ];
+      for (let i = 0; i < count; i++) {
+        const p = document.createElement('div');
+        p.className = 'hero-particle';
+        const size = 3 + Math.random() * 5;
+        p.style.cssText = `
+          width: ${size}px; height: ${size}px;
+          left: ${10 + Math.random() * 80}%;
+          bottom: ${Math.random() * 30}%;
+          background: ${colors[i % colors.length]};
+          animation-duration: ${12 + Math.random() * 18}s;
+          animation-delay: ${Math.random() * 10}s;
+        `;
+        container.appendChild(p);
+      }
+    })();
+
+    // --- City Skyline for dark section ---
+    (function createSkyline() {
+      const skyline = document.getElementById('darkSkyline');
+      if (!skyline) return;
+
+      const buildings = [
+        { left: '2%', width: '6%', height: '55px' },
+        { left: '9%', width: '4%', height: '75px' },
+        { left: '14%', width: '7%', height: '40px' },
+        { left: '22%', width: '5%', height: '90px' },
+        { left: '28%', width: '8%', height: '60px' },
+        { left: '37%', width: '4%', height: '105px' },
+        { left: '42%', width: '6%', height: '70px' },
+        { left: '49%', width: '5%', height: '85px' },
+        { left: '55%', width: '7%', height: '50px' },
+        { left: '63%', width: '4%', height: '95px' },
+        { left: '68%', width: '6%', height: '65px' },
+        { left: '75%', width: '5%', height: '80px' },
+        { left: '81%', width: '7%', height: '45px' },
+        { left: '89%', width: '4%', height: '70px' },
+        { left: '94%', width: '5%', height: '55px' },
+      ];
+
+      buildings.forEach(b => {
+        const el = document.createElement('div');
+        el.className = 'dark-skyline-building';
+        el.style.cssText = `left:${b.left}; width:${b.width}; height:${b.height};`;
+        skyline.appendChild(el);
+
+        // Add windows
+        const bWidth = parseFloat(b.width);
+        const bHeight = parseFloat(b.height);
+        const windowCount = Math.floor(bHeight / 18) * Math.max(1, Math.floor(bWidth / 3));
+        for (let i = 0; i < windowCount; i++) {
+          const w = document.createElement('div');
+          w.className = 'dark-window';
+          w.style.cssText = `
+            left: ${15 + Math.random() * 65}%;
+            bottom: ${12 + Math.random() * 70}%;
+            animation-delay: ${Math.random() * 8}s;
+            opacity: ${Math.random() > 0.4 ? (0.2 + Math.random() * 0.5) : 0};
+          `;
+          el.appendChild(w);
+        }
+      });
+    })();
+
+    // --- Breathing Exercise ---
+    (function initBreathing() {
+      const wrap = document.getElementById('breathingWrap');
+      const circle = document.getElementById('breathingCircle');
+      const textMain = document.getElementById('breathingText');
+      const textSub = document.getElementById('breathingPhase');
+      const prompt = document.getElementById('breathingPrompt');
+      const btn = document.getElementById('breathingBtn');
+      const counter = document.getElementById('breathingCounter');
+      const progress = document.getElementById('breathingProgress');
+
+      if (!wrap || !circle || !btn) return;
+
+      let active = false;
+      let cycleCount = 0;
+      let timer = null;
+      const circumference = 2 * Math.PI * 134;
+
+      if (progress) {
+        progress.style.strokeDasharray = circumference;
+        progress.style.strokeDashoffset = circumference;
+      }
+
+      function startBreathing() {
+        if (active) {
+          stopBreathing();
+          return;
+        }
+        active = true;
+        cycleCount = 0;
+        wrap.classList.add('active');
+        btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg> 停止';
+        runCycle();
+      }
+
+      function stopBreathing() {
+        active = false;
+        wrap.classList.remove('active');
+        circle.className = 'breathing-circle';
+        textMain.textContent = '开始';
+        textSub.textContent = '';
+        prompt.textContent = '点击光球，跟着节奏呼吸';
+        counter.textContent = '';
+        btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg> 开始';
+        if (progress) progress.style.strokeDashoffset = circumference;
+        clearTimeout(timer);
+      }
+
+      function runCycle() {
+        if (!active) return;
+        cycleCount++;
+        counter.textContent = '第 ' + cycleCount + ' 轮';
+
+        // Inhale 4s
+        circle.className = 'breathing-circle inhale';
+        textMain.textContent = '吸';
+        textSub.textContent = 'INHALE';
+        prompt.textContent = '跟着这个节奏... 慢慢吸...';
+        animateProgress(0, 4000);
+
+        timer = setTimeout(() => {
+          if (!active) return;
+          // Hold 7s
+          circle.className = 'breathing-circle hold';
+          textMain.textContent = '停';
+          textSub.textContent = 'HOLD';
+          prompt.textContent = '屏住... 让空气在身体里停留...';
+          animateProgress(0.42, 7000);
+
+          timer = setTimeout(() => {
+            if (!active) return;
+            // Exhale 8s
+            circle.className = 'breathing-circle exhale';
+            textMain.textContent = '呼';
+            textSub.textContent = 'EXHALE';
+            prompt.textContent = '慢慢呼出来... 把紧张一起放掉...';
+            animateProgress(0.79, 8000);
+
+            timer = setTimeout(() => {
+              if (!active) return;
+              if (cycleCount < 3) {
+                runCycle();
+              } else {
+                prompt.textContent = '好一点了吗？想继续聊可以继续，想安静也没关系。';
+                textMain.textContent = '完成';
+                textSub.textContent = '';
+                setTimeout(() => { if (active) stopBreathing(); }, 3000);
+              }
+            }, 8000);
+          }, 7000);
+        }, 4000);
+      }
+
+      function animateProgress(startFraction, duration) {
+        if (!progress) return;
+        const totalCycleDuration = 19000;
+        const startOffset = circumference * (1 - startFraction);
+        const endFraction = startFraction + (duration / totalCycleDuration);
+        const endOffset = circumference * (1 - endFraction);
+        progress.style.transition = 'none';
+        progress.style.strokeDashoffset = startOffset;
+        requestAnimationFrame(() => {
+          progress.style.transition = 'stroke-dashoffset ' + duration + 'ms linear';
+          progress.style.strokeDashoffset = endOffset;
+        });
+      }
+
+      btn.addEventListener('click', startBreathing);
+      wrap.addEventListener('click', (e) => {
+        if (e.target === wrap || e.target.closest('.breathing-circle') || e.target.closest('.breathing-text')) {
+          startBreathing();
+        }
+      });
+    })();
+
+    // --- Tokens toggle ---
+    (function initTokens() {
+      const header = document.getElementById('tokensHeader');
+      const body = document.getElementById('tokensBody');
+      const toggle = document.getElementById('tokensToggle');
+      if (!header || !body) return;
+
+      function toggleTokens() {
+        const isOpen = body.classList.toggle('open');
+        if (toggle) toggle.classList.toggle('open', isOpen);
+        header.setAttribute('aria-expanded', isOpen);
+      }
+
+      header.addEventListener('click', toggleTokens);
+      header.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          toggleTokens();
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

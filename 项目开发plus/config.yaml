@@ -1,0 +1,19 @@
+config_version: 1
+
+# Claude Code CLI 配置
+claude:
+  cli_path: "claude"
+  model: "claude-opus-4-6"
+  effort: "high"          # 思考深度：low | medium | high
+  timeout: 600            # 单次 CLI 调用超时（秒）
+  max_retries: 2          # 验证失败后最大重试次数
+
+# 项目输出配置
+output:
+  base_dir: "./outputs"  # 产出物根目录
+
+# 服务端口
+server:
+  gateway_port: 8001
+  frontend_port: 3000
+  nginx_port: 2026

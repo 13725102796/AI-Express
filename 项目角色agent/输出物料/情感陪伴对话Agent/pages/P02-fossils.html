@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>留白 Liminal -- 化石层</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --color-primary: oklch(0.75 0.10 55);
+      --color-primary-hover: oklch(0.70 0.12 55);
+      --color-primary-active: oklch(0.65 0.13 55);
+      --color-primary-subtle: oklch(0.92 0.04 55);
+      --color-primary-faint: oklch(0.96 0.02 55);
+      --color-secondary: oklch(0.78 0.05 60);
+      --color-accent: oklch(0.65 0.14 40);
+      --color-lavender: oklch(0.68 0.08 300);
+      --color-sage: oklch(0.70 0.08 155);
+      --color-success: oklch(0.72 0.10 155);
+      --color-error: oklch(0.65 0.12 25);
+      --color-surface-0: oklch(0.98 0.008 55);
+      --color-surface-1: oklch(0.96 0.010 55);
+      --color-surface-2: oklch(0.93 0.012 55);
+      --color-surface-3: oklch(0.89 0.015 55);
+      --color-text-primary: oklch(0.25 0.025 55);
+      --color-text-secondary: oklch(0.50 0.020 55);
+      --color-text-tertiary: oklch(0.65 0.015 55);
+      --color-text-on-primary: oklch(0.98 0.005 55);
+      --color-border: oklch(0.88 0.012 55);
+      --color-border-focus: oklch(0.75 0.10 55);
+
+      --emotion-lonely: oklch(0.55 0.06 250);
+      --emotion-anxious: oklch(0.68 0.10 70);
+      --emotion-sad: oklch(0.58 0.06 280);
+      --emotion-calm: oklch(0.70 0.08 155);
+      --emotion-happy: oklch(0.75 0.12 80);
+      --emotion-confused: oklch(0.62 0.06 290);
+      --emotion-touched: oklch(0.68 0.10 25);
+      --emotion-angry: oklch(0.55 0.10 30);
+
+      --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+      --space-5: 20px; --space-6: 24px; --space-8: 32px; --space-10: 40px;
+      --space-12: 48px;
+
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-heading: 'Plus Jakarta Sans', system-ui, sans-serif;
+      --font-body: 'Figtree', system-ui, sans-serif;
+      --text-xs: 0.75rem; --text-sm: 0.875rem; --text-base: 1rem;
+      --text-lg: 1.125rem; --text-xl: 1.25rem; --text-2xl: 1.5rem;
+      --leading-normal: 1.5; --leading-relaxed: 1.7;
+
+      --shadow-sm: 0 1px 2px oklch(0.25 0.02 55 / 0.04), 0 1px 3px oklch(0.25 0.02 55 / 0.06);
+      --shadow-md: 0 2px 4px oklch(0.25 0.02 55 / 0.04), 0 4px 8px oklch(0.25 0.02 55 / 0.06), 0 8px 16px oklch(0.25 0.02 55 / 0.04);
+
+      --radius-sm: 6px; --radius-md: 8px; --radius-lg: 12px;
+      --radius-xl: 16px; --radius-2xl: 24px; --radius-full: 9999px;
+      --duration-fast: 200ms; --duration-normal: 300ms; --duration-slow: 500ms;
+      --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+      --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    [data-theme="dark"] {
+      --color-surface-0: oklch(0.18 0.020 40);
+      --color-surface-1: oklch(0.22 0.018 45);
+      --color-surface-2: oklch(0.26 0.016 50);
+      --color-surface-3: oklch(0.30 0.014 50);
+      --color-text-primary: oklch(0.90 0.010 55);
+      --color-text-secondary: oklch(0.70 0.012 55);
+      --color-text-tertiary: oklch(0.55 0.010 55);
+      --color-border: oklch(0.32 0.015 50);
+      --color-primary-subtle: oklch(0.30 0.06 55);
+      --color-primary-faint: oklch(0.24 0.04 55);
+      --emotion-lonely: oklch(0.45 0.05 250);
+      --emotion-sad: oklch(0.48 0.05 280);
+      --emotion-calm: oklch(0.55 0.06 155);
+      --emotion-happy: oklch(0.60 0.10 80);
+      --emotion-touched: oklch(0.55 0.08 25);
+      --emotion-confused: oklch(0.50 0.05 290);
+      --emotion-anxious: oklch(0.55 0.08 70);
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { font-size: 16px; }
+    body {
+      font-family: var(--font-body); color: var(--color-text-primary);
+      background: var(--color-surface-0); -webkit-font-smoothing: antialiased;
+      height: 100vh; height: 100dvh; overflow: hidden;
+      display: flex; flex-direction: column;
+    }
+
+    /* State Switcher */
+    .state-switcher {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+      background: oklch(0.95 0.005 55); border-bottom: 1px solid var(--color-border);
+      padding: var(--space-2) var(--space-4);
+      display: flex; gap: var(--space-2); flex-wrap: wrap; align-items: center;
+      font-size: var(--text-xs); font-family: var(--font-heading);
+    }
+    .state-switcher span { color: var(--color-text-tertiary); }
+    .state-btn {
+      padding: var(--space-1) var(--space-3); border-radius: var(--radius-full);
+      border: 1px solid var(--color-border); background: transparent;
+      color: var(--color-text-secondary); cursor: pointer;
+      font-size: var(--text-xs); font-family: var(--font-heading);
+      transition: all var(--duration-fast) var(--ease-out-quart);
+    }
+    .state-btn:hover { background: var(--color-primary-faint); }
+    .state-btn.active { background: var(--color-primary); color: var(--color-text-on-primary); border-color: var(--color-primary); }
+
+    /* Page Header */
+    .page-header {
+      position: fixed; top: 36px; left: 0; right: 0; z-index: 100;
+      padding: var(--space-4) var(--space-5) 0;
+      background: var(--color-surface-0);
+    }
+    [data-theme="dark"] .page-header { background: var(--color-surface-0); }
+    .page-title-row {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: var(--space-4);
+    }
+    .page-title {
+      font-family: var(--font-heading); font-size: var(--text-xl);
+      font-weight: 700;
+    }
+    .search-btn {
+      background: none; border: none; cursor: pointer; padding: var(--space-2);
+      color: var(--color-text-secondary); border-radius: var(--radius-md);
+      transition: all var(--duration-fast);
+    }
+    .search-btn:hover { color: var(--color-primary); background: var(--color-primary-faint); }
+    .search-btn svg { width: 20px; height: 20px; }
+
+    /* Sub Tabs */
+    .sub-tabs {
+      display: flex; gap: var(--space-1);
+      background: var(--color-surface-2); border-radius: var(--radius-full);
+      padding: var(--space-1);
+      margin-bottom: var(--space-4);
+    }
+    .sub-tab {
+      flex: 1; padding: var(--space-2) var(--space-3);
+      text-align: center; font-size: var(--text-sm);
+      font-family: var(--font-heading); font-weight: 500;
+      border-radius: var(--radius-full); cursor: pointer;
+      color: var(--color-text-secondary);
+      transition: all var(--duration-normal) var(--ease-out-quart);
+      border: none; background: transparent;
+    }
+    .sub-tab.active {
+      background: var(--color-surface-0); color: var(--color-text-primary);
+      box-shadow: var(--shadow-sm);
+    }
+    .sub-tab:hover:not(.active) { color: var(--color-text-primary); }
+
+    /* Search Panel */
+    .search-panel {
+      display: none; padding: 0 var(--space-5);
+      position: fixed; top: calc(36px + 100px); left: 0; right: 0; z-index: 99;
+      background: var(--color-surface-0);
+    }
+    .search-panel.visible { display: block; animation: slideDown 300ms var(--ease-out-expo); }
+    @keyframes slideDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+    .search-input {
+      width: 100%; padding: var(--space-3) var(--space-4);
+      font-family: var(--font-body); font-size: var(--text-sm);
+      color: var(--color-text-primary); background: var(--color-surface-1);
+      border: 1.5px solid var(--color-border); border-radius: var(--radius-full);
+      outline: none; margin-bottom: var(--space-3);
+    }
+    .search-input:focus { border-color: var(--color-border-focus); }
+    .filter-pills {
+      display: flex; gap: var(--space-2); flex-wrap: wrap;
+      padding-bottom: var(--space-3); border-bottom: 1px solid var(--color-border);
+      margin-bottom: var(--space-3);
+    }
+    .filter-pill {
+      padding: var(--space-1) var(--space-3); border-radius: var(--radius-full);
+      font-size: var(--text-xs); font-family: var(--font-heading);
+      border: 1px solid var(--color-border); background: transparent;
+      color: var(--color-text-secondary); cursor: pointer;
+      transition: all var(--duration-fast);
+    }
+    .filter-pill:hover { border-color: var(--color-primary); color: var(--color-primary); }
+    .filter-pill.active { background: var(--color-primary); color: var(--color-text-on-primary); border-color: var(--color-primary); }
+
+    /* Content Area */
+    .content-area {
+      flex: 1; overflow-y: auto;
+      padding: calc(36px + 110px) var(--space-5) calc(72px + env(safe-area-inset-bottom, 0px));
+    }
+
+    /* Fossil Card */
+    .fossil-card {
+      display: flex; gap: var(--space-4);
+      padding: var(--space-5);
+      background: var(--color-surface-1);
+      border-radius: var(--radius-xl);
+      margin-bottom: var(--space-4);
+      cursor: pointer;
+      transition: all var(--duration-normal) var(--ease-out-quart);
+      border-left: 4px solid;
+    }
+    .fossil-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .fossil-card-body { flex: 1; }
+    .fossil-card-time {
+      font-size: var(--text-xs); color: var(--color-text-tertiary);
+      font-family: var(--font-heading); margin-bottom: var(--space-2);
+    }
+    .fossil-card-inscription {
+      font-family: var(--font-display); font-size: var(--text-sm);
+      line-height: var(--leading-relaxed); color: var(--color-text-secondary);
+      font-style: italic; margin-bottom: var(--space-3);
+      display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .fossil-card-tags { display: flex; gap: var(--space-2); flex-wrap: wrap; }
+    .fossil-card-tag {
+      padding: 2px var(--space-2); border-radius: var(--radius-full);
+      font-size: 11px; font-family: var(--font-heading);
+    }
+
+    /* Landscape View */
+    .landscape-view { display: none; padding: var(--space-4) 0; }
+    .landscape-view.visible { display: block; }
+    .landscape-chart {
+      width: 100%; height: 200px; position: relative;
+      background: var(--color-surface-1); border-radius: var(--radius-xl);
+      overflow: hidden; margin-bottom: var(--space-6);
+    }
+    .landscape-svg { width: 100%; height: 100%; }
+    .landscape-dot {
+      cursor: pointer;
+      transition: all var(--duration-fast);
+    }
+    .landscape-dot:hover { filter: brightness(1.2); }
+    .landscape-insight {
+      padding: var(--space-5);
+      background: var(--color-surface-1); border-radius: var(--radius-xl);
+      font-size: var(--text-sm); line-height: var(--leading-relaxed);
+      color: var(--color-text-secondary);
+      border-left: 3px solid var(--color-primary);
+    }
+    .landscape-insight-title {
+      font-family: var(--font-heading); font-size: var(--text-xs);
+      font-weight: 600; color: var(--color-text-tertiary);
+      margin-bottom: var(--space-3); text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    /* Echo Letter */
+    .letter-section { margin-bottom: var(--space-6); }
+    .letter-section-title {
+      font-family: var(--font-heading); font-size: var(--text-sm);
+      font-weight: 600; color: var(--color-text-tertiary);
+      margin-bottom: var(--space-3);
+    }
+    .letter-card {
+      padding: var(--space-5);
+      background: var(--color-surface-1); border-radius: var(--radius-xl);
+      margin-bottom: var(--space-3); cursor: pointer;
+      transition: all var(--duration-normal) var(--ease-out-quart);
+      position: relative; overflow: hidden;
+    }
+    .letter-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .letter-card.pending { opacity: 0.85; }
+    .letter-card.pending::before {
+      content: ''; position: absolute; inset: 0;
+      background: repeating-linear-gradient(45deg, transparent, transparent 10px, oklch(0.75 0.10 55 / 0.03) 10px, oklch(0.75 0.10 55 / 0.03) 20px);
+    }
+    .letter-date {
+      font-size: var(--text-xs); color: var(--color-text-tertiary);
+      font-family: var(--font-heading); margin-bottom: var(--space-2);
+    }
+    .letter-countdown {
+      font-size: var(--text-sm); color: var(--color-primary);
+      font-family: var(--font-heading); font-weight: 500;
+      margin-bottom: var(--space-2);
+    }
+    .letter-context {
+      font-size: var(--text-sm); color: var(--color-text-secondary);
+      line-height: var(--leading-relaxed);
+    }
+    .letter-content {
+      font-family: var(--font-display); font-size: var(--text-sm);
+      font-style: italic; line-height: var(--leading-relaxed);
+      color: var(--color-text-secondary); margin-top: var(--space-3);
+      padding-top: var(--space-3); border-top: 1px solid var(--color-border);
+    }
+
+    /* History conversation list */
+    .history-group { margin-bottom: var(--space-6); }
+    .history-date {
+      font-size: var(--text-xs); color: var(--color-text-tertiary);
+      font-family: var(--font-heading); font-weight: 600;
+      margin-bottom: var(--space-3); text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .history-item {
+      padding: var(--space-4) var(--space-5);
+      background: var(--color-surface-1); border-radius: var(--radius-lg);
+      margin-bottom: var(--space-3); cursor: pointer;
+      transition: all var(--duration-fast) var(--ease-out-quart);
+    }
+    .history-item:hover { background: var(--color-surface-2); }
+    .history-preview {
+      font-size: var(--text-sm); color: var(--color-text-primary);
+      margin-bottom: var(--space-2);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .history-meta {
+      display: flex; gap: var(--space-2); align-items: center;
+    }
+    .history-tag {
+      padding: 1px var(--space-2); border-radius: var(--radius-full);
+      font-size: 10px; font-family: var(--font-heading);
+    }
+    .history-count {
+      font-size: var(--text-xs); color: var(--color-text-tertiary);
+      margin-left: auto;
+    }
+
+    /* Empty State */
+    .empty-state {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; text-align: center;
+      padding: var(--space-16) var(--space-8); color: var(--color-text-tertiary);
+    }
+    .empty-state svg { width: 80px; height: 80px; margin-bottom: var(--space-6); opacity: 0.3; }
+    .empty-state p { font-size: var(--text-sm); max-width: 240px; line-height: var(--leading-relaxed); }
+
+    /* FAB */
+    .fab {
+      position: fixed; bottom: calc(72px + env(safe-area-inset-bottom, 0px) + var(--space-4));
+      right: var(--space-5); z-index: 50;
+      display: flex; align-items: center; gap: var(--space-2);
+      padding: var(--space-3) var(--space-5);
+      background: var(--color-primary); color: var(--color-text-on-primary);
+      border: none; border-radius: var(--radius-full);
+      font-size: var(--text-sm); font-family: var(--font-heading); font-weight: 500;
+      cursor: pointer; box-shadow: var(--shadow-md);
+      transition: all var(--duration-normal) var(--ease-out-quart);
+    }
+    .fab:hover { background: var(--color-primary-hover); transform: translateY(-2px); box-shadow: 0 8px 24px oklch(0.75 0.10 55 / 0.3); }
+    .fab svg { width: 18px; height: 18px; }
+
+    /* Bottom Nav */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 90;
+      padding: var(--space-2) 0 calc(var(--space-2) + env(safe-area-inset-bottom, 0px));
+      background: oklch(0.98 0.008 55 / 0.9);
+      backdrop-filter: blur(20px); border-top: 1px solid oklch(0.88 0.012 55 / 0.5);
+    }
+    [data-theme="dark"] .bottom-nav { background: oklch(0.18 0.020 40 / 0.9); border-top-color: oklch(0.32 0.015 50 / 0.5); }
+    .nav-items { display: flex; justify-content: space-around; }
+    .nav-item {
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+      padding: var(--space-2) var(--space-4);
+      color: var(--color-text-tertiary); cursor: pointer;
+      font-size: var(--text-xs); font-family: var(--font-heading);
+      transition: color var(--duration-fast);
+    }
+    .nav-item.active { color: var(--color-primary); }
+    .nav-item svg { width: 22px; height: 22px; }
+
+    @media (max-width: 375px) {
+      .sub-tab { font-size: var(--text-xs); padding: var(--space-2); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="state-switcher">
+    <span>P02 Fossils</span>
+    <button class="state-btn active" onclick="showTab('fossils')">Fossils</button>
+    <button class="state-btn" onclick="showTab('landscape')">Landscape</button>
+    <button class="state-btn" onclick="showTab('letters')">Echo Letters</button>
+    <button class="state-btn" onclick="showTab('history')">History</button>
+    <button class="state-btn" onclick="showTab('empty')">Empty</button>
+    <button class="state-btn" onclick="showTab('search')">Search</button>
+    <button class="state-btn" onclick="toggleDark()">Dark</button>
+  </div>
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="page-title-row">
+      <div class="page-title">化石层</div>
+      <button class="search-btn" onclick="toggleSearch()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      </button>
+    </div>
+    <div class="sub-tabs">
+      <button class="sub-tab active" data-tab="fossils" onclick="switchTab(this)">化石流</button>
+      <button class="sub-tab" data-tab="landscape" onclick="switchTab(this)">地貌</button>
+      <button class="sub-tab" data-tab="letters" onclick="switchTab(this)">回声信</button>
+      <button class="sub-tab" data-tab="history" onclick="switchTab(this)">回忆</button>
+    </div>
+  </div>
+
+  <!-- Search Panel -->
+  <div class="search-panel" id="searchPanel">
+    <input class="search-input" placeholder="搜索关键词..." oninput="handleSearch(this.value)">
+    <div class="filter-pills">
+      <button class="filter-pill active">全部</button>
+      <button class="filter-pill" onclick="this.classList.toggle('active')">委屈</button>
+      <button class="filter-pill" onclick="this.classList.toggle('active')">焦虑</button>
+      <button class="filter-pill" onclick="this.classList.toggle('active')">孤独</button>
+      <button class="filter-pill" onclick="this.classList.toggle('active')">平静</button>
+      <button class="filter-pill" onclick="this.classList.toggle('active')">开心</button>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="content-area" id="contentArea"></div>
+
+  <!-- FAB -->
+  <button class="fab" id="fab" onclick="alert('Open write letter panel')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg>
+    写一封信
+  </button>
+
+  <!-- Bottom Nav -->
+  <div class="bottom-nav">
+    <div class="nav-items">
+      <a class="nav-item" href="P01-chat.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        对话
+      </a>
+      <a class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        化石层
+      </a>
+      <a class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        回忆
+      </a>
+      <a class="nav-item" href="P05-settings.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        我的
+      </a>
+    </div>
+  </div>
+
+  <script>
+    const fossils = [
+      { time: "周三深夜", inscription: "这次是关于「被看见」——你在等一个认可，但那个人可能不知道你在等。不过至少今晚，这份委屈被说出来了。", tags: ["委屈", "不甘", "一点释然"], emotion: "sad", color: "var(--emotion-sad)" },
+      { time: "周二凌晨", inscription: "深夜的焦虑像涨潮的海水——不知道从哪来，但真实地漫过脚踝。你说了句「万一都白费了」，但其实你从没真的放弃过。", tags: ["焦虑", "不安"], emotion: "anxious", color: "var(--emotion-anxious)" },
+      { time: "上周日晚上", inscription: "今天的你像一杯终于停止冒泡的汽水——安静下来的那一刻，反而觉得自在。周末就应该什么都不想。", tags: ["平静", "放松"], emotion: "calm", color: "var(--emotion-calm)" },
+      { time: "上周五傍晚", inscription: "下班路上那段空白时间，你说「不知道在等什么」。也许你不是在等什么人，而是在等自己回过神来。", tags: ["倦怠", "迷茫"], emotion: "confused", color: "var(--emotion-confused)" },
+      { time: "上周三深夜", inscription: "你说「好像只有我在意这些」——但在意本身不是弱点。它只是证明你还在认真地活着，虽然这样真的很累。", tags: ["孤独", "被忽视"], emotion: "lonely", color: "var(--emotion-lonely)" },
+      { time: "上周一中午", inscription: "方案过了的时候你没有特别开心，反而松了一口气。你已经太习惯把成功当「终于没出错」来感受了。", tags: ["释然", "一点骄傲"], emotion: "happy", color: "var(--emotion-happy)" },
+      { time: "两周前周五晚", inscription: "和朋友吃完饭回家的路上，你说「开心完了更空虚」。热闹结束后的安静，总是让人措手不及。", tags: ["空虚", "落差感"], emotion: "lonely", color: "var(--emotion-lonely)" },
+      { time: "两周前周二深夜", inscription: "你对着糯米说了十分钟的话。它可能没听懂，但你说完之后觉得好多了。有时候表达本身就是疗愈，不需要对方真的理解。", tags: ["温暖", "自我安慰"], emotion: "touched", color: "var(--emotion-touched)" }
+    ];
+
+    const emotionBgMap = {
+      sad: "oklch(0.58 0.06 280 / 0.12)", anxious: "oklch(0.68 0.10 70 / 0.12)",
+      calm: "oklch(0.70 0.08 155 / 0.12)", confused: "oklch(0.62 0.06 290 / 0.12)",
+      lonely: "oklch(0.55 0.06 250 / 0.12)", happy: "oklch(0.75 0.12 80 / 0.12)",
+      touched: "oklch(0.68 0.10 25 / 0.12)"
+    };
+
+    function renderFossils() {
+      let html = '';
+      fossils.forEach(f => {
+        const tags = f.tags.map(t => `<span class="fossil-card-tag" style="background:${emotionBgMap[f.emotion]};color:${f.color}">${t}</span>`).join('');
+        html += `<div class="fossil-card" style="border-color:${f.color}" onclick="alert('Open fossil detail')">
+          <div class="fossil-card-body">
+            <div class="fossil-card-time">${f.time}</div>
+            <div class="fossil-card-inscription">${f.inscription}</div>
+            <div class="fossil-card-tags">${tags}</div>
+          </div>
+        </div>`;
+      });
+      return html;
+    }
+
+    function renderLandscape() {
+      // Simple SVG landscape visualization
+      const points = [
+        { x: 30, y: 140, r: 8, color: "var(--emotion-touched)" },
+        { x: 80, y: 100, r: 6, color: "var(--emotion-lonely)" },
+        { x: 140, y: 70, r: 9, color: "var(--emotion-happy)" },
+        { x: 200, y: 110, r: 7, color: "var(--emotion-lonely)" },
+        { x: 260, y: 60, r: 8, color: "var(--emotion-confused)" },
+        { x: 310, y: 80, r: 6, color: "var(--emotion-calm)" },
+        { x: 360, y: 50, r: 9, color: "var(--emotion-anxious)" },
+        { x: 420, y: 40, r: 8, color: "var(--emotion-sad)" }
+      ];
+      const pathD = "M 0,180 " + points.map(p => `L ${p.x},${p.y}`).join(' ') + " L 450,180 Z";
+      let dotsHtml = points.map(p =>
+        `<circle class="landscape-dot" cx="${p.x}" cy="${p.y}" r="${p.r}" fill="${p.color}" opacity="0.8" onclick="alert('Fossil detail')">
+          <animate attributeName="r" values="${p.r};${p.r+3};${p.r}" dur="3s" repeatCount="indefinite"/>
+        </circle>`
+      ).join('');
+
+      return `<div class="landscape-view visible">
+        <div class="landscape-chart">
+          <svg class="landscape-svg" viewBox="0 0 450 200" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="oklch(0.75 0.10 55)" stop-opacity="0.3"/>
+                <stop offset="100%" stop-color="oklch(0.75 0.10 55)" stop-opacity="0.02"/>
+              </linearGradient>
+            </defs>
+            <path d="${pathD}" fill="url(#areaGrad)"/>
+            <polyline points="${points.map(p=>p.x+','+p.y).join(' ')}" fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round"/>
+            ${dotsHtml}
+          </svg>
+        </div>
+        <div class="landscape-insight">
+          <div class="landscape-insight-title">地貌洞察</div>
+          这两周你的情绪像一条波浪线——工作日攒的疲惫在深夜涌出来，但周末会慢慢回升。你好像正在学会一种节奏：白天撑住，晚上放手。这不是软弱，是你自己的方式。
+        </div>
+      </div>`;
+    }
+
+    function renderLetters() {
+      return `<div class="letter-section">
+        <div class="letter-section-title">待开启</div>
+        <div class="letter-card pending" onclick="alert('Cannot open yet')">
+          <div class="letter-date">上周三深夜写下</div>
+          <div class="letter-countdown">还有 23 天 3 小时</div>
+          <div class="letter-context">写于一个被忽视的深夜。你说好像只有自己在意那些小事。</div>
+        </div>
+        <div class="letter-card pending" onclick="alert('Cannot open yet')">
+          <div class="letter-date">三周前周二晚写下</div>
+          <div class="letter-countdown">还有 7 天</div>
+          <div class="letter-context">写于一个加班到很晚的夜晚。你刚和leader起了争执。</div>
+        </div>
+      </div>
+      <div class="letter-section">
+        <div class="letter-section-title">已开启</div>
+        <div class="letter-card" onclick="alert('View letter')">
+          <div class="letter-date">情人节晚上写下</div>
+          <div class="letter-context">写于一个独自度过的情人节。朋友圈都在秀恩爱。</div>
+          <div class="letter-content">给一个月后的阿栗：今天一个人也没什么不好。但如果你看到这封信的时候不再觉得一个人有什么不好了，那就太好了。</div>
+        </div>
+      </div>`;
+    }
+
+    function renderHistory() {
+      const convs = [
+        { date: "昨天", items: [
+          { preview: "今天也没怎么样，就是莫名其妙的不开心...", tags: [{t:"委屈",e:"sad"},{t:"不甘",e:"sad"}], count: 11 }
+        ]},
+        { date: "本周", items: [
+          { preview: "万一都是白费的怎么办...", tags: [{t:"焦虑",e:"anxious"}], count: 14 }
+        ]},
+        { date: "上周", items: [
+          { preview: "今天什么都不想做，就窝在家里...", tags: [{t:"平静",e:"calm"}], count: 8 },
+          { preview: "下班了但不想回家...", tags: [{t:"倦怠",e:"confused"}], count: 9 },
+          { preview: "好像只有我在意这些...", tags: [{t:"孤独",e:"lonely"}], count: 12 },
+          { preview: "方案终于过了...", tags: [{t:"释然",e:"calm"}], count: 6 }
+        ]}
+      ];
+      let html = '';
+      convs.forEach(g => {
+        html += `<div class="history-group"><div class="history-date">${g.date}</div>`;
+        g.items.forEach(item => {
+          const tags = item.tags.map(t =>
+            `<span class="history-tag" style="background:${emotionBgMap[t.e]};color:var(--emotion-${t.e})">${t.t}</span>`
+          ).join('');
+          html += `<div class="history-item" onclick="alert('View conversation')">
+            <div class="history-preview">${item.preview}</div>
+            <div class="history-meta">${tags}<span class="history-count">${item.count} 条</span></div>
+          </div>`;
+        });
+        html += '</div>';
+      });
+      return html;
+    }
+
+    function showTab(tab) {
+      document.querySelectorAll('.state-btn').forEach(b => b.classList.remove('active'));
+      if (event && event.target) event.target.classList.add('active');
+
+      const content = document.getElementById('contentArea');
+      const fab = document.getElementById('fab');
+      const searchPanel = document.getElementById('searchPanel');
+      searchPanel.classList.remove('visible');
+
+      // Update sub-tabs
+      document.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
+
+      switch(tab) {
+        case 'fossils':
+          document.querySelector('[data-tab="fossils"]').classList.add('active');
+          content.innerHTML = renderFossils();
+          fab.style.display = 'flex';
+          break;
+        case 'landscape':
+          document.querySelector('[data-tab="landscape"]').classList.add('active');
+          content.innerHTML = renderLandscape();
+          fab.style.display = 'none';
+          break;
+        case 'letters':
+          document.querySelector('[data-tab="letters"]').classList.add('active');
+          content.innerHTML = renderLetters();
+          fab.style.display = 'flex';
+          break;
+        case 'history':
+          document.querySelector('[data-tab="history"]').classList.add('active');
+          content.innerHTML = renderHistory();
+          fab.style.display = 'none';
+          break;
+        case 'empty':
+          document.querySelector('[data-tab="fossils"]').classList.add('active');
+          content.innerHTML = `<div class="empty-state">
+            <svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1">
+              <rect x="10" y="20" width="60" height="45" rx="8" opacity="0.3"/>
+              <path d="M25 35h30M25 45h20" opacity="0.2" stroke-width="2"/>
+              <circle cx="40" cy="15" r="5" opacity="0.2"/>
+            </svg>
+            <p>每一次深度对话都会留下一块情绪化石。<br>去和留白聊聊天吧。</p>
+          </div>`;
+          fab.style.display = 'none';
+          break;
+        case 'search':
+          document.querySelector('[data-tab="fossils"]').classList.add('active');
+          searchPanel.classList.add('visible');
+          content.innerHTML = renderFossils();
+          fab.style.display = 'none';
+          break;
+      }
+    }
+
+    function switchTab(el) {
+      showTab(el.dataset.tab);
+    }
+
+    function toggleSearch() {
+      document.getElementById('searchPanel').classList.toggle('visible');
+    }
+
+    function handleSearch(val) {
+      // Simple filter simulation
+      const content = document.getElementById('contentArea');
+      if (!val) { content.innerHTML = renderFossils(); return; }
+      const filtered = fossils.filter(f =>
+        f.inscription.includes(val) || f.tags.some(t => t.includes(val))
+      );
+      if (filtered.length === 0) {
+        content.innerHTML = '<div class="empty-state"><p>没有找到相关的化石</p></div>';
+      } else {
+        let html = '';
+        filtered.forEach(f => {
+          const tags = f.tags.map(t => `<span class="fossil-card-tag" style="background:${emotionBgMap[f.emotion]};color:${f.color}">${t}</span>`).join('');
+          html += `<div class="fossil-card" style="border-color:${f.color}">
+            <div class="fossil-card-body">
+              <div class="fossil-card-time">${f.time}</div>
+              <div class="fossil-card-inscription">${f.inscription}</div>
+              <div class="fossil-card-tags">${tags}</div>
+            </div>
+          </div>`;
+        });
+        content.innerHTML = html;
+      }
+    }
+
+    function toggleDark() {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+    }
+
+    // Init
+    showTab('fossils');
+  </script>
+</body>
+</html>

@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>留白 Liminal -- 对话</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ===== DESIGN TOKENS ===== */
+    :root {
+      --color-primary: oklch(0.75 0.10 55);
+      --color-primary-hover: oklch(0.70 0.12 55);
+      --color-primary-active: oklch(0.65 0.13 55);
+      --color-primary-subtle: oklch(0.92 0.04 55);
+      --color-primary-faint: oklch(0.96 0.02 55);
+      --color-secondary: oklch(0.78 0.05 60);
+      --color-accent: oklch(0.65 0.14 40);
+      --color-accent-subtle: oklch(0.90 0.05 40);
+      --color-lavender: oklch(0.68 0.08 300);
+      --color-sage: oklch(0.70 0.08 155);
+      --color-success: oklch(0.72 0.10 155);
+      --color-error: oklch(0.65 0.12 25);
+      --color-error-subtle: oklch(0.92 0.05 25);
+
+      --color-surface-0: oklch(0.98 0.008 55);
+      --color-surface-1: oklch(0.96 0.010 55);
+      --color-surface-2: oklch(0.93 0.012 55);
+      --color-surface-3: oklch(0.89 0.015 55);
+      --color-text-primary: oklch(0.25 0.025 55);
+      --color-text-secondary: oklch(0.50 0.020 55);
+      --color-text-tertiary: oklch(0.65 0.015 55);
+      --color-text-on-primary: oklch(0.98 0.005 55);
+      --color-text-on-dark: oklch(0.92 0.010 55);
+      --color-border: oklch(0.88 0.012 55);
+      --color-border-focus: oklch(0.75 0.10 55);
+
+      --emotion-lonely: oklch(0.55 0.06 250);
+      --emotion-anxious: oklch(0.68 0.10 70);
+      --emotion-sad: oklch(0.58 0.06 280);
+      --emotion-angry: oklch(0.55 0.10 30);
+      --emotion-calm: oklch(0.70 0.08 155);
+      --emotion-happy: oklch(0.75 0.12 80);
+      --emotion-confused: oklch(0.62 0.06 290);
+      --emotion-touched: oklch(0.68 0.10 25);
+
+      --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+      --space-5: 20px; --space-6: 24px; --space-8: 32px; --space-10: 40px;
+      --space-12: 48px; --space-16: 64px;
+
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-heading: 'Plus Jakarta Sans', system-ui, sans-serif;
+      --font-body: 'Figtree', system-ui, sans-serif;
+      --text-xs: 0.75rem; --text-sm: 0.875rem; --text-base: 1rem;
+      --text-lg: 1.125rem; --text-xl: 1.25rem; --text-2xl: 1.5rem;
+      --leading-tight: 1.15; --leading-snug: 1.3; --leading-normal: 1.5; --leading-relaxed: 1.7;
+
+      --shadow-sm: 0 1px 2px oklch(0.25 0.02 55 / 0.04), 0 1px 3px oklch(0.25 0.02 55 / 0.06);
+      --shadow-md: 0 2px 4px oklch(0.25 0.02 55 / 0.04), 0 4px 8px oklch(0.25 0.02 55 / 0.06), 0 8px 16px oklch(0.25 0.02 55 / 0.04);
+
+      --radius-sm: 6px; --radius-md: 8px; --radius-lg: 12px;
+      --radius-xl: 16px; --radius-2xl: 24px; --radius-full: 9999px;
+
+      --duration-fast: 200ms; --duration-normal: 300ms; --duration-slow: 500ms;
+      --duration-entrance: 700ms; --duration-dramatic: 1000ms;
+      --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+      --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-in-out-sine: cubic-bezier(0.37, 0, 0.63, 1);
+
+      /* Bubble colors */
+      --bubble-user: oklch(0.75 0.10 55 / 0.15);
+      --bubble-ai: oklch(0.78 0.05 60);
+    }
+
+    [data-theme="dark"] {
+      --color-surface-0: oklch(0.18 0.020 40);
+      --color-surface-1: oklch(0.22 0.018 45);
+      --color-surface-2: oklch(0.26 0.016 50);
+      --color-surface-3: oklch(0.30 0.014 50);
+      --color-text-primary: oklch(0.90 0.010 55);
+      --color-text-secondary: oklch(0.70 0.012 55);
+      --color-text-tertiary: oklch(0.55 0.010 55);
+      --color-border: oklch(0.32 0.015 50);
+      --color-border-focus: oklch(0.65 0.10 55);
+      --color-primary-subtle: oklch(0.30 0.06 55);
+      --color-primary-faint: oklch(0.24 0.04 55);
+      --bubble-user: oklch(0.35 0.06 55);
+      --bubble-ai: oklch(0.28 0.025 50);
+      --emotion-lonely: oklch(0.45 0.05 250);
+      --emotion-sad: oklch(0.48 0.05 280);
+      --emotion-anxious: oklch(0.55 0.08 70);
+      --emotion-calm: oklch(0.55 0.06 155);
+      --emotion-happy: oklch(0.60 0.10 80);
+      --emotion-touched: oklch(0.55 0.08 25);
+      --emotion-confused: oklch(0.50 0.05 290);
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { font-size: 16px; }
+    body {
+      font-family: var(--font-body); color: var(--color-text-primary);
+      background: var(--color-surface-0); -webkit-font-smoothing: antialiased;
+      height: 100vh; height: 100dvh; overflow: hidden;
+      display: flex; flex-direction: column;
+    }
+
+    /* State Switcher */
+    .state-switcher {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+      background: oklch(0.95 0.005 55); border-bottom: 1px solid var(--color-border);
+      padding: var(--space-2) var(--space-4);
+      display: flex; gap: var(--space-2); flex-wrap: wrap; align-items: center;
+      font-size: var(--text-xs); font-family: var(--font-heading);
+    }
+    .state-switcher span { color: var(--color-text-tertiary); margin-right: var(--space-2); }
+    .state-btn {
+      padding: var(--space-1) var(--space-3); border-radius: var(--radius-full);
+      border: 1px solid var(--color-border); background: transparent;
+      color: var(--color-text-secondary); cursor: pointer;
+      font-size: var(--text-xs); font-family: var(--font-heading);
+      transition: all var(--duration-fast) var(--ease-out-quart);
+    }
+    .state-btn:hover { background: var(--color-primary-faint); }
+    .state-btn.active { background: var(--color-primary); color: var(--color-text-on-primary); border-color: var(--color-primary); }
+
+    /* ===== HEADER ===== */
+    .chat-header {
+      position: fixed; top: 36px; left: 0; right: 0; z-index: 100;
+      height: 56px; display: flex; align-items: center; justify-content: space-between;
+      padding: 0 var(--space-5);
+      background: oklch(0.98 0.008 55 / 0.85);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid oklch(0.88 0.012 55 / 0.5);
+    }
+    [data-theme="dark"] .chat-header {
+      background: oklch(0.18 0.020 40 / 0.85);
+      border-bottom-color: oklch(0.32 0.015 50 / 0.5);
+    }
+    .header-left { display: flex; align-items: center; gap: var(--space-3); }
+    .header-logo {
+      font-family: var(--font-display); font-size: var(--text-lg);
+      font-weight: 500; letter-spacing: 0.05em;
+    }
+    .ai-status {
+      display: flex; align-items: center; gap: var(--space-2);
+      font-size: var(--text-xs); color: var(--color-text-tertiary);
+    }
+    .status-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--color-success);
+      animation: breathe 3s var(--ease-in-out-sine) infinite;
+    }
+    @keyframes breathe {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+    .status-dot.thinking { background: var(--color-primary); animation: pulse 1.2s var(--ease-in-out-sine) infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+    .header-right { display: flex; align-items: center; gap: var(--space-4); }
+    .header-btn {
+      background: none; border: none; cursor: pointer; padding: var(--space-2);
+      color: var(--color-text-secondary); font-size: var(--text-sm);
+      font-family: var(--font-body); border-radius: var(--radius-md);
+      transition: all var(--duration-fast) var(--ease-out-quart);
+    }
+    .header-btn:hover { color: var(--color-primary); background: var(--color-primary-faint); }
+    .header-icon-btn {
+      background: none; border: none; cursor: pointer; padding: var(--space-2);
+      color: var(--color-text-secondary); border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      transition: all var(--duration-fast) var(--ease-out-quart);
+    }
+    .header-icon-btn:hover { color: var(--color-primary); background: var(--color-primary-faint); }
+    .header-icon-btn svg { width: 20px; height: 20px; }
+
+    /* ===== MESSAGES ===== */
+    .chat-messages {
+      flex: 1; overflow-y: auto; overflow-x: hidden;
+      padding: calc(36px + 56px + var(--space-4)) var(--space-5) calc(80px + var(--space-4));
+      scroll-behavior: smooth;
+    }
+    .msg-group { margin-bottom: var(--space-6); }
+
+    /* Time separator */
+    .msg-time {
+      text-align: center; font-size: var(--text-xs);
+      color: var(--color-text-tertiary); margin: var(--space-8) 0 var(--space-6);
+      font-family: var(--font-heading); letter-spacing: 0.04em;
+    }
+
+    /* Message row */
+    .msg { display: flex; margin-bottom: var(--space-4); animation: msgIn 400ms var(--ease-out-expo); }
+    .msg-user { justify-content: flex-end; }
+    .msg-ai { justify-content: flex-start; }
+    @keyframes msgIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Bubble */
+    .msg-bubble {
+      max-width: 80%; padding: var(--space-4) var(--space-5);
+      font-size: var(--text-base); line-height: var(--leading-relaxed);
+      word-break: break-word; white-space: pre-line;
+    }
+    .msg-user .msg-bubble {
+      background: var(--bubble-user); border-radius: var(--radius-xl) var(--radius-xl) var(--radius-sm) var(--radius-xl);
+      color: var(--color-text-primary);
+    }
+    .msg-ai .msg-bubble {
+      background: var(--bubble-ai); border-radius: var(--radius-xl) var(--radius-xl) var(--radius-xl) var(--radius-sm);
+      color: var(--color-text-primary);
+    }
+    [data-theme="dark"] .msg-ai .msg-bubble { color: var(--color-text-primary); }
+
+    /* Emotion tag */
+    .msg-emotion {
+      display: inline-flex; align-items: center; gap: var(--space-2);
+      margin-top: var(--space-2); padding: var(--space-1) var(--space-3);
+      font-size: var(--text-xs); color: var(--color-text-secondary);
+      background: var(--color-surface-1); border-radius: var(--radius-full);
+      font-family: var(--font-heading);
+      animation: fadeIn 400ms var(--ease-out-expo) 300ms both;
+    }
+    .emotion-dot { width: 6px; height: 6px; border-radius: 50%; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    /* Typing indicator */
+    .typing-indicator {
+      display: none; align-items: center; gap: var(--space-3);
+      padding: var(--space-4) var(--space-5);
+      font-size: var(--text-sm); color: var(--color-text-tertiary);
+    }
+    .typing-indicator.visible { display: flex; animation: fadeIn 300ms var(--ease-out-expo); }
+    .typing-dots { display: flex; gap: 4px; }
+    .typing-dots span {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--color-text-tertiary);
+      animation: dotBounce 1.4s var(--ease-in-out-sine) infinite;
+    }
+    .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes dotBounce {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+      30% { transform: translateY(-6px); opacity: 1; }
+    }
+
+    /* Safety card */
+    .safety-card {
+      display: none; margin: var(--space-4) 0;
+      padding: var(--space-5); background: var(--color-surface-1);
+      border-radius: var(--radius-xl); border-left: 3px solid var(--color-accent);
+    }
+    .safety-card.visible { display: block; animation: fadeIn 500ms var(--ease-out-expo); }
+    .safety-card h4 {
+      font-family: var(--font-heading); font-size: var(--text-sm);
+      font-weight: 600; color: var(--color-text-primary); margin-bottom: var(--space-3);
+    }
+    .safety-line {
+      display: flex; align-items: center; gap: var(--space-3);
+      padding: var(--space-2) 0; font-size: var(--text-sm);
+    }
+    .safety-line a {
+      color: var(--color-primary); text-decoration: none; font-weight: 500;
+    }
+    .safety-line a:hover { text-decoration: underline; }
+    .safety-note { font-size: var(--text-xs); color: var(--color-text-tertiary); margin-top: var(--space-3); }
+
+    /* ===== INPUT AREA ===== */
+    .chat-input-area {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+      padding: var(--space-3) var(--space-4) calc(var(--space-4) + env(safe-area-inset-bottom, 0px));
+      background: var(--color-surface-0);
+      border-top: 1px solid var(--color-border);
+    }
+    [data-theme="dark"] .chat-input-area { background: var(--color-surface-0); }
+
+    .input-row {
+      display: flex; align-items: flex-end; gap: var(--space-3);
+    }
+    .input-field-wrap {
+      flex: 1; position: relative;
+    }
+    .chat-textarea {
+      width: 100%; min-height: 44px; max-height: 120px;
+      padding: var(--space-3) var(--space-4);
+      font-family: var(--font-body); font-size: var(--text-base);
+      line-height: var(--leading-normal);
+      color: var(--color-text-primary);
+      background: var(--color-surface-1);
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      resize: none; outline: none;
+      transition: border-color var(--duration-fast) var(--ease-out-quart);
+    }
+    .chat-textarea:focus {
+      border-color: var(--color-border-focus);
+      box-shadow: 0 0 0 3px oklch(0.75 0.10 55 / 0.08);
+    }
+    .chat-textarea::placeholder { color: var(--color-text-tertiary); }
+
+    .char-limit-warn {
+      display: none; position: absolute; bottom: -20px; left: var(--space-4);
+      font-size: var(--text-xs); color: var(--color-error);
+    }
+    .char-limit-warn.visible { display: block; }
+
+    .input-btn {
+      width: 44px; height: 44px; border-radius: 50%;
+      border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all var(--duration-fast) var(--ease-out-quart);
+      flex-shrink: 0;
+    }
+    .mic-btn {
+      background: var(--color-surface-2); color: var(--color-text-secondary);
+    }
+    .mic-btn:hover { background: var(--color-surface-3); color: var(--color-text-primary); }
+    .mic-btn.recording {
+      background: var(--color-error-subtle); color: var(--color-error);
+      animation: pulse 1s var(--ease-in-out-sine) infinite;
+    }
+
+    .send-btn {
+      background: var(--color-primary); color: var(--color-text-on-primary);
+      opacity: 0; transform: scale(0.8); pointer-events: none;
+      transition: all var(--duration-normal) var(--ease-out-expo);
+    }
+    .send-btn.visible {
+      opacity: 1; transform: scale(1); pointer-events: auto;
+    }
+    .send-btn:hover { background: var(--color-primary-hover); transform: scale(1.05); }
+    .send-btn:active { background: var(--color-primary-active); transform: scale(0.95); }
+    .send-btn:disabled { opacity: 0.4; pointer-events: none; }
+    .send-btn svg, .mic-btn svg { width: 20px; height: 20px; }
+
+    /* Voice recording overlay */
+    .voice-overlay {
+      display: none; position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
+      padding: var(--space-8) var(--space-6) calc(var(--space-8) + env(safe-area-inset-bottom, 0px));
+      background: var(--color-surface-0); border-top: 1px solid var(--color-border);
+      text-align: center;
+    }
+    .voice-overlay.visible { display: block; animation: slideUp 300ms var(--ease-out-expo); }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .voice-wave {
+      display: flex; align-items: center; justify-content: center; gap: 3px;
+      height: 40px; margin-bottom: var(--space-4);
+    }
+    .voice-wave span {
+      width: 3px; border-radius: 2px; background: var(--color-primary);
+      animation: waveBar 0.8s var(--ease-in-out-sine) infinite;
+    }
+    .voice-wave span:nth-child(1) { height: 12px; animation-delay: 0s; }
+    .voice-wave span:nth-child(2) { height: 20px; animation-delay: 0.1s; }
+    .voice-wave span:nth-child(3) { height: 28px; animation-delay: 0.2s; }
+    .voice-wave span:nth-child(4) { height: 16px; animation-delay: 0.3s; }
+    .voice-wave span:nth-child(5) { height: 24px; animation-delay: 0.4s; }
+    .voice-wave span:nth-child(6) { height: 18px; animation-delay: 0.5s; }
+    .voice-wave span:nth-child(7) { height: 14px; animation-delay: 0.6s; }
+    @keyframes waveBar {
+      0%, 100% { transform: scaleY(1); }
+      50% { transform: scaleY(1.8); }
+    }
+    .voice-timer { font-size: var(--text-sm); color: var(--color-text-secondary); font-family: var(--font-heading); }
+    .voice-hint { font-size: var(--text-xs); color: var(--color-text-tertiary); margin-top: var(--space-2); }
+
+    /* ===== BREATHING OVERLAY ===== */
+    .breathing-overlay {
+      display: none; position: fixed; inset: 0; z-index: 500;
+      background: oklch(0.15 0.015 40 / 0.95);
+      flex-direction: column; align-items: center; justify-content: center;
+    }
+    .breathing-overlay.visible { display: flex; animation: fadeIn 500ms var(--ease-out-expo); }
+    .breathing-close {
+      position: absolute; top: var(--space-6); right: var(--space-6);
+      background: none; border: none; cursor: pointer;
+      color: oklch(0.60 0.010 55); padding: var(--space-3);
+      transition: color var(--duration-fast);
+    }
+    .breathing-close:hover { color: oklch(0.80 0.010 55); }
+    .breathing-close svg { width: 24px; height: 24px; }
+
+    .breathing-circle {
+      width: 180px; height: 180px; border-radius: 50%;
+      background: radial-gradient(circle, oklch(0.75 0.10 55 / 0.6) 0%, oklch(0.68 0.08 300 / 0.3) 60%, transparent 100%);
+      animation: breatheCircle 14s var(--ease-in-out-sine) infinite;
+      box-shadow: 0 0 60px oklch(0.75 0.10 55 / 0.2);
+    }
+    @keyframes breatheCircle {
+      0% { transform: scale(0.6); opacity: 0.5; }
+      28.6% { transform: scale(1); opacity: 1; }  /* inhale 4s */
+      57.1% { transform: scale(1); opacity: 0.9; } /* hold 4s */
+      100% { transform: scale(0.6); opacity: 0.5; } /* exhale 6s */
+    }
+
+    .breathing-text {
+      margin-top: var(--space-10);
+      font-family: var(--font-body); font-size: var(--text-xl);
+      color: oklch(0.80 0.010 55); letter-spacing: 0.1em;
+      animation: breatheText 14s var(--ease-in-out-sine) infinite;
+    }
+
+    .breathing-disclaimer {
+      position: absolute; bottom: var(--space-8);
+      font-size: var(--text-xs); color: oklch(0.40 0.010 55);
+      text-align: center; padding: 0 var(--space-6);
+    }
+
+    /* ===== FOSSIL PREVIEW ===== */
+    .fossil-preview {
+      display: none; position: fixed;
+      bottom: calc(80px + env(safe-area-inset-bottom, 0px) + var(--space-4));
+      left: var(--space-4); right: var(--space-4);
+      z-index: 90;
+      background: var(--color-surface-0); border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-md);
+      padding: var(--space-5); border-left: 4px solid;
+    }
+    .fossil-preview.visible {
+      display: block; animation: slideUp 500ms var(--ease-out-expo);
+    }
+    .fossil-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: var(--space-3);
+    }
+    .fossil-time { font-size: var(--text-xs); color: var(--color-text-tertiary); font-family: var(--font-heading); }
+    .fossil-close {
+      background: none; border: none; cursor: pointer;
+      color: var(--color-text-tertiary); padding: var(--space-1);
+    }
+    .fossil-close:hover { color: var(--color-text-primary); }
+    .fossil-inscription {
+      font-family: var(--font-display); font-size: var(--text-sm);
+      line-height: var(--leading-relaxed); color: var(--color-text-secondary);
+      font-style: italic; margin-bottom: var(--space-3);
+    }
+    .fossil-tags { display: flex; gap: var(--space-2); flex-wrap: wrap; margin-bottom: var(--space-3); }
+    .fossil-tag {
+      padding: var(--space-1) var(--space-3);
+      font-size: var(--text-xs); border-radius: var(--radius-full);
+      font-family: var(--font-heading);
+    }
+    .fossil-action {
+      font-size: var(--text-sm); color: var(--color-primary);
+      background: none; border: none; cursor: pointer;
+      font-family: var(--font-heading); font-weight: 500;
+      padding: 0; margin-top: var(--space-2);
+    }
+    .fossil-action:hover { text-decoration: underline; }
+
+    /* ===== BOTTOM NAV ===== */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
+      display: none; /* Hidden on chat page by default, shown via state switch */
+      padding: var(--space-2) 0 calc(var(--space-2) + env(safe-area-inset-bottom, 0px));
+      background: oklch(0.98 0.008 55 / 0.9);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid oklch(0.88 0.012 55 / 0.5);
+    }
+    [data-theme="dark"] .bottom-nav {
+      background: oklch(0.18 0.020 40 / 0.9);
+      border-top-color: oklch(0.32 0.015 50 / 0.5);
+    }
+    .nav-items { display: flex; justify-content: space-around; }
+    .nav-item {
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+      padding: var(--space-2) var(--space-4);
+      color: var(--color-text-tertiary); cursor: pointer;
+      font-size: var(--text-xs); font-family: var(--font-heading);
+      text-decoration: none;
+      transition: color var(--duration-fast);
+    }
+    .nav-item.active { color: var(--color-primary); }
+    .nav-item:hover { color: var(--color-primary); }
+    .nav-item svg { width: 22px; height: 22px; }
+
+    /* Error banner */
+    .error-banner {
+      display: none; align-items: center; justify-content: center; gap: var(--space-3);
+      padding: var(--space-3) var(--space-5);
+      background: var(--color-error-subtle); color: var(--color-error);
+      font-size: var(--text-sm); text-align: center;
+    }
+    .error-banner.visible { display: flex; animation: fadeIn 300ms var(--ease-out-expo); }
+    .error-banner button {
+      padding: var(--space-1) var(--space-3);
+      background: transparent; border: 1px solid var(--color-error);
+      color: var(--color-error); border-radius: var(--radius-full);
+      font-size: var(--text-xs); cursor: pointer;
+    }
+
+    /* New message indicator */
+    .new-msg-btn {
+      display: none; position: fixed;
+      bottom: calc(80px + env(safe-area-inset-bottom, 0px) + var(--space-2));
+      left: 50%; transform: translateX(-50%);
+      padding: var(--space-2) var(--space-4);
+      background: var(--color-primary); color: var(--color-text-on-primary);
+      border: none; border-radius: var(--radius-full);
+      font-size: var(--text-xs); font-family: var(--font-heading);
+      cursor: pointer; box-shadow: var(--shadow-md); z-index: 95;
+    }
+    .new-msg-btn.visible { display: block; animation: fadeIn 300ms var(--ease-out-expo); }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+      .breathing-circle { animation: none; transform: scale(0.8); }
+    }
+    @media (max-width: 375px) {
+      .chat-textarea { font-size: var(--text-base); }
+      .msg-bubble { max-width: 85%; }
+    }
+  </style>
+</head>
+<body>
+  <!-- State Switcher -->
+  <div class="state-switcher">
+    <span>P01 Chat</span>
+    <button class="state-btn active" onclick="showState('normal')">Normal</button>
+    <button class="state-btn" onclick="showState('empty')">Empty</button>
+    <button class="state-btn" onclick="showState('typing')">AI Typing</button>
+    <button class="state-btn" onclick="showState('voice')">Voice</button>
+    <button class="state-btn" onclick="showState('breathing')">Breathing</button>
+    <button class="state-btn" onclick="showState('safety')">Safety</button>
+    <button class="state-btn" onclick="showState('fossil')">Fossil</button>
+    <button class="state-btn" onclick="showState('error')">Error</button>
+    <button class="state-btn" onclick="toggleDark()">Dark</button>
+  </div>
+
+  <!-- Header -->
+  <div class="chat-header">
+    <div class="header-left">
+      <div class="header-logo">留白</div>
+      <div class="ai-status">
+        <div class="status-dot" id="statusDot"></div>
+        <span id="statusText">在的</span>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="header-btn" id="breathBtn" onclick="showBreathing()">我需要冷静一下</button>
+      <button class="header-icon-btn" onclick="toggleDark()">
+        <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="12" cy="12" r="5"/><path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Messages -->
+  <div class="chat-messages" id="chatMessages"></div>
+
+  <!-- Typing Indicator -->
+  <div class="typing-indicator" id="typingIndicator">
+    <span>留白在想</span>
+    <div class="typing-dots"><span></span><span></span><span></span></div>
+  </div>
+
+  <!-- Error Banner -->
+  <div class="error-banner" id="errorBanner">
+    网络有点不稳定，等一下再试
+    <button onclick="hideError()">重试</button>
+  </div>
+
+  <!-- Safety Card (inserted into messages) -->
+
+  <!-- Chat Input -->
+  <div class="chat-input-area" id="chatInputArea">
+    <div class="input-row">
+      <button class="input-btn mic-btn" id="micBtn" onclick="toggleVoice()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="9" y="1" width="6" height="12" rx="3"/><path d="M19 10v1a7 7 0 01-14 0v-1m7 8v4m-4 0h8"/>
+        </svg>
+      </button>
+      <div class="input-field-wrap">
+        <textarea class="chat-textarea" id="chatTextarea" rows="1"
+                  placeholder="想说点什么..." oninput="handleTextInput(this)"></textarea>
+        <div class="char-limit-warn" id="charWarn">消息太长了，分开说好不好，我不会走的</div>
+      </div>
+      <button class="input-btn send-btn" id="sendBtn" onclick="sendMessage()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Voice Recording Overlay -->
+  <div class="voice-overlay" id="voiceOverlay">
+    <div class="voice-wave">
+      <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+    </div>
+    <div class="voice-timer" id="voiceTimer">0:00</div>
+    <div class="voice-hint">松开结束录音</div>
+  </div>
+
+  <!-- Breathing Overlay -->
+  <div class="breathing-overlay" id="breathingOverlay">
+    <button class="breathing-close" onclick="hideBreathing()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/>
+      </svg>
+    </button>
+    <div class="breathing-circle"></div>
+    <div class="breathing-text" id="breathingText">吸...</div>
+    <div class="breathing-disclaimer">呼吸引导不替代专业心理咨询</div>
+  </div>
+
+  <!-- Fossil Preview -->
+  <div class="fossil-preview" id="fossilPreview" style="border-color: var(--emotion-sad);">
+    <div class="fossil-header">
+      <span class="fossil-time">周三深夜</span>
+      <button class="fossil-close" onclick="hideFossil()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+    <div class="fossil-inscription">这次是关于「被看见」——你在等一个认可，但那个人可能不知道你在等。不过至少今晚，这份委屈被说出来了。</div>
+    <div class="fossil-tags">
+      <span class="fossil-tag" style="background: oklch(0.58 0.06 280 / 0.15); color: var(--emotion-sad);">委屈</span>
+      <span class="fossil-tag" style="background: oklch(0.55 0.10 30 / 0.15); color: var(--emotion-angry);">不甘</span>
+      <span class="fossil-tag" style="background: oklch(0.70 0.08 155 / 0.15); color: var(--emotion-calm);">一点释然</span>
+    </div>
+    <button class="fossil-action">写一封回声信</button>
+  </div>
+
+  <!-- New Message Button -->
+  <button class="new-msg-btn" id="newMsgBtn" onclick="scrollToBottom()">有新消息</button>
+
+  <script>
+    // Mock data
+    const messages = [
+      { type: "time", content: "周三深夜" },
+      { type: "user", content: "今天也没怎么样，就是莫名其妙的不开心" },
+      { type: "ai", content: "嗯，有些日子就是这样——没有原因地沉着。不需要给这种感觉找理由的。", emotion: "疲惫", emotionColor: "var(--emotion-lonely)" },
+      { type: "user", content: "就感觉大家都有自己的生活，只有我一个人待在出租屋里，连猫都不理我" },
+      { type: "ai", content: "糯米也有它犯困的时候嘛。但你说的那种感觉我懂——不是真的在意猫理不理你，是那种「世界在转，我好像停着」的错觉。你今天在公司也是一个人扛着吧？", emotion: "孤独", emotionColor: "var(--emotion-lonely)" },
+      { type: "user", content: "嗯...下午被leader当着大家面说我的方案差点意思，其实我改了好几版了。但我什么也没说就笑着答应改了" },
+      { type: "ai", content: "笑着说「好的我改」，但心里可能在翻涌吧。你不是对那个方案不自信——你是委屈，因为你很努力但没人看见那个过程。改了好几版这件事，你自己知道就够了。", emotion: "委屈", emotionColor: "var(--emotion-sad)" },
+      { type: "user", content: "...你怎么知道的。就是这种感觉，我自己都说不清楚，但你说出来就是这样" },
+      { type: "ai", content: "因为你之前也提过类似的事。你不是一个不在意评价的人，但你习惯把在意的部分藏起来——用「没事」挡在外面，把委屈留给深夜。\n\n阿栗，被看见是一种需要，不是矫情。", emotion: "被理解", emotionColor: "var(--emotion-touched)" },
+      { type: "user", content: "谢谢你。突然觉得好一点了。其实也没什么大不了的事，就是攒了一天到晚上就绷不住了" },
+      { type: "ai", content: "没什么大不了的事堆在一起，就是很大的事了。你今天绷了一整天，现在能说出来，已经是在照顾自己了。\n\n早点休息好吗？糯米可能也在等你上床呢。明天的事明天再说。", emotion: "释然", emotionColor: "var(--emotion-calm)" }
+    ];
+
+    function renderMessages(msgs) {
+      const container = document.getElementById('chatMessages');
+      container.innerHTML = '';
+      msgs.forEach(msg => {
+        if (msg.type === 'time') {
+          container.innerHTML += `<div class="msg-time">${msg.content}</div>`;
+        } else if (msg.type === 'user') {
+          container.innerHTML += `<div class="msg msg-user"><div class="msg-bubble">${msg.content}</div></div>`;
+        } else if (msg.type === 'ai') {
+          let emotionHtml = '';
+          if (msg.emotion) {
+            emotionHtml = `<div class="msg-emotion"><span class="emotion-dot" style="background:${msg.emotionColor}"></span>${msg.emotion}</div>`;
+          }
+          container.innerHTML += `<div class="msg msg-ai"><div><div class="msg-bubble">${msg.content}</div>${emotionHtml}</div></div>`;
+        }
+      });
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function showState(state) {
+      document.querySelectorAll('.state-btn').forEach(b => b.classList.remove('active'));
+      if (event && event.target) event.target.classList.add('active');
+
+      // Reset all overlays
+      document.getElementById('breathingOverlay').classList.remove('visible');
+      document.getElementById('voiceOverlay').classList.remove('visible');
+      document.getElementById('fossilPreview').classList.remove('visible');
+      document.getElementById('errorBanner').classList.remove('visible');
+      document.getElementById('typingIndicator').classList.remove('visible');
+      document.getElementById('statusDot').className = 'status-dot';
+      document.getElementById('statusText').textContent = '在的';
+      document.getElementById('chatInputArea').style.display = 'block';
+
+      switch (state) {
+        case 'normal':
+          renderMessages(messages);
+          break;
+        case 'empty':
+          document.getElementById('chatMessages').innerHTML = `
+            <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:60vh;text-align:center;padding:0 var(--space-8);">
+              <div class="msg msg-ai" style="animation:none;"><div><div class="msg-bubble">阿栗，以后我就在这里。想聊什么都可以。</div></div></div>
+            </div>`;
+          break;
+        case 'typing':
+          renderMessages(messages.slice(0, 6));
+          document.getElementById('typingIndicator').classList.add('visible');
+          document.getElementById('statusDot').classList.add('thinking');
+          document.getElementById('statusText').textContent = '在想...';
+          break;
+        case 'voice':
+          renderMessages(messages);
+          document.getElementById('voiceOverlay').classList.add('visible');
+          break;
+        case 'breathing':
+          renderMessages(messages);
+          showBreathing();
+          break;
+        case 'safety':
+          renderMessages(messages.slice(0, 4));
+          const safetyHtml = `
+            <div class="msg msg-ai"><div>
+              <div class="msg-bubble">听到你说这些，我很担心你。你现在经历的一定非常痛苦。有些痛苦需要更专业的人来帮你一起承担。</div>
+            </div></div>
+            <div class="safety-card visible">
+              <h4>如果你需要帮助</h4>
+              <div class="safety-line"><a href="tel:400-161-9995">24小时心理援助热线：400-161-9995</a></div>
+              <div class="safety-line"><a href="tel:010-82951332">北京心理危机研究与干预中心：010-82951332</a></div>
+              <div class="safety-line"><a href="tel:400-821-1215">生命热线：400-821-1215</a></div>
+              <div class="safety-note">你不需要一个人扛着</div>
+            </div>`;
+          document.getElementById('chatMessages').innerHTML += safetyHtml;
+          document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
+          break;
+        case 'fossil':
+          renderMessages(messages);
+          document.getElementById('fossilPreview').classList.add('visible');
+          break;
+        case 'error':
+          renderMessages(messages.slice(0, 6));
+          document.getElementById('errorBanner').classList.add('visible');
+          break;
+      }
+    }
+
+    function handleTextInput(el) {
+      // Auto-resize
+      el.style.height = 'auto';
+      el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+
+      const len = el.value.length;
+      const sendBtn = document.getElementById('sendBtn');
+      const charWarn = document.getElementById('charWarn');
+
+      if (len > 0) {
+        sendBtn.classList.add('visible');
+      } else {
+        sendBtn.classList.remove('visible');
+      }
+
+      if (len > 1000) {
+        charWarn.classList.add('visible');
+        sendBtn.disabled = true;
+      } else {
+        charWarn.classList.remove('visible');
+        sendBtn.disabled = false;
+      }
+    }
+
+    function sendMessage() {
+      const textarea = document.getElementById('chatTextarea');
+      const text = textarea.value.trim();
+      if (!text || text.length > 1000) return;
+
+      // Add user message
+      const container = document.getElementById('chatMessages');
+      container.innerHTML += `<div class="msg msg-user"><div class="msg-bubble">${text}</div></div>`;
+
+      // Clear input
+      textarea.value = '';
+      textarea.style.height = 'auto';
+      document.getElementById('sendBtn').classList.remove('visible');
+
+      // Scroll
+      container.scrollTop = container.scrollHeight;
+
+      // Show typing
+      document.getElementById('typingIndicator').classList.add('visible');
+      document.getElementById('statusDot').classList.add('thinking');
+      document.getElementById('statusText').textContent = '在想...';
+
+      // Simulate AI reply
+      setTimeout(() => {
+        document.getElementById('typingIndicator').classList.remove('visible');
+        document.getElementById('statusDot').classList.remove('thinking');
+        document.getElementById('statusText').textContent = '在的';
+
+        container.innerHTML += `<div class="msg msg-ai"><div><div class="msg-bubble">嗯，我在听。你继续说。</div><div class="msg-emotion"><span class="emotion-dot" style="background:var(--emotion-calm)"></span>倾听</div></div></div>`;
+        container.scrollTop = container.scrollHeight;
+      }, 2000);
+    }
+
+    function toggleVoice() {
+      const overlay = document.getElementById('voiceOverlay');
+      overlay.classList.toggle('visible');
+    }
+
+    function showBreathing() {
+      document.getElementById('breathingOverlay').classList.add('visible');
+      animateBreathingText();
+    }
+    function hideBreathing() {
+      document.getElementById('breathingOverlay').classList.remove('visible');
+    }
+
+    let breathPhase = 0;
+    function animateBreathingText() {
+      const phases = [
+        { text: '吸...', duration: 4000 },
+        { text: '停...', duration: 4000 },
+        { text: '呼...', duration: 6000 }
+      ];
+      const el = document.getElementById('breathingText');
+      function cycle() {
+        if (!document.getElementById('breathingOverlay').classList.contains('visible')) return;
+        el.textContent = phases[breathPhase].text;
+        breathPhase = (breathPhase + 1) % 3;
+        setTimeout(cycle, phases[breathPhase === 0 ? 2 : breathPhase - 1].duration);
+      }
+      cycle();
+    }
+
+    function hideFossil() { document.getElementById('fossilPreview').classList.remove('visible'); }
+    function hideError() { document.getElementById('errorBanner').classList.remove('visible'); }
+    function scrollToBottom() {
+      document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
+      document.getElementById('newMsgBtn').classList.remove('visible');
+    }
+
+    function toggleDark() {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+    }
+
+    // Handle Enter key
+    document.getElementById('chatTextarea').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    // Init
+    showState('normal');
+  </script>
+</body>
+</html>

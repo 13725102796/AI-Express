@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+.venv/
+.env
+
+# Node
+node_modules/
+.next/
+frontend/.env.local
+
+# IDE
+.vscode/settings.json
+.idea/
+
+# Output
+outputs/
+*.db
+*.log
+.DS_Store
