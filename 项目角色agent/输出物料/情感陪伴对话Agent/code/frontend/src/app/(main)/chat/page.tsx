@@ -31,7 +31,28 @@ export default function ChatPage() {
   const [showBreathingConfirm, setShowBreathingConfirm] = useState(false);
   const [isAtBottom, setIsAtBottom] = useState(true);
 
-  const transport = useMemo(() => new DefaultChatTransport({ api: "/api/chat" }), []);
+  // Timing tracking
+  const sendTimeRef = useRef<number>(0);
+  const serverStartRef = useRef<number>(0);
+  const firstTokenTimeRef = useRef<number>(0);
+  const [latency, setLatency] = useState<{
+    clientToServer: number;
+    prefill: number;
+    generation: number;
+    total: number;
+  } | null>(null);
+  const prevStatusRef = useRef<string>("ready");
+
+  // Custom transport to capture X-Server-Start header
+  const transport = useMemo(() => new DefaultChatTransport({
+    api: "/api/chat",
+    fetch: async (url, init) => {
+      const resp = await fetch(url, init);
+      const serverStart = resp.headers.get("X-Server-Start");
+      if (serverStart) serverStartRef.current = Number(serverStart);
+      return resp;
+    },
+  }), []);
 
   const { messages, sendMessage, status } = useChat({
     transport,
@@ -53,6 +74,27 @@ export default function ChatPage() {
   const isStreaming = status === "streaming";
   const isSubmitting = status === "submitted";
   const isBusy = isStreaming || isSubmitting;
+
+  // Track status transitions for timing
+  useEffect(() => {
+    const prev = prevStatusRef.current;
+    if (prev !== "streaming" && status === "streaming") {
+      firstTokenTimeRef.current = Date.now();
+    }
+    if (prev === "streaming" && status === "ready") {
+      const tEnd = Date.now();
+      const tSend = sendTimeRef.current;
+      const tServer = serverStartRef.current || tSend;
+      const tFirst = firstTokenTimeRef.current;
+      setLatency({
+        clientToServer: tServer - tSend,        // 客户端 → Next.js API
+        prefill: tFirst - tServer,              // API → LLM 首 token（prefill + LAN）
+        generation: tEnd - tFirst,              // 首 token → 完成（纯生成）
+        total: tEnd - tSend,                    // 全链路
+      });
+    }
+    prevStatusRef.current = status;
+  }, [status]);
 
   // Auto scroll to bottom
   useEffect(() => {
@@ -76,6 +118,9 @@ export default function ChatPage() {
 
   const handleSendMessage = useCallback(
     (text: string) => {
+      sendTimeRef.current = Date.now();
+      firstTokenTimeRef.current = 0;
+      setLatency(null);
       sendMessage({ text });
     },
     [sendMessage]
@@ -156,6 +201,15 @@ export default function ChatPage() {
             isStreaming={isStreaming && i === chatMessages.length - 1 && msg.role === "assistant"}
           />
         ))}
+
+        {/* Timing display */}
+        {latency && !isBusy && (
+          <div className="flex justify-start px-2 pb-1">
+            <span className="text-[10px] text-text-tertiary/50 font-mono leading-relaxed">
+              网络 {latency.clientToServer}ms · prefill {latency.prefill}ms · 生成 {latency.generation}ms · 合计 {latency.total}ms
+            </span>
+          </div>
+        )}
 
         {/* Typing indicator */}
         {isSubmitting && (

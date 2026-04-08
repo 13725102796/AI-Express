@@ -43,10 +43,25 @@ mcp-servers/.venv/
 pgdata/
 redisdata/
 
+# Model files
+*.bin
+*.onnx
+*.pt
+*.pth
+*.h5
+*.hdf5
+*.pb
+*.tflite
+*.gguf
+*.ggml
+*.safetensors
+*.mlmodel
+*.mlpackage
+
 # Logs
 *.log
 /tmp/
-
+*.lock
 # OS
 .DS_Store
 *.DS_Store

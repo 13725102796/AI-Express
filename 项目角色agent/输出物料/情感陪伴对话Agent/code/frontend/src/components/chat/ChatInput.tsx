@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
+import { useVoiceInput } from "@/hooks/useVoiceInput";
 
 interface ChatInputProps {
   onSend: (message: string) => void;
@@ -12,6 +13,14 @@ const MAX_LENGTH = 1000;
 export function ChatInput({ onSend, disabled = false }: ChatInputProps) {
   const [text, setText] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // 语音识别完成 → 直接发送给 LLM，不停留在输入框
+  const handleVoiceResult = useCallback((transcribed: string) => {
+    onSend(transcribed);
+  }, [onSend]);
+
+  const { state: voiceState, error: voiceError, toggle: toggleVoice } =
+    useVoiceInput(handleVoiceResult);
 
   const isOverLimit = text.length > MAX_LENGTH;
   const isEmpty = !text.trim();
@@ -52,20 +61,46 @@ export function ChatInput({ onSend, disabled = false }: ChatInputProps) {
         </div>
       )}
 
+      {/* 语音错误提示 */}
+      {voiceError && (
+        <div className="px-4 py-1.5 text-xs text-text-secondary bg-surface-1 animate-float-up">
+          {voiceError}
+        </div>
+      )}
+
       <div className="flex items-end gap-2 px-4 py-3">
         {/* Voice input button */}
         <button
-          className="flex-shrink-0 w-10 h-10 flex items-center justify-center
-            rounded-full bg-surface-1 text-text-tertiary
-            hover:bg-surface-2 transition-colors duration-[var(--duration-fast)]"
-          aria-label="语音输入"
+          onClick={toggleVoice}
+          disabled={disabled || voiceState === "transcribing"}
+          className={`
+            flex-shrink-0 w-10 h-10 flex items-center justify-center
+            rounded-full transition-all duration-[var(--duration-fast)]
+            ${voiceState === "recording"
+              ? "bg-red-500/15 text-red-500 animate-pulse"
+              : voiceState === "transcribing"
+                ? "bg-surface-1 text-text-tertiary opacity-50"
+                : "bg-surface-1 text-text-tertiary hover:bg-surface-2"
+            }
+          `}
+          aria-label={
+            voiceState === "recording" ? "停止录音"
+              : voiceState === "transcribing" ? "识别中"
+              : "语音输入"
+          }
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
-            <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-            <line x1="12" y1="19" x2="12" y2="23" />
-            <line x1="8" y1="23" x2="16" y2="23" />
-          </svg>
+          {voiceState === "transcribing" ? (
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="animate-spin">
+              <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+            </svg>
+          ) : (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+              <line x1="12" y1="19" x2="12" y2="23" />
+              <line x1="8" y1="23" x2="16" y2="23" />
+            </svg>
+          )}
         </button>
 
         {/* Text input */}

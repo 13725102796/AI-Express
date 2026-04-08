@@ -4,6 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:stt": "conda run -n liminal-stt uvicorn main:app --host 0.0.0.0 --port 8001 --workers 1 --log-level info",
+    "dev:tts": "conda run -n liminal-tts uvicorn main:app --host 0.0.0.0 --port 8002 --workers 1 --log-level info",
+    "dev:all": "concurrently -n \"next,stt,tts\" -c \"cyan,green,yellow\" \"pnpm dev\" \"pnpm dev:stt\" \"pnpm dev:tts\"",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
@@ -39,7 +42,8 @@
     "jsdom": "^29.0.1",
     "tailwindcss": "^4",
     "typescript": "^5",
-    "vitest": "^4.1.2"
+    "vitest": "^4.1.2",
+    "concurrently": "^9.1.2"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
