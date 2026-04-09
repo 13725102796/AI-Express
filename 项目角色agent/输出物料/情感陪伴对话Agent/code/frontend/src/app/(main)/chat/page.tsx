@@ -12,6 +12,8 @@ import { BreathingOverlay } from "@/components/breathing/BreathingOverlay";
 import { useChatStore } from "@/stores/chatStore";
 import { useAuthStore } from "@/stores/authStore";
 import { Modal } from "@/components/ui/Modal";
+import { useSentenceTTS } from "@/hooks/useSentenceTTS";
+import { getTTSEmotion } from "@/lib/ai/prompts";
 import type { ChatMessage } from "@/types/chat";
 
 export default function ChatPage() {
@@ -30,6 +32,11 @@ export default function ChatPage() {
   const [showSafetyCard, setShowSafetyCard] = useState(false);
   const [showBreathingConfirm, setShowBreathingConfirm] = useState(false);
   const [isAtBottom, setIsAtBottom] = useState(true);
+
+  // TTS 逐句调度
+  const { feedText, flush, stopAll, isSpeaking } = useSentenceTTS();
+  const ttsEmotion = getTTSEmotion(user?.companionStyle || "warm");
+  const streamedTextRef = useRef("");
 
   // Timing tracking
   const sendTimeRef = useRef<number>(0);
@@ -75,26 +82,43 @@ export default function ChatPage() {
   const isSubmitting = status === "submitted";
   const isBusy = isStreaming || isSubmitting;
 
-  // Track status transitions for timing
+  // Track status transitions for timing + TTS
   useEffect(() => {
     const prev = prevStatusRef.current;
     if (prev !== "streaming" && status === "streaming") {
       firstTokenTimeRef.current = Date.now();
+      streamedTextRef.current = "";
     }
+    // LLM 流式输出中：逐句喂给 TTS
+    if (status === "streaming" && messages.length > 0) {
+      const lastMsg = messages[messages.length - 1];
+      if (lastMsg.role === "assistant") {
+        const text = getMessageText(lastMsg);
+        if (text !== streamedTextRef.current) {
+          streamedTextRef.current = text;
+          feedText(text, ttsEmotion);
+        }
+      }
+    }
+    // LLM 流结束：flush 剩余文本 + 记录延迟
     if (prev === "streaming" && status === "ready") {
+      const lastMsg = messages[messages.length - 1];
+      if (lastMsg?.role === "assistant") {
+        flush(getMessageText(lastMsg), ttsEmotion);
+      }
       const tEnd = Date.now();
       const tSend = sendTimeRef.current;
       const tServer = serverStartRef.current || tSend;
       const tFirst = firstTokenTimeRef.current;
       setLatency({
-        clientToServer: tServer - tSend,        // 客户端 → Next.js API
-        prefill: tFirst - tServer,              // API → LLM 首 token（prefill + LAN）
-        generation: tEnd - tFirst,              // 首 token → 完成（纯生成）
-        total: tEnd - tSend,                    // 全链路
+        clientToServer: tServer - tSend,
+        prefill: tFirst - tServer,
+        generation: tEnd - tFirst,
+        total: tEnd - tSend,
       });
     }
     prevStatusRef.current = status;
-  }, [status]);
+  }, [status, messages, feedText, flush, ttsEmotion]);
 
   // Auto scroll to bottom
   useEffect(() => {
@@ -118,12 +142,13 @@ export default function ChatPage() {
 
   const handleSendMessage = useCallback(
     (text: string) => {
+      stopAll(); // 中止正在播放的 TTS
       sendTimeRef.current = Date.now();
       firstTokenTimeRef.current = 0;
       setLatency(null);
       sendMessage({ text });
     },
-    [sendMessage]
+    [sendMessage, stopAll]
   );
 
   const toggleTheme = useCallback(() => {
