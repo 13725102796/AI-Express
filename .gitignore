@@ -58,6 +58,11 @@ redisdata/
 *.mlmodel
 *.mlpackage
 
+# HuggingFace cache & large model checkpoints
+**/hf_cache/
+**/checkpoints/
+**/cosyvoice-src/
+
 # Logs
 *.log
 /tmp/
