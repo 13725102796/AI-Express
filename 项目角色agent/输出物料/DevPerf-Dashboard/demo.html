@@ -1,0 +1,1633 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DevPerf Dashboard -- Design Style Reference</title>
+
+<!-- Fonts: Plus Jakarta Sans (distinctive, not Inter/Roboto) + HarmonyOS Sans fallback -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+/* ================================================================
+   DESIGN TOKENS -- DevPerf Dashboard
+   Color space: OKLCH (perceptually uniform)
+   Spacing: 4px base unit
+   Typography: Modular scale ratio 1.25 (Major Third)
+   ================================================================ */
+
+:root {
+  /* -- Color System (OKLCH) -- */
+  --color-primary: oklch(0.45 0.12 255);         /* Trusted Indigo #3B5998 region */
+  --color-primary-light: oklch(0.55 0.10 255);   /* Lighter indigo for hover */
+  --color-primary-dark: oklch(0.35 0.14 255);    /* Darker indigo for active */
+  --color-primary-surface: oklch(0.95 0.02 255); /* Tinted surface */
+
+  --color-secondary: oklch(0.55 0.03 250);       /* Muted blue-gray */
+  --color-accent: oklch(0.75 0.15 75);           /* Amber/Gold for CTA */
+  --color-accent-hover: oklch(0.70 0.17 75);
+  --color-accent-surface: oklch(0.95 0.04 75);
+
+  --color-success: oklch(0.55 0.15 160);         /* Forest green */
+  --color-success-surface: oklch(0.93 0.04 160);
+  --color-warning: oklch(0.65 0.16 70);          /* Deep amber - darkened for AA on light bg */
+  --color-warning-text: oklch(0.55 0.18 70);     /* Warning text variant for small text AA */
+  --color-warning-surface: oklch(0.93 0.04 70);
+  --color-error: oklch(0.55 0.18 25);            /* Warm red */
+  --color-error-surface: oklch(0.93 0.04 25);
+
+  /* Tinted Neutrals (blue-tinted, never pure gray) */
+  --color-bg: oklch(0.985 0.005 250);            /* Warm white, slight blue tint */
+  --color-bg-elevated: oklch(1.0 0.0 0);         /* Cards - near white */
+  --color-bg-sunken: oklch(0.96 0.008 250);      /* Sunken areas */
+  --color-bg-dark: oklch(0.15 0.02 255);         /* Dark mode bg */
+
+  --color-text-primary: oklch(0.20 0.02 250);    /* Near-black, blue-tinted */
+  --color-text-secondary: oklch(0.45 0.02 250);  /* Mid gray, blue-tinted */
+  --color-text-tertiary: oklch(0.60 0.015 250);  /* Light gray */
+  --color-text-on-primary: oklch(0.98 0.005 250);
+  --color-text-on-accent: oklch(0.18 0.02 75);
+
+  --color-border: oklch(0.88 0.01 250);
+  --color-border-strong: oklch(0.78 0.015 250);
+  --color-divider: oklch(0.92 0.008 250);
+
+  /* Chart palette (5 distinguishable colors for data viz) */
+  --color-chart-1: oklch(0.45 0.12 255);  /* Primary indigo ~ #3B5998 */
+  --color-chart-2: oklch(0.55 0.15 160);  /* Green ~ #0D9668 */
+  --color-chart-3: oklch(0.75 0.15 75);   /* Amber ~ #D4920A */
+  --color-chart-4: oklch(0.50 0.12 310);  /* Plum ~ #7C4DBA */
+  --color-chart-5: oklch(0.60 0.12 200);  /* Teal ~ #2B8CA3 */
+
+  /* -- Font System -- */
+  --font-heading: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-body: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* Modular scale: 1.25 ratio (Major Third) */
+  --text-xs: 0.64rem;      /* 10.24px */
+  --text-sm: 0.8rem;       /* 12.8px */
+  --text-base: 1rem;       /* 16px */
+  --text-md: 1.125rem;     /* 18px */
+  --text-lg: 1.25rem;      /* 20px */
+  --text-xl: 1.563rem;     /* 25px */
+  --text-2xl: 1.953rem;    /* 31.25px */
+  --text-3xl: 2.441rem;    /* 39px */
+  --text-4xl: clamp(2.441rem, 2rem + 2vw, 3.815rem);
+
+  --leading-tight: 1.2;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.7;
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --weight-extrabold: 800;
+
+  /* -- Spacing System (4px base) -- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+
+  /* -- Shadow System (multi-layer soft shadows) -- */
+  --shadow-sm: 0 1px 2px oklch(0.20 0.02 250 / 0.04), 0 1px 3px oklch(0.20 0.02 250 / 0.06);
+  --shadow-md: 0 2px 4px oklch(0.20 0.02 250 / 0.04), 0 4px 8px oklch(0.20 0.02 250 / 0.06), 0 8px 16px oklch(0.20 0.02 250 / 0.04);
+  --shadow-lg: 0 4px 8px oklch(0.20 0.02 250 / 0.03), 0 8px 16px oklch(0.20 0.02 250 / 0.05), 0 16px 32px oklch(0.20 0.02 250 / 0.06), 0 24px 48px oklch(0.20 0.02 250 / 0.04);
+  --shadow-xl: 0 8px 16px oklch(0.20 0.02 250 / 0.04), 0 16px 32px oklch(0.20 0.02 250 / 0.06), 0 32px 64px oklch(0.20 0.02 250 / 0.08);
+
+  /* -- Border Radius -- */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* -- Motion -- */
+  --duration-instant: 100ms;
+  --duration-fast: 200ms;
+  --duration-normal: 300ms;
+  --duration-slow: 500ms;
+  --duration-entrance: 600ms;
+
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ================================================================
+   BASE RESET & DEFAULTS
+   ================================================================ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-normal);
+  color: var(--color-text-primary);
+  background: var(--color-bg);
+}
+
+/* ================================================================
+   LAYOUT
+   ================================================================ */
+
+.page-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-4);
+}
+
+@media (min-width: 768px) {
+  .page-container {
+    padding: var(--space-12) var(--space-8);
+  }
+}
+
+@media (min-width: 1025px) {
+  .page-container {
+    padding: var(--space-16) var(--space-12);
+  }
+}
+
+/* ================================================================
+   SECTION STYLING
+   ================================================================ */
+
+.section {
+  margin-bottom: var(--space-20);
+}
+
+.section-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+  margin-bottom: var(--space-3);
+}
+
+.section-title {
+  font-family: var(--font-heading);
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-tight);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-2);
+}
+
+.section-subtitle {
+  font-size: var(--text-md);
+  color: var(--color-text-secondary);
+  max-width: 560px;
+  margin-bottom: var(--space-10);
+  line-height: var(--leading-relaxed);
+}
+
+/* ================================================================
+   HERO SECTION
+   ================================================================ */
+
+.hero {
+  padding: var(--space-16) 0 var(--space-20);
+  text-align: left;
+}
+
+.hero-eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  letter-spacing: 0.08em;
+  color: var(--color-primary);
+  margin-bottom: var(--space-4);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.hero-eyebrow::before {
+  content: '';
+  width: 24px;
+  height: 2px;
+  background: var(--color-primary);
+  display: inline-block;
+}
+
+.hero-title {
+  font-family: var(--font-heading);
+  font-size: var(--text-4xl);
+  font-weight: var(--weight-extrabold);
+  line-height: 1.1;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-6);
+  max-width: 720px;
+}
+
+.hero-title .accent {
+  color: var(--color-primary);
+}
+
+.hero-description {
+  font-size: var(--text-lg);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-secondary);
+  max-width: 560px;
+  margin-bottom: var(--space-10);
+}
+
+.hero-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.hero-tag {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  background: var(--color-primary-surface);
+  color: var(--color-primary);
+  border: 1px solid oklch(0.45 0.12 255 / 0.15);
+}
+
+/* ================================================================
+   COLOR PALETTE SECTION
+   ================================================================ */
+
+.palette-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-8);
+}
+
+.color-card {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--duration-fast) var(--ease-out-quart), box-shadow var(--duration-fast) var(--ease-out-quart);
+}
+
+.color-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.color-swatch {
+  height: 100px;
+  display: flex;
+  align-items: flex-end;
+  padding: var(--space-3);
+}
+
+.color-swatch .contrast-badge {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  background: oklch(0.98 0 0 / 0.85);
+  color: var(--color-text-primary);
+}
+
+.color-info {
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-bg-elevated);
+}
+
+.color-name {
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-sm);
+  color: var(--color-text-primary);
+  margin-bottom: 2px;
+}
+
+.color-value {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+}
+
+.color-usage {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  margin-top: 2px;
+}
+
+/* Neutrals strip */
+.neutrals-strip {
+  display: flex;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  margin-top: var(--space-6);
+}
+
+.neutral-swatch {
+  flex: 1;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  transition: flex var(--duration-normal) var(--ease-out-quart);
+}
+
+.neutral-swatch:hover {
+  flex: 2;
+}
+
+.neutrals-label {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  margin-top: var(--space-2);
+  margin-bottom: var(--space-2);
+  font-weight: var(--weight-medium);
+}
+
+/* ================================================================
+   TYPOGRAPHY SECTION
+   ================================================================ */
+
+.type-specimen {
+  margin-bottom: var(--space-8);
+}
+
+.type-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-4) 0;
+  border-bottom: 1px solid var(--color-divider);
+}
+
+@media (min-width: 768px) {
+  .type-row {
+    flex-direction: row;
+    align-items: baseline;
+    gap: var(--space-6);
+  }
+}
+
+.type-meta {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+  min-width: 160px;
+  flex-shrink: 0;
+  line-height: 1.6;
+}
+
+.type-sample {
+  font-family: var(--font-heading);
+  color: var(--color-text-primary);
+}
+
+/* ================================================================
+   COMPONENT SECTION
+   ================================================================ */
+
+/* Buttons */
+.button-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+  margin-bottom: var(--space-8);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  line-height: 1;
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-md);
+  border: none;
+  cursor: pointer;
+  min-height: 44px;
+  transition: all var(--duration-fast) var(--ease-out-quart);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-bg), 0 0 0 5px var(--color-primary);
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: var(--color-text-on-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-primary:hover {
+  background: var(--color-primary-light);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  background: var(--color-primary-dark);
+  transform: scale(0.98);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-secondary {
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+}
+
+.btn-secondary:hover {
+  background: var(--color-bg-sunken);
+  border-color: var(--color-border-strong);
+}
+
+.btn-accent {
+  background: var(--color-accent);
+  color: var(--color-text-on-accent);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-accent:hover {
+  background: var(--color-accent-hover);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--color-primary);
+  border: none;
+}
+
+.btn-ghost:hover {
+  background: var(--color-primary-surface);
+}
+
+.btn-disabled {
+  background: var(--color-bg-sunken);
+  color: var(--color-text-tertiary);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.btn-disabled:hover, .btn-disabled:active {
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+  margin-top: var(--space-1);
+  text-align: center;
+}
+
+.btn-demo-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+/* Cards */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-6);
+  margin-bottom: var(--space-8);
+}
+
+.card {
+  background: var(--color-bg-elevated);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border);
+  transition: transform var(--duration-fast) var(--ease-out-quart), box-shadow var(--duration-fast) var(--ease-out-quart);
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+
+.card-title {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.card-badge {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+}
+
+.card-badge-success {
+  background: var(--color-success-surface);
+  color: var(--color-success);
+}
+
+.card-badge-warning {
+  background: var(--color-warning-surface);
+  color: var(--color-warning-text);
+}
+
+.card-badge-error {
+  background: var(--color-error-surface);
+  color: var(--color-error);
+}
+
+.card-metric {
+  font-size: var(--text-3xl);
+  font-weight: var(--weight-extrabold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-1);
+  font-feature-settings: "tnum" 1;
+}
+
+.card-metric-label {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.card-trend {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-top: var(--space-3);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+}
+
+.card-trend-up { color: var(--color-success); }
+.card-trend-down { color: var(--color-error); }
+
+/* Mini chart placeholder */
+.mini-chart {
+  height: 48px;
+  margin-top: var(--space-4);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  position: relative;
+}
+
+.mini-chart-bar {
+  position: absolute;
+  bottom: 0;
+  border-radius: 2px 2px 0 0;
+  transition: height var(--duration-slow) var(--ease-out-expo);
+}
+
+/* Input fields */
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 400px;
+  margin-bottom: var(--space-8);
+}
+
+.input-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.input-label {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-primary);
+}
+
+.input-field {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  min-height: 44px;
+  transition: all var(--duration-fast) var(--ease-out-quart);
+  outline: none;
+}
+
+.input-field::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+.input-field:hover {
+  border-color: var(--color-border-strong);
+}
+
+.input-field:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px oklch(0.45 0.12 255 / 0.12);
+}
+
+.input-field:focus-visible {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px oklch(0.45 0.12 255 / 0.12);
+}
+
+/* Navigation demo */
+.nav-demo {
+  display: flex;
+  gap: var(--space-4);
+  background: var(--color-bg-elevated);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--space-8);
+  overflow-x: auto;
+}
+
+.nav-item {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-secondary);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out-quart);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.nav-item:hover {
+  color: var(--color-primary);
+  background: var(--color-primary-surface);
+}
+
+.nav-item-active {
+  color: var(--color-primary);
+  background: var(--color-primary-surface);
+  font-weight: var(--weight-semibold);
+}
+
+.nav-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+/* Badge / Tag */
+.badge-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-8);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-full);
+}
+
+.badge-primary { background: var(--color-primary-surface); color: var(--color-primary); }
+.badge-success { background: var(--color-success-surface); color: var(--color-success); }
+.badge-warning { background: var(--color-warning-surface); color: var(--color-warning-text); }
+.badge-error { background: var(--color-error-surface); color: var(--color-error); }
+.badge-neutral {
+  background: var(--color-bg-sunken);
+  color: var(--color-text-secondary);
+}
+
+.badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+/* ================================================================
+   DASHBOARD PREVIEW SECTION (immersive dark)
+   ================================================================ */
+
+.dashboard-preview {
+  background: var(--color-bg-dark);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8);
+  margin: var(--space-10) calc(-1 * var(--space-4));
+  box-shadow: var(--shadow-xl);
+}
+
+@media (min-width: 768px) {
+  .dashboard-preview {
+    margin: var(--space-12) calc(-1 * var(--space-8));
+    padding: var(--space-12);
+  }
+}
+
+@media (min-width: 1025px) {
+  .dashboard-preview {
+    margin: var(--space-16) calc(-1 * var(--space-12));
+    padding: var(--space-16);
+  }
+}
+
+.dashboard-preview .section-label {
+  color: oklch(0.60 0.01 250);
+}
+
+.dashboard-preview .section-title {
+  color: oklch(0.95 0.005 250);
+}
+
+.dashboard-preview .section-subtitle {
+  color: oklch(0.65 0.01 250);
+}
+
+.preview-panel-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+}
+
+@media (min-width: 768px) {
+  .preview-panel-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-6);
+  }
+}
+
+.preview-panel {
+  background: oklch(0.20 0.02 255);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  border: 1px solid oklch(0.30 0.015 255);
+  transition: border-color var(--duration-fast) var(--ease-out-quart);
+}
+
+.preview-panel:hover {
+  border-color: oklch(0.40 0.03 255);
+}
+
+.preview-panel-title {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: oklch(0.78 0.01 250);
+  margin-bottom: var(--space-4);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.preview-panel-metric {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-extrabold);
+  color: oklch(0.98 0.005 250);
+  font-feature-settings: "tnum" 1;
+}
+
+.preview-panel-sub {
+  font-size: var(--text-sm);
+  color: oklch(0.55 0.01 250);
+  margin-top: var(--space-1);
+}
+
+/* Simulated bar chart */
+.bar-chart-demo {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 80px;
+  margin-top: var(--space-4);
+  padding-top: var(--space-2);
+}
+
+.bar-chart-demo .bar {
+  flex: 1;
+  border-radius: 3px 3px 0 0;
+  min-width: 8px;
+  transition: height var(--duration-slow) var(--ease-out-expo);
+}
+
+/* Goal line */
+.bar-chart-demo-wrapper {
+  position: relative;
+}
+
+.goal-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 2px dashed oklch(0.55 0.15 160 / 0.5);
+  z-index: 1;
+}
+
+.goal-line-label {
+  position: absolute;
+  right: 0;
+  top: -16px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: oklch(0.55 0.15 160);
+}
+
+/* Simulated donut */
+.donut-demo {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: conic-gradient(
+    var(--color-chart-1) 0deg 130deg,
+    var(--color-chart-3) 130deg 200deg,
+    var(--color-chart-2) 200deg 290deg,
+    var(--color-chart-5) 290deg 360deg
+  );
+  margin: var(--space-4) auto 0;
+  position: relative;
+}
+
+.donut-demo::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: oklch(0.20 0.02 255);
+}
+
+/* ================================================================
+   MOTION DEMO SECTION
+   ================================================================ */
+
+.motion-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-6);
+}
+
+.motion-card {
+  background: var(--color-bg-elevated);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  border: 1px solid var(--color-border);
+  text-align: center;
+}
+
+.motion-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+  margin-bottom: var(--space-3);
+}
+
+.motion-demo-box {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
+  margin: 0 auto var(--space-3);
+}
+
+.motion-card:hover .motion-demo-entrance {
+  animation: entrance var(--duration-entrance) var(--ease-out-expo) forwards;
+}
+
+.motion-card:hover .motion-demo-hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  transition: all var(--duration-fast) var(--ease-out-quart);
+}
+
+.motion-card:hover .motion-demo-scale {
+  transform: scale(1.1);
+  transition: all var(--duration-fast) var(--ease-out-quart);
+}
+
+.motion-desc {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  margin-top: var(--space-2);
+}
+
+@keyframes entrance {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Stagger entrance animation for page load */
+.stagger-in {
+  opacity: 0;
+  transform: translateY(24px);
+  animation: entrance var(--duration-entrance) var(--ease-out-expo) forwards;
+}
+
+.stagger-in:nth-child(1) { animation-delay: 0ms; }
+.stagger-in:nth-child(2) { animation-delay: 60ms; }
+.stagger-in:nth-child(3) { animation-delay: 120ms; }
+.stagger-in:nth-child(4) { animation-delay: 180ms; }
+.stagger-in:nth-child(5) { animation-delay: 240ms; }
+
+/* ================================================================
+   DESIGN TOKENS REFERENCE (collapsed)
+   ================================================================ */
+
+.tokens-ref {
+  background: var(--color-bg-sunken);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  margin-top: var(--space-8);
+}
+
+.tokens-ref summary {
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  padding: var(--space-2) 0;
+}
+
+.tokens-ref summary:hover {
+  color: var(--color-primary);
+}
+
+.tokens-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: var(--space-4);
+  font-size: var(--text-sm);
+}
+
+.tokens-table th {
+  text-align: left;
+  font-weight: var(--weight-semibold);
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 2px solid var(--color-border-strong);
+  color: var(--color-text-secondary);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.tokens-table td {
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--color-divider);
+  vertical-align: top;
+}
+
+.tokens-table .token-name {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-primary);
+}
+
+.tokens-table .token-value {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+}
+
+/* ================================================================
+   FOOTER
+   ================================================================ */
+
+.footer {
+  padding: var(--space-12) 0 var(--space-8);
+  border-top: 1px solid var(--color-divider);
+  text-align: center;
+}
+
+.footer-text {
+  font-size: var(--text-sm);
+  color: var(--color-text-tertiary);
+}
+
+/* ================================================================
+   ACCESSIBILITY
+   ================================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .stagger-in {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (pointer: coarse) {
+  .btn { min-height: 48px; }
+  .nav-item { padding: var(--space-3) var(--space-4); }
+  .input-field { min-height: 48px; }
+}
+</style>
+</head>
+
+<body>
+<div class="page-container">
+
+  <!-- ============================================================
+       HERO
+       ============================================================ -->
+  <section class="hero section stagger-in">
+    <div class="hero-eyebrow">DEVPERF DASHBOARD</div>
+    <h1 class="hero-title">Design <span class="accent">Style Reference</span></h1>
+    <p class="hero-description">
+      DevPerf Dashboard 的设计风格方向参考页。本页展示配色方案、字体搭配、组件风格样例、布局节奏和动效基调。
+      这不是最终设计稿，而是风格方向的可视化确认。
+    </p>
+    <div class="hero-tags">
+      <span class="hero-tag">专业可信</span>
+      <span class="hero-tag">数据驱动</span>
+      <span class="hero-tag">管理层友好</span>
+      <span class="hero-tag">OKLCH 色彩空间</span>
+      <span class="hero-tag">Plus Jakarta Sans</span>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       1. COLOR PALETTE
+       ============================================================ -->
+  <section class="section stagger-in">
+    <div class="section-label">01 / Color System</div>
+    <h2 class="section-title">配色方案</h2>
+    <p class="section-subtitle">
+      基于"信赖靛蓝"方向。所有色值使用 OKLCH 色彩空间定义，中性色带蓝色调。60% 中性背景 / 30% 靛蓝系 / 10% 琥珀强调。
+    </p>
+
+    <!-- Primary colors -->
+    <div class="palette-grid">
+      <div class="color-card">
+        <div class="color-swatch" style="background: oklch(0.45 0.12 255);">
+          <span class="contrast-badge">AA 5.8:1</span>
+        </div>
+        <div class="color-info">
+          <div class="color-name">Primary</div>
+          <div class="color-value">oklch(0.45 0.12 255)</div>
+          <div class="color-usage">品牌色 / 主按钮 / 导航</div>
+        </div>
+      </div>
+
+      <div class="color-card">
+        <div class="color-swatch" style="background: oklch(0.55 0.03 250);">
+          <span class="contrast-badge">AA 3.4:1</span>
+        </div>
+        <div class="color-info">
+          <div class="color-name">Secondary</div>
+          <div class="color-value">oklch(0.55 0.03 250)</div>
+          <div class="color-usage">次要操作 / 辅助文字</div>
+        </div>
+      </div>
+
+      <div class="color-card">
+        <div class="color-swatch" style="background: oklch(0.75 0.15 75);">
+          <span class="contrast-badge">AA on dark</span>
+        </div>
+        <div class="color-info">
+          <div class="color-name">Accent (Amber)</div>
+          <div class="color-value">oklch(0.75 0.15 75)</div>
+          <div class="color-usage">CTA / 数据高亮 / 关键指标</div>
+        </div>
+      </div>
+
+      <div class="color-card">
+        <div class="color-swatch" style="background: oklch(0.55 0.15 160);">
+          <span class="contrast-badge">AA 4.2:1</span>
+        </div>
+        <div class="color-info">
+          <div class="color-name">Success</div>
+          <div class="color-value">oklch(0.55 0.15 160)</div>
+          <div class="color-usage">完成 / 正向指标 / 达标</div>
+        </div>
+      </div>
+
+      <div class="color-card">
+        <div class="color-swatch" style="background: oklch(0.70 0.15 70);">
+          <span class="contrast-badge">AA on dark</span>
+        </div>
+        <div class="color-info">
+          <div class="color-name">Warning</div>
+          <div class="color-value">oklch(0.70 0.15 70)</div>
+          <div class="color-usage">预警 / 即将到期</div>
+        </div>
+      </div>
+
+      <div class="color-card">
+        <div class="color-swatch" style="background: oklch(0.55 0.18 25);">
+          <span class="contrast-badge">AA 4.5:1</span>
+        </div>
+        <div class="color-info">
+          <div class="color-name">Error</div>
+          <div class="color-value">oklch(0.55 0.18 25)</div>
+          <div class="color-usage">错误 / 逾期 / 阻塞</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tinted Neutrals -->
+    <div class="neutrals-label">Tinted Neutrals (蓝调灰度阶)</div>
+    <div class="neutrals-strip">
+      <div class="neutral-swatch" style="background: oklch(0.985 0.005 250); color: oklch(0.20 0.02 250);">985</div>
+      <div class="neutral-swatch" style="background: oklch(0.96 0.008 250); color: oklch(0.20 0.02 250);">960</div>
+      <div class="neutral-swatch" style="background: oklch(0.92 0.008 250); color: oklch(0.20 0.02 250);">920</div>
+      <div class="neutral-swatch" style="background: oklch(0.88 0.01 250); color: oklch(0.20 0.02 250);">880</div>
+      <div class="neutral-swatch" style="background: oklch(0.78 0.015 250); color: oklch(0.20 0.02 250);">780</div>
+      <div class="neutral-swatch" style="background: oklch(0.60 0.015 250); color: oklch(0.98 0.005 250);">600</div>
+      <div class="neutral-swatch" style="background: oklch(0.45 0.02 250); color: oklch(0.98 0.005 250);">450</div>
+      <div class="neutral-swatch" style="background: oklch(0.20 0.02 250); color: oklch(0.98 0.005 250);">200</div>
+      <div class="neutral-swatch" style="background: oklch(0.15 0.02 255); color: oklch(0.98 0.005 250);">150</div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       2. TYPOGRAPHY
+       ============================================================ -->
+  <section class="section stagger-in">
+    <div class="section-label">02 / Typography</div>
+    <h2 class="section-title">字体搭配</h2>
+    <p class="section-subtitle">
+      使用 Plus Jakarta Sans 作为标题和正文字体（几何感强、有辨识度）。等宽数字确保 KPI 数据列对齐。
+      模块化比例尺 1.25（Major Third）。
+    </p>
+
+    <div class="type-specimen">
+      <div class="type-row">
+        <div class="type-meta">4xl / extrabold<br>clamp(2.4rem, 2rem+2vw, 3.8rem)</div>
+        <div class="type-sample" style="font-size: var(--text-4xl); font-weight: var(--weight-extrabold); line-height: var(--leading-tight);">Sprint 交付率 82%</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">3xl / bold<br>2.441rem (39px)</div>
+        <div class="type-sample" style="font-size: var(--text-3xl); font-weight: var(--weight-bold); line-height: var(--leading-tight);">团队总览 Dashboard</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">2xl / bold<br>1.953rem (31px)</div>
+        <div class="type-sample" style="font-size: var(--text-2xl); font-weight: var(--weight-bold); line-height: var(--leading-tight);">产品线进度总览</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">xl / semibold<br>1.563rem (25px)</div>
+        <div class="type-sample" style="font-size: var(--text-xl); font-weight: var(--weight-semibold);">AVATAR 项目本周概况</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">lg / semibold<br>1.25rem (20px)</div>
+        <div class="type-sample" style="font-size: var(--text-lg); font-weight: var(--weight-semibold);">Sprint 交付率趋势分析</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">base / regular<br>1rem (16px)</div>
+        <div class="type-sample" style="font-size: var(--text-base); font-weight: var(--weight-regular);">本季度共完成 127 个 Story Points，交付率较上季度提升 12%。团队在 PR 合入时间上仍有优化空间。</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">sm / medium<br>0.8rem (12.8px)</div>
+        <div class="type-sample" style="font-size: var(--text-sm); font-weight: var(--weight-medium); color: var(--color-text-secondary);">最后同步时间：2026-04-09 14:30 | 下次同步：14:45</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">mono / medium<br>JetBrains Mono</div>
+        <div class="type-sample" style="font-family: var(--font-mono); font-size: var(--text-sm); font-weight: var(--weight-medium); color: var(--color-text-secondary);">commit: a3f7b2e | branch: feat/okr-sync</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">tabular figures<br>tnum 1</div>
+        <div class="type-sample" style="font-size: var(--text-2xl); font-weight: var(--weight-extrabold); font-feature-settings: 'tnum' 1;">1,024 &nbsp; 856 &nbsp; 7.2h &nbsp; 92%</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       3. COMPONENTS
+       ============================================================ -->
+  <section class="section stagger-in">
+    <div class="section-label">03 / Components</div>
+    <h2 class="section-title">组件样例</h2>
+    <p class="section-subtitle">
+      按钮、卡片、输入框、导航、标签的视觉语言。所有可交互元素最小 44x44px 触控区域。
+      hover/active/focus/disabled 全状态展示。
+    </p>
+
+    <!-- Buttons -->
+    <h3 style="font-size: var(--text-lg); font-weight: var(--weight-semibold); margin-bottom: var(--space-4); color: var(--color-text-primary);">Buttons</h3>
+    <div class="button-group">
+      <div class="btn-demo-col">
+        <button class="btn btn-primary">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          查看报告
+        </button>
+        <span class="btn-label">Primary</span>
+      </div>
+      <div class="btn-demo-col">
+        <button class="btn btn-accent">触发同步</button>
+        <span class="btn-label">Accent</span>
+      </div>
+      <div class="btn-demo-col">
+        <button class="btn btn-secondary">筛选</button>
+        <span class="btn-label">Secondary</span>
+      </div>
+      <div class="btn-demo-col">
+        <button class="btn btn-ghost">查看全部</button>
+        <span class="btn-label">Ghost</span>
+      </div>
+      <div class="btn-demo-col">
+        <button class="btn btn-disabled" disabled>不可用</button>
+        <span class="btn-label">Disabled</span>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <h3 style="font-size: var(--text-lg); font-weight: var(--weight-semibold); margin-bottom: var(--space-4); color: var(--color-text-primary);">Sidebar Navigation</h3>
+    <div class="nav-demo" style="flex-direction: column; max-width: 240px;">
+      <div class="nav-item nav-item-active">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        团队总览
+      </div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        项目明细
+      </div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>
+        个人产出
+      </div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        OKR 看板
+      </div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/></svg>
+        Git 活动
+      </div>
+    </div>
+
+    <!-- Badges / Tags -->
+    <h3 style="font-size: var(--text-lg); font-weight: var(--weight-semibold); margin-bottom: var(--space-4); color: var(--color-text-primary);">Badges &amp; Status Tags</h3>
+    <div class="badge-group">
+      <span class="badge badge-success"><span class="badge-dot" style="background: var(--color-success);"></span>已完成</span>
+      <span class="badge badge-primary"><span class="badge-dot" style="background: var(--color-primary);"></span>进行中</span>
+      <span class="badge badge-warning"><span class="badge-dot" style="background: var(--color-warning);"></span>即将到期</span>
+      <span class="badge badge-error"><span class="badge-dot" style="background: var(--color-error);"></span>已逾期</span>
+      <span class="badge badge-neutral"><span class="badge-dot" style="background: var(--color-text-tertiary);"></span>待开始</span>
+      <span class="badge badge-primary">P0</span>
+      <span class="badge badge-warning">P1</span>
+      <span class="badge badge-neutral">P2</span>
+    </div>
+
+    <!-- Input Fields -->
+    <h3 style="font-size: var(--text-lg); font-weight: var(--weight-semibold); margin-bottom: var(--space-4); color: var(--color-text-primary);">Input Fields</h3>
+    <div class="input-group">
+      <div class="input-wrapper">
+        <label class="input-label">邮箱地址</label>
+        <input class="input-field" type="email" placeholder="admin@jasonqiyuan.com">
+      </div>
+      <div class="input-wrapper">
+        <label class="input-label">筛选时间范围</label>
+        <input class="input-field" type="text" placeholder="2026-Q2" value="2026-Q2">
+      </div>
+    </div>
+
+    <!-- KPI Cards -->
+    <h3 style="font-size: var(--text-lg); font-weight: var(--weight-semibold); margin-bottom: var(--space-4); color: var(--color-text-primary);">KPI Metric Cards</h3>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Sprint 交付率</span>
+          <span class="card-badge card-badge-success">达标</span>
+        </div>
+        <div class="card-metric">82.4%</div>
+        <div class="card-metric-label">本季度平均（目标 80%）</div>
+        <div class="card-trend card-trend-up">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17l5-5 5 5M7 7l5-5 5 5"/></svg>
+          +5.2% vs 上季度
+        </div>
+        <div class="mini-chart">
+          <div class="mini-chart-bar" style="left: 0%; width: 14%; height: 60%; background: var(--color-chart-1);"></div>
+          <div class="mini-chart-bar" style="left: 16%; width: 14%; height: 75%; background: var(--color-chart-1);"></div>
+          <div class="mini-chart-bar" style="left: 32%; width: 14%; height: 65%; background: var(--color-chart-1);"></div>
+          <div class="mini-chart-bar" style="left: 48%; width: 14%; height: 80%; background: var(--color-chart-1);"></div>
+          <div class="mini-chart-bar" style="left: 64%; width: 14%; height: 85%; background: var(--color-chart-1);"></div>
+          <div class="mini-chart-bar" style="left: 80%; width: 14%; height: 90%; background: var(--color-primary-light);"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">PR 平均合入时间</span>
+          <span class="card-badge card-badge-warning">关注</span>
+        </div>
+        <div class="card-metric">36.5h</div>
+        <div class="card-metric-label">本周平均（预警线 48h）</div>
+        <div class="card-trend card-trend-down">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 7l5 5 5-5M7 17l5 5 5-5"/></svg>
+          +8.3h vs 上周
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">OKR 完成进度</span>
+          <span class="card-badge card-badge-success">进展良好</span>
+        </div>
+        <div class="card-metric">68%</div>
+        <div class="card-metric-label">Q2 整体进度（目标 70%）</div>
+        <div class="card-trend card-trend-up">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17l5-5 5 5M7 7l5-5 5 5"/></svg>
+          +12% vs 上月
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       4. DASHBOARD PREVIEW (immersive dark section)
+       ============================================================ -->
+  <div class="dashboard-preview">
+    <section class="section" style="margin-bottom: var(--space-10);">
+      <div class="section-label">04 / Layout Preview</div>
+      <h2 class="section-title">仪表盘布局预览</h2>
+      <p class="section-subtitle">
+        团队总览页的面板布局示意。2 列 x 3 行网格，每个面板聚焦一个核心指标。
+        暗色背景让图表色彩更突出。
+      </p>
+
+      <div class="preview-panel-grid">
+        <div class="preview-panel">
+          <div class="preview-panel-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="12" width="4" height="9"/><rect x="10" y="7" width="4" height="14"/><rect x="17" y="3" width="4" height="18"/></svg>
+            Sprint 交付率趋势
+          </div>
+          <div class="preview-panel-metric">82.4%</div>
+          <div class="preview-panel-sub">近 6 个 Sprint 平均</div>
+          <div class="bar-chart-demo-wrapper" style="position: relative;">
+            <div class="goal-line" style="bottom: 64px; top: auto; position: absolute; left: 0; right: 0;">
+              <span class="goal-line-label">80% 目标</span>
+            </div>
+            <div class="bar-chart-demo">
+              <div class="bar" style="height: 58%; background: oklch(0.45 0.12 255);"></div>
+              <div class="bar" style="height: 72%; background: oklch(0.45 0.12 255);"></div>
+              <div class="bar" style="height: 65%; background: oklch(0.45 0.12 255);"></div>
+              <div class="bar" style="height: 80%; background: oklch(0.45 0.12 255);"></div>
+              <div class="bar" style="height: 85%; background: oklch(0.55 0.10 255);"></div>
+              <div class="bar" style="height: 92%; background: oklch(0.55 0.15 160);"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="preview-panel">
+          <div class="preview-panel-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            任务状态分布
+          </div>
+          <div class="preview-panel-metric">247</div>
+          <div class="preview-panel-sub">全部活跃任务</div>
+          <div class="donut-demo"></div>
+          <div style="display: flex; gap: var(--space-3); justify-content: center; margin-top: var(--space-3); flex-wrap: wrap;">
+            <span style="font-size: 11px; color: oklch(0.65 0.01 250); display: flex; align-items: center; gap: 4px;">
+              <span style="width: 8px; height: 8px; border-radius: 2px; background: var(--color-chart-1);"></span>Done 36%
+            </span>
+            <span style="font-size: 11px; color: oklch(0.65 0.01 250); display: flex; align-items: center; gap: 4px;">
+              <span style="width: 8px; height: 8px; border-radius: 2px; background: var(--color-chart-3);"></span>Review 19%
+            </span>
+            <span style="font-size: 11px; color: oklch(0.65 0.01 250); display: flex; align-items: center; gap: 4px;">
+              <span style="width: 8px; height: 8px; border-radius: 2px; background: var(--color-chart-2);"></span>In Progress 25%
+            </span>
+            <span style="font-size: 11px; color: oklch(0.65 0.01 250); display: flex; align-items: center; gap: 4px;">
+              <span style="width: 8px; height: 8px; border-radius: 2px; background: var(--color-chart-5);"></span>Todo 20%
+            </span>
+          </div>
+        </div>
+
+        <div class="preview-panel">
+          <div class="preview-panel-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            产品线进度
+          </div>
+          <div style="display: flex; flex-direction: column; gap: var(--space-3); margin-top: var(--space-4);">
+            <div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                <span style="font-size: 12px; color: oklch(0.80 0.01 250); font-weight: 500;">AVATAR</span>
+                <span style="font-size: 12px; color: oklch(0.55 0.15 160); font-weight: 600;">87%</span>
+              </div>
+              <div style="height: 6px; background: oklch(0.25 0.015 255); border-radius: 3px; overflow: hidden;">
+                <div style="width: 87%; height: 100%; background: oklch(0.55 0.15 160); border-radius: 3px;"></div>
+              </div>
+            </div>
+            <div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                <span style="font-size: 12px; color: oklch(0.80 0.01 250); font-weight: 500;">AIRFLOW</span>
+                <span style="font-size: 12px; color: oklch(0.45 0.12 255); font-weight: 600;">62%</span>
+              </div>
+              <div style="height: 6px; background: oklch(0.25 0.015 255); border-radius: 3px; overflow: hidden;">
+                <div style="width: 62%; height: 100%; background: oklch(0.45 0.12 255); border-radius: 3px;"></div>
+              </div>
+            </div>
+            <div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                <span style="font-size: 12px; color: oklch(0.80 0.01 250); font-weight: 500;">NEXUS</span>
+                <span style="font-size: 12px; color: oklch(0.70 0.15 70); font-weight: 600;">45%</span>
+              </div>
+              <div style="height: 6px; background: oklch(0.25 0.015 255); border-radius: 3px; overflow: hidden;">
+                <div style="width: 45%; height: 100%; background: oklch(0.70 0.15 70); border-radius: 3px;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="preview-panel">
+          <div class="preview-panel-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/></svg>
+            PR 平均合入时间
+          </div>
+          <div class="preview-panel-metric">36.5h</div>
+          <div class="preview-panel-sub">本周平均 (预警线 48h)</div>
+          <div class="bar-chart-demo" style="height: 60px;">
+            <div class="bar" style="height: 45%; background: oklch(0.45 0.12 255);"></div>
+            <div class="bar" style="height: 55%; background: oklch(0.45 0.12 255);"></div>
+            <div class="bar" style="height: 40%; background: oklch(0.45 0.12 255);"></div>
+            <div class="bar" style="height: 68%; background: oklch(0.45 0.12 255);"></div>
+            <div class="bar" style="height: 72%; background: oklch(0.70 0.15 70);"></div>
+            <div class="bar" style="height: 60%; background: oklch(0.45 0.12 255);"></div>
+            <div class="bar" style="height: 50%; background: oklch(0.45 0.12 255);"></div>
+            <div class="bar" style="height: 75%; background: oklch(0.45 0.12 255);"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ============================================================
+       5. MOTION
+       ============================================================ -->
+  <section class="section stagger-in">
+    <div class="section-label">05 / Motion</div>
+    <h2 class="section-title">动效基调</h2>
+    <p class="section-subtitle">
+      克制的微交互。使用 exponential easing（ease-out-quart），不使用 bounce/elastic。
+      Dashboard 场景优先数据呈现速度，动效为辅。Hover 查看效果。
+    </p>
+
+    <div class="motion-grid">
+      <div class="motion-card">
+        <div class="motion-label">entrance / 600ms</div>
+        <div class="motion-demo-box motion-demo-entrance"></div>
+        <div class="motion-desc">入场动画：translateY(16px) + fade<br>ease-out-expo</div>
+      </div>
+
+      <div class="motion-card">
+        <div class="motion-label">hover / 200ms</div>
+        <div class="motion-demo-box motion-demo-hover" style="transition: all var(--duration-fast) var(--ease-out-quart);"></div>
+        <div class="motion-desc">悬浮上移：translateY(-4px) + shadow<br>ease-out-quart</div>
+      </div>
+
+      <div class="motion-card">
+        <div class="motion-label">active / 100ms</div>
+        <div class="motion-demo-box motion-demo-scale" style="transition: all var(--duration-instant) var(--ease-out-quart);"></div>
+        <div class="motion-desc">按下缩放：scale(0.98)<br>ease-out-quart</div>
+      </div>
+    </div>
+
+    <div class="tokens-ref" style="margin-top: var(--space-10);">
+      <details>
+        <summary>Motion Tokens Reference</summary>
+        <table class="tokens-table">
+          <thead>
+            <tr><th>Token</th><th>Value</th><th>Usage</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="token-name">--duration-instant</td><td class="token-value">100ms</td><td>按钮 active、即时反馈</td></tr>
+            <tr><td class="token-name">--duration-fast</td><td class="token-value">200ms</td><td>hover 状态变化、tooltip</td></tr>
+            <tr><td class="token-name">--duration-normal</td><td class="token-value">300ms</td><td>面板展开、tab 切换</td></tr>
+            <tr><td class="token-name">--duration-slow</td><td class="token-value">500ms</td><td>图表过渡、布局变化</td></tr>
+            <tr><td class="token-name">--duration-entrance</td><td class="token-value">600ms</td><td>页面入场、面板首次加载</td></tr>
+            <tr><td class="token-name">--ease-out-quart</td><td class="token-value">cubic-bezier(0.25, 1, 0.5, 1)</td><td>默认 easing（大多数交互）</td></tr>
+            <tr><td class="token-name">--ease-out-expo</td><td class="token-value">cubic-bezier(0.16, 1, 0.3, 1)</td><td>入场动画、强调性过渡</td></tr>
+          </tbody>
+        </table>
+      </details>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       DESIGN TOKENS FULL REFERENCE (collapsed)
+       ============================================================ -->
+  <section class="section">
+    <div class="section-label">06 / Design Tokens</div>
+    <h2 class="section-title">设计令牌参考</h2>
+
+    <div class="tokens-ref">
+      <details>
+        <summary>Color Tokens</summary>
+        <table class="tokens-table">
+          <thead><tr><th>Token</th><th>OKLCH Value</th><th>Usage</th></tr></thead>
+          <tbody>
+            <tr><td class="token-name">--color-primary</td><td class="token-value">oklch(0.45 0.12 255)</td><td>品牌色 / 主按钮</td></tr>
+            <tr><td class="token-name">--color-primary-light</td><td class="token-value">oklch(0.55 0.10 255)</td><td>Hover 态</td></tr>
+            <tr><td class="token-name">--color-primary-dark</td><td class="token-value">oklch(0.35 0.14 255)</td><td>Active 态</td></tr>
+            <tr><td class="token-name">--color-accent</td><td class="token-value">oklch(0.75 0.15 75)</td><td>CTA / 数据高亮</td></tr>
+            <tr><td class="token-name">--color-success</td><td class="token-value">oklch(0.55 0.15 160)</td><td>完成 / 正向</td></tr>
+            <tr><td class="token-name">--color-warning</td><td class="token-value">oklch(0.65 0.16 70)</td><td>预警 / 到期（大文字）</td></tr>
+            <tr><td class="token-name">--color-warning-text</td><td class="token-value">oklch(0.55 0.18 70)</td><td>预警文字（小文字 AA）</td></tr>
+            <tr><td class="token-name">--color-error</td><td class="token-value">oklch(0.55 0.18 25)</td><td>错误 / 逾期</td></tr>
+            <tr><td class="token-name">--color-bg</td><td class="token-value">oklch(0.985 0.005 250)</td><td>页面背景</td></tr>
+            <tr><td class="token-name">--color-bg-dark</td><td class="token-value">oklch(0.15 0.02 255)</td><td>暗色区域</td></tr>
+            <tr><td class="token-name">--color-text-primary</td><td class="token-value">oklch(0.20 0.02 250)</td><td>主要文字</td></tr>
+            <tr><td class="token-name">--color-text-secondary</td><td class="token-value">oklch(0.45 0.02 250)</td><td>辅助文字</td></tr>
+            <tr><td class="token-name">--color-chart-1</td><td class="token-value">oklch(0.45 0.12 255) ~ #3B5998</td><td>图表系列 1 (Indigo)</td></tr>
+            <tr><td class="token-name">--color-chart-2</td><td class="token-value">oklch(0.55 0.15 160) ~ #0D9668</td><td>图表系列 2 (Green)</td></tr>
+            <tr><td class="token-name">--color-chart-3</td><td class="token-value">oklch(0.75 0.15 75) ~ #D4920A</td><td>图表系列 3 (Amber)</td></tr>
+            <tr><td class="token-name">--color-chart-4</td><td class="token-value">oklch(0.50 0.12 310) ~ #7C4DBA</td><td>图表系列 4 (Plum)</td></tr>
+            <tr><td class="token-name">--color-chart-5</td><td class="token-value">oklch(0.60 0.12 200) ~ #2B8CA3</td><td>图表系列 5 (Teal)</td></tr>
+          </tbody>
+        </table>
+      </details>
+    </div>
+
+    <div class="tokens-ref">
+      <details>
+        <summary>Spacing Tokens</summary>
+        <table class="tokens-table">
+          <thead><tr><th>Token</th><th>Value</th><th>Usage</th></tr></thead>
+          <tbody>
+            <tr><td class="token-name">--space-1</td><td class="token-value">4px</td><td>最小间距</td></tr>
+            <tr><td class="token-name">--space-2</td><td class="token-value">8px</td><td>紧凑间距</td></tr>
+            <tr><td class="token-name">--space-3</td><td class="token-value">12px</td><td>组件内边距</td></tr>
+            <tr><td class="token-name">--space-4</td><td class="token-value">16px</td><td>标准间距</td></tr>
+            <tr><td class="token-name">--space-6</td><td class="token-value">24px</td><td>区块间距</td></tr>
+            <tr><td class="token-name">--space-8</td><td class="token-value">32px</td><td>Section 内边距</td></tr>
+            <tr><td class="token-name">--space-12</td><td class="token-value">48px</td><td>大区块间距</td></tr>
+            <tr><td class="token-name">--space-16</td><td class="token-value">64px</td><td>Section 间距</td></tr>
+          </tbody>
+        </table>
+      </details>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       FOOTER
+       ============================================================ -->
+  <footer class="footer">
+    <p class="footer-text">DevPerf Dashboard -- Phase 0 Design Style Reference -- 2026-04-09</p>
+    <p class="footer-text" style="margin-top: var(--space-2);">风格确认后进入 Phase 1 完整页面设计与开发</p>
+  </footer>
+
+</div>
+</body>
+</html>

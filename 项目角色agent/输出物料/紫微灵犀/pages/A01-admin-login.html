@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>紫微灵犀 · 主控核心 — 接入认证</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root { --c-gold: #D4AF37; --c-gold-dim: rgba(212, 175, 55, 0.4); --c-bg: #000000; --text-main: rgba(255,255,255,0.9); }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--c-bg); color: var(--text-main); font-family: 'Noto Serif SC', serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+
+.starfield { position: fixed; inset: 0; z-index: -2; pointer-events: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Ccircle cx='50' cy='150' r='1' fill='rgba(212,175,55,0.4)'/%3E%3Ccircle cx='300' cy='80' r='1.5' fill='rgba(255,255,255,0.6)'/%3E%3Ccircle cx='120' cy='320' r='0.5' fill='rgba(212,175,55,0.2)'/%3E%3C/svg%3E"); background-size: 200px 200px; }
+.bg-ambient { position: fixed; inset: 0; z-index: -1; background-image: radial-gradient(circle at 50% 30%, rgba(212, 175, 55, 0.06) 0%, transparent 70%); }
+
+.corner-dec { position: fixed; width: 24px; height: 24px; border: 1px solid var(--c-gold-dim); opacity: 0.5; }
+.ctl { top: 24px; left: 24px; border-right: none; border-bottom: none; }
+.ctr { top: 24px; right: 24px; border-left: none; border-bottom: none; }
+.cbl { bottom: 24px; left: 24px; border-right: none; border-top: none; }
+.cbr { bottom: 24px; right: 24px; border-left: none; border-top: none; }
+
+.admin-card {
+  width: 100%; max-width: 380px; padding: 40px 32px;
+  background: rgba(10,10,15,0.85); border: 1px solid var(--c-gold);
+  box-shadow: 0 0 60px rgba(212,175,55,0.12), inset 0 0 30px rgba(212,175,55,0.04);
+  backdrop-filter: blur(20px); border-radius: 4px;
+}
+
+.admin-emblem { width: 56px; height: 56px; margin: 0 auto 24px; border: 1px solid var(--c-gold); display: flex; align-items: center; justify-content: center; color: var(--c-gold); font-size: 24px; box-shadow: 0 0 20px rgba(212,175,55,0.2); transform: rotate(45deg); }
+.admin-emblem span { transform: rotate(-45deg); }
+
+.admin-title { text-align: center; font-size: 20px; color: var(--c-gold); letter-spacing: 6px; margin-bottom: 4px; font-weight: 600; }
+.admin-subtitle { text-align: center; font-size: 11px; color: rgba(255,255,255,0.5); letter-spacing: 4px; margin-bottom: 36px; }
+
+.field { margin-bottom: 20px; }
+.field-label { display: block; font-size: 11px; color: var(--c-gold); letter-spacing: 3px; margin-bottom: 8px; }
+.field-input { width: 100%; padding: 12px 14px; background: rgba(0,0,0,0.6); border: 1px solid var(--c-gold-dim); color: #fff; font-family: inherit; font-size: 14px; outline: none; letter-spacing: 1px; transition: 0.3s; }
+.field-input:focus { border-color: var(--c-gold); box-shadow: inset 0 0 10px rgba(212,175,55,0.1); }
+
+.action-btn { width: 100%; margin-top: 12px; padding: 14px; border: 1px solid var(--c-gold); color: var(--c-gold); background: transparent; font-family: inherit; font-size: 14px; letter-spacing: 4px; cursor: pointer; transition: 0.3s; box-shadow: inset 0 0 10px rgba(212,175,55,0.05); }
+.action-btn:hover { background: rgba(212,175,55,0.1); box-shadow: 0 0 20px rgba(212,175,55,0.2); }
+
+.warn-text { text-align: center; font-size: 10px; color: rgba(255,255,255,0.35); margin-top: 24px; letter-spacing: 1px; line-height: 1.6; }
+.warn-text span { color: rgba(255,100,100,0.7); }
+</style>
+</head>
+<body>
+<div class="starfield"></div><div class="bg-ambient"></div>
+<div class="corner-dec ctl"></div><div class="corner-dec ctr"></div>
+<div class="corner-dec cbl"></div><div class="corner-dec cbr"></div>
+
+<form class="admin-card" onsubmit="event.preventDefault();location.href='A05-admin-stats.html'">
+  <div class="admin-emblem"><span>枢</span></div>
+  <div class="admin-title">紫微灵犀</div>
+  <div class="admin-subtitle">主控核心</div>
+
+  <div class="field">
+    <label class="field-label">操守者编号</label>
+    <input type="text" class="field-input" placeholder="admin" value="admin" />
+  </div>
+
+  <div class="field">
+    <label class="field-label">主控密钥</label>
+    <input type="password" class="field-input" placeholder="••••••••" value="********" />
+  </div>
+
+  <button type="submit" class="action-btn">进入主控核心</button>
+
+  <div class="warn-text"><span>⚠</span> 未授权访问将被记录并追溯</div>
+</form>
+
+</body>
+</html>

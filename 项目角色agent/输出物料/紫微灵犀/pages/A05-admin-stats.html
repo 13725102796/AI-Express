@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>主控核心 — 数据概览</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root { --c-gold: #D4AF37; --c-gold-dim: rgba(212, 175, 55, 0.4); --c-bg: #000000; --text-main: rgba(255,255,255,0.9); }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--c-bg); color: var(--text-main); font-family: 'Noto Serif SC', serif; min-height: 100vh; display: flex; }
+.starfield { position: fixed; inset: 0; z-index: -2; pointer-events: none; opacity: 0.5; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Ccircle cx='50' cy='150' r='1' fill='rgba(212,175,55,0.4)'/%3E%3Ccircle cx='300' cy='80' r='1.5' fill='rgba(255,255,255,0.6)'/%3E%3C/svg%3E"); background-size: 200px 200px; }
+
+.sidebar { width: 200px; min-height: 100vh; background: rgba(10,10,15,0.9); border-right: 1px solid var(--c-gold-dim); padding: 24px 0; flex-shrink: 0; position: sticky; top: 0; }
+.side-logo { padding: 0 24px 24px; border-bottom: 1px solid rgba(212,175,55,0.15); margin-bottom: 16px; }
+.side-logo-title { font-size: 16px; color: var(--c-gold); letter-spacing: 4px; font-weight: 600; }
+.side-logo-sub { font-size: 9px; color: rgba(255,255,255,0.4); letter-spacing: 3px; margin-top: 4px; }
+.side-menu { display: flex; flex-direction: column; }
+.side-item { padding: 14px 24px; color: rgba(255,255,255,0.6); text-decoration: none; font-size: 13px; letter-spacing: 1px; border-left: 2px solid transparent; transition: 0.3s; }
+.side-item:hover { background: rgba(212,175,55,0.05); color: var(--c-gold); }
+.side-item.active { background: rgba(212,175,55,0.08); color: var(--c-gold); border-left-color: var(--c-gold); }
+.side-divider { height: 1px; background: rgba(212,175,55,0.1); margin: 16px 24px; }
+
+.main { flex: 1; min-width: 0; }
+.topbar { padding: 14px 32px; background: rgba(10,10,15,0.6); border-bottom: 1px solid rgba(212,175,55,0.1); display: flex; justify-content: space-between; align-items: center; }
+.topbar-title { font-size: 14px; color: rgba(255,255,255,0.7); letter-spacing: 2px; }
+.topbar-user { font-size: 12px; color: rgba(255,255,255,0.6); }
+.topbar-user a { color: var(--c-gold); text-decoration: none; padding: 4px 12px; border: 1px solid var(--c-gold-dim); border-radius: 99px; font-size: 11px; margin-left: 12px; }
+
+.content { padding: 32px; max-width: 1400px; }
+.page-title { font-size: 22px; color: var(--c-gold); letter-spacing: 4px; margin-bottom: 8px; font-weight: 600; }
+.page-desc { font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 32px; letter-spacing: 1px; }
+.page-desc span { color: var(--c-gold); }
+
+/* 数字卡片网格（PRD Q6 - 6 张数据卡） */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 36px; }
+.stat-card { padding: 24px 22px; background: rgba(10,10,15,0.6); border: 1px solid rgba(212,175,55,0.15); border-radius: 12px; transition: 0.3s; position: relative; overflow: hidden; }
+.stat-card::before { content: ''; position: absolute; top: -1px; left: -1px; right: -1px; height: 2px; background: linear-gradient(90deg, transparent, var(--c-gold), transparent); opacity: 0.6; }
+.stat-card:hover { border-color: var(--c-gold-dim); box-shadow: 0 4px 24px rgba(212,175,55,0.06); }
+.stat-label { font-size: 11px; color: rgba(255,255,255,0.5); letter-spacing: 2px; margin-bottom: 12px; }
+.stat-value { font-size: 32px; color: var(--c-gold); font-weight: 600; letter-spacing: 1px; line-height: 1; margin-bottom: 8px; }
+.stat-meta { font-size: 11px; color: rgba(255,255,255,0.5); }
+.stat-meta .up { color: #6ec06d; }
+.stat-meta .down { color: #ff8888; }
+
+/* Top 5 模板列表 */
+.section-title { font-size: 14px; color: var(--c-gold); letter-spacing: 3px; padding: 8px 0; border-bottom: 1px solid var(--c-gold-dim); margin-bottom: 16px; }
+
+.top-list { background: rgba(10,10,15,0.6); border: 1px solid rgba(212,175,55,0.1); border-radius: 12px; overflow: hidden; }
+.top-row { display: flex; align-items: center; padding: 16px 20px; border-bottom: 1px solid rgba(212,175,55,0.06); transition: 0.3s; }
+.top-row:last-child { border-bottom: none; }
+.top-row:hover { background: rgba(212,175,55,0.03); }
+.top-rank { font-size: 22px; color: var(--c-gold); font-weight: 600; min-width: 40px; }
+.top-rank.first { font-size: 28px; }
+.top-content { flex: 1; }
+.top-name { font-size: 14px; color: rgba(255,255,255,0.85); margin-bottom: 4px; letter-spacing: 1px; }
+.top-tags { display: flex; gap: 6px; }
+.top-tag { font-size: 10px; padding: 2px 6px; border: 1px solid var(--c-gold-dim); color: rgba(212,175,55,0.7); border-radius: 4px; }
+.top-count { font-size: 18px; color: var(--c-gold); font-weight: 600; }
+.top-bar { width: 200px; height: 6px; background: rgba(212,175,55,0.06); margin: 0 16px; border-radius: 99px; overflow: hidden; }
+.top-bar-fill { height: 100%; background: linear-gradient(90deg, var(--c-gold), rgba(212,175,55,0.6)); }
+
+.note { font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 16px; letter-spacing: 1px; }
+</style>
+</head>
+<body>
+<div class="starfield"></div>
+
+<aside class="sidebar">
+  <div class="side-logo">
+    <div class="side-logo-title">紫微灵犀</div>
+    <div class="side-logo-sub">主控核心</div>
+  </div>
+  <nav class="side-menu">
+    <a href="A05-admin-stats.html" class="side-item active">数据概览</a>
+    <a href="A02-admin-templates.html" class="side-item">神谕模块管理</a>
+    <a href="A04-admin-points-config.html" class="side-item">灵犀经济配置</a>
+    <a href="A03-admin-users.html" class="side-item">缘主管理</a>
+    <div class="side-divider"></div>
+    <a href="A01-admin-login.html" class="side-item">切断接入</a>
+  </nav>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-title">数据概览</div>
+    <div class="topbar-user">操守者：admin <a href="A01-admin-login.html">退出</a></div>
+  </div>
+
+  <div class="content">
+    <h1 class="page-title">数据概览</h1>
+    <p class="page-desc">数据更新时间：<span>2026-04-17 14:32</span></p>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">累计接入缘主</div>
+        <div class="stat-value">12,345</div>
+        <div class="stat-meta"><span class="up">↑ 12.3%</span> 较上周</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">今日新增缘主</div>
+        <div class="stat-value">56</div>
+        <div class="stat-meta"><span class="up">↑ 8.6%</span> 较昨日</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">累计神谕推演</div>
+        <div class="stat-value">23,456</div>
+        <div class="stat-meta"><span class="up">↑ 15.2%</span> 较上周</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">今日推演次数</div>
+        <div class="stat-value">234</div>
+        <div class="stat-meta"><span class="down">↓ 3.1%</span> 较昨日</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">累计灵犀发放</div>
+        <div class="stat-value">1,234,500</div>
+        <div class="stat-meta">¤ · 含注册/签到/分享/邀请</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">累计灵犀消耗</div>
+        <div class="stat-value">234,500</div>
+        <div class="stat-meta">¤ · 含启封/推演 · 占发放 19%</div>
+      </div>
+    </div>
+
+    <div class="section-title">神谕模块启封排行 Top 5</div>
+
+    <div class="top-list">
+      <div class="top-row">
+        <div class="top-rank first">1</div>
+        <div class="top-content">
+          <div class="top-name">命格初探</div>
+          <div class="top-tags"><span class="top-tag">命宫</span><span class="top-tag">性格</span><span class="top-tag">限免</span></div>
+        </div>
+        <div class="top-bar"><div class="top-bar-fill" style="width:100%;"></div></div>
+        <div class="top-count">12,456</div>
+      </div>
+      <div class="top-row">
+        <div class="top-rank">2</div>
+        <div class="top-content">
+          <div class="top-name">今日运势</div>
+          <div class="top-tags"><span class="top-tag">流日</span><span class="top-tag">运势</span><span class="top-tag">限免</span></div>
+        </div>
+        <div class="top-bar"><div class="top-bar-fill" style="width:72%;"></div></div>
+        <div class="top-count">8,932</div>
+      </div>
+      <div class="top-row">
+        <div class="top-rank">3</div>
+        <div class="top-content">
+          <div class="top-name">感情桃花密码</div>
+          <div class="top-tags"><span class="top-tag">感情</span><span class="top-tag">夫妻</span></div>
+        </div>
+        <div class="top-bar"><div class="top-bar-fill" style="width:54%;"></div></div>
+        <div class="top-count">6,789</div>
+      </div>
+      <div class="top-row">
+        <div class="top-rank">4</div>
+        <div class="top-content">
+          <div class="top-name">事业财帛全景观</div>
+          <div class="top-tags"><span class="top-tag">事业</span><span class="top-tag">财帛</span></div>
+        </div>
+        <div class="top-bar"><div class="top-bar-fill" style="width:45%;"></div></div>
+        <div class="top-count">5,621</div>
+      </div>
+      <div class="top-row">
+        <div class="top-rank">5</div>
+        <div class="top-content">
+          <div class="top-name">流年运程详批</div>
+          <div class="top-tags"><span class="top-tag">大限</span><span class="top-tag">流年</span></div>
+        </div>
+        <div class="top-bar"><div class="top-bar-fill" style="width:33%;"></div></div>
+        <div class="top-count">4,123</div>
+      </div>
+    </div>
+
+    <div class="note">⚠ MVP 阶段（用户 &lt; 1 万）仅提供基础数据，复杂图表与漏斗分析将在阶段二上线（PRD Q6）</div>
+  </div>
+</main>
+
+</body>
+</html>

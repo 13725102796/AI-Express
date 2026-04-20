@@ -184,11 +184,27 @@ Part C: 集成验证
 ### Step 0：读取 Phase 过渡文档（必须首先执行）
 
 1. 读取 `输出物料/[项目名称]/phase1-to-phase2.md`
-2. 验证 `<decisions>` 所有字段非空
-3. 验证 `<file-manifest>` 中列出的文件实际存在
-4. 将 `<context-for-agents>` 内容记录为本 phase 的**基础上下文**
-5. 后续所有 agent 派发的 `<context-snapshot>` 必须包含此基础上下文
-6. 如果过渡文档缺失或不完整 → 停止流程，提示用户先完成 Phase 1
+2. **强制校验用户确认门**（在任何其他校验之前）：
+   - 文档顶部必须存在 `<user-approval>` 块
+   - `<status>` 必须为 `approved`
+   - `<approved-at>` 必须为有效时间戳
+   - `<design-source>` 字段非空（值为 `original-page-design-agent` 或 `user-replaced`）
+   - 任一字段缺失或 status≠approved → **立即停止流程**，向用户输出：
+     ```
+     ⛔ Phase 2 启动失败：phase1-to-phase2.md 未包含有效的 <user-approval> 块。
+     请先在 Phase 1 完成后回复设计确认语（"设计确认通过" / "Phase 2" /
+     "设计已替换，继续 Phase 2"），由 phase1-orchestrator 写入用户确认信息。
+     ```
+3. **如 `<design-source>` = `user-replaced`**：表明用户用其他模型替换了设计稿
+   - 重新对齐设计系统：在派发给 tech-architect-agent 前，先 Read 1-2 个
+     替换后的 `pages/*.html`，提取实际使用的 CSS 变量/字体/间距，更新
+     `<context-for-agents>` 中的设计令牌摘要
+   - 在 `<notes>` 提及的特殊说明必须传递给所有下游 agent
+4. 验证 `<decisions>` 所有字段非空
+5. 验证 `<file-manifest>` 中列出的文件实际存在
+6. 将 `<context-for-agents>` 内容记录为本 phase 的**基础上下文**
+7. 后续所有 agent 派发的 `<context-snapshot>` 必须包含此基础上下文
+8. 如果过渡文档缺失或不完整 → 停止流程，提示用户先完成 Phase 1
 
 ## Part A：技术架构设计
 

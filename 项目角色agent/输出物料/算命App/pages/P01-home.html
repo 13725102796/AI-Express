@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>天机 AI 算命</title>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=ZCOOL+XiaoWei&family=Noto+Sans+SC:wght@300;400;500;700&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,700;1,9..144,400;1,9..144,700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg-obsidian:          oklch(0.12 0.01 260); 
+  --bg-obsidian-light:    oklch(0.18 0.02 260);
+  
+  --glow-gold:            oklch(0.85 0.16 85);
+  --glow-gold-dim:        oklch(0.70 0.14 80);
+
+  --text-pure:            oklch(0.98 0.01 260);
+  --text-dim:             oklch(0.75 0.02 260);
+  --text-ghost:           oklch(0.50 0.02 260);
+
+  --glass-bg:             oklch(0.18 0.02 260 / 0.45);
+  --glass-border:         oklch(0.98 0.01 260 / 0.12);
+  --glass-border-gold:    oklch(0.85 0.16 85 / 0.3);
+
+  --shadow-luminous:      0 0 24px oklch(0.85 0.16 85 / 0.2), 0 4px 16px oklch(0 0 0 / 0.5);
+  --shadow-glass:         0 -8px 32px oklch(0 0 0 / 0.4);
+
+  --ease-elastic:         cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-smooth:          cubic-bezier(0.25, 1, 0.5, 1);
+  --duration-base:        400ms;
+
+  --radius-xl:            32px;
+  --radius-lg:            24px;
+  --radius-md:            16px;
+  --radius-full:          9999px;
+
+  --font-display:         'ZCOOL XiaoWei', serif;
+  --font-body:            'Noto Sans SC', sans-serif;
+  --font-magic:           'Fraunces', serif;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box; margin: 0; padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  background-color: var(--bg-obsidian);
+  color: var(--text-pure);
+  font-family: var(--font-body);
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Prevent scrolling on home, full app-like feel */
+  position: relative;
+}
+
+/* ============================================================
+   BACKGROUND (Ambient Glowing Mysticism)
+   ============================================================ */
+.ambient-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: radial-gradient(circle at 50% 20%, oklch(0.25 0.12 260) 0%, transparent 50%),
+              radial-gradient(circle at 80% 100%, oklch(0.35 0.1 20) 0%, transparent 40%),
+              radial-gradient(circle at 10% 80%, oklch(0.20 0.1 280) 0%, transparent 40%);
+  background-color: var(--bg-obsidian);
+}
+
+.ambient-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+
+/* ============================================================
+   HERO AREA (Centered initially, pushed up by Action Sheet)
+   ============================================================ */
+.hero {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  padding-bottom: 40vh; /* space for action sheet */
+  transition: transform 0.6s var(--ease-elastic);
+}
+
+.bagua-icon {
+  width: 140px;
+  height: 140px;
+  margin-bottom: 24px;
+  color: var(--glow-gold);
+  filter: drop-shadow(0 0 32px var(--glow-gold-dim));
+  animation: floatOrb 6s ease-in-out infinite, rotateSlow 60s linear infinite;
+}
+
+@keyframes floatOrb {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-10px) scale(1.02); filter: drop-shadow(0 0 48px var(--glow-gold)); }
+}
+
+@keyframes rotateSlow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.title-hero {
+  font-family: var(--font-display);
+  font-size: 3rem;
+  font-weight: 400;
+  letter-spacing: 0.15em;
+  margin-bottom: 4px;
+  text-shadow: 0 4px 24px oklch(0 0 0 / 0.8);
+  animation: fadeIn 1.2s var(--ease-smooth) forwards;
+}
+
+.subtitle {
+  font-family: var(--font-magic);
+  font-size: 1rem;
+  color: var(--glow-gold);
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  opacity: 0.8;
+  animation: fadeIn 1.5s var(--ease-smooth) forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================
+   ACTION SHEET (Interactive Bottom Form)
+   ============================================================ */
+.action-sheet {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  background: var(--glass-bg);
+  backdrop-filter: blur(32px);
+  -webkit-backdrop-filter: blur(32px);
+  border-top: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  box-shadow: var(--shadow-glass);
+  padding: 32px 24px calc(24px + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  transform: translateY(0);
+  transition: transform 0.4s var(--ease-elastic);
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.sheet-handle {
+  width: 48px;
+  height: 4px;
+  background: var(--glass-border);
+  border-radius: var(--radius-full);
+  margin: -16px auto 16px auto;
+}
+
+.sheet-title {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  color: var(--text-pure);
+  text-align: center;
+  letter-spacing: 0.05em;
+}
+
+/* ============================================================
+   INPUT FORM
+   ============================================================ */
+.input-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.input-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.input-label {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  font-family: var(--font-magic);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding-left: 4px;
+}
+
+.custom-select {
+  width: 100%;
+  height: 52px;
+  background: oklch(0 0 0 / 0.2);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  color: var(--glow-gold);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  padding: 0 16px;
+  appearance: none;
+  cursor: pointer;
+  outline: none;
+  transition: all var(--duration-base) var(--ease-smooth);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d4a853' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  background-size: 16px;
+}
+
+.custom-select:focus {
+  border-color: var(--glass-border-gold);
+  background: oklch(0 0 0 / 0.4);
+  box-shadow: 0 0 0 4px oklch(0.85 0.16 85 / 0.1);
+}
+
+.custom-select option {
+  background: var(--bg-obsidian-light);
+  color: var(--text-pure);
+}
+
+.gender-toggle {
+  display: flex;
+  background: oklch(0 0 0 / 0.2);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-full);
+  height: 48px;
+  padding: 4px;
+  margin-bottom: 8px;
+}
+
+.gender-toggle label {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--duration-base) var(--ease-elastic);
+}
+
+.gender-toggle input {
+  display: none;
+}
+
+.gender-toggle input:checked + span {
+  color: var(--bg-obsidian);
+}
+
+/* Background pill for toggle */
+.gender-toggle {
+  position: relative;
+}
+.gender-pill {
+  position: absolute;
+  top: 4px; left: 4px; bottom: 4px;
+  width: calc(33.33% - 4px);
+  background: var(--glow-gold);
+  border-radius: var(--radius-full);
+  transition: transform var(--duration-base) var(--ease-elastic);
+  z-index: 0;
+}
+.gender-toggle label span { position: relative; z-index: 1; }
+
+.gender-toggle input[value="nil"]:checked ~ .gender-pill { transform: translateX(0); }
+.gender-toggle input[value="male"]:checked ~ .gender-pill { transform: translateX(100%); }
+.gender-toggle input[value="female"]:checked ~ .gender-pill { transform: translateX(200%); }
+
+/* ============================================================
+   KINETIC BUTTON
+   ============================================================ */
+.btn-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 56px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, var(--glow-gold), var(--glow-gold-dim));
+  color: var(--bg-obsidian);
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  border: none;
+  cursor: pointer;
+  box-shadow: var(--shadow-luminous);
+  transition: all var(--duration-base) var(--ease-elastic);
+  position: relative;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.btn-submit::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, oklch(1 1 1 / 0.4), transparent);
+  transform: translateX(-100%);
+  animation: shine 4s infinite 2s;
+}
+
+@keyframes shine {
+  0% { transform: translateX(-100%); }
+  20%, 100% { transform: translateX(100%); }
+}
+
+.btn-submit:active {
+  transform: scale(0.95);
+  box-shadow: 0 0 32px var(--glow-gold);
+}
+
+.btn-icon {
+  margin-left: 8px;
+  transition: transform var(--duration-base) var(--ease-elastic);
+}
+
+.btn-submit:active .btn-icon {
+  transform: translateX(4px);
+}
+
+/* Spinner for loading state */
+.spinner {
+  display: none;
+  width: 24px;
+  height: 24px;
+  border: 3px solid oklch(0.12 0.01 260 / 0.3);
+  border-top-color: var(--bg-obsidian);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.btn-submit.loading .btn-text, .btn-submit.loading .btn-icon { display: none; }
+.btn-submit.loading .spinner { display: block; }
+.btn-submit.loading { pointer-events: none; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ============================================================
+   APP START UP ANIMATION
+   ============================================================ */
+.action-sheet {
+  animation: slideUp 1s var(--ease-elastic) 0.5s both;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+</style>
+</head>
+<body>
+
+  <div class="ambient-bg"></div>
+
+  <div class="hero">
+    <svg class="bagua-icon" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="60" cy="60" r="56" stroke="currentColor" stroke-width="1.5" opacity="0.3"/>
+      <circle cx="60" cy="60" r="44" stroke="currentColor" stroke-width="1" opacity="0.2"/>
+      <path d="M60 16 A44 44 0 0 1 60 104 A22 22 0 0 1 60 60 A22 22 0 0 0 60 16Z" fill="currentColor" opacity="0.9"/>
+      <path d="M60 16 A44 44 0 0 0 60 104 A22 22 0 0 0 60 60 A22 22 0 0 1 60 16Z" fill="currentColor" opacity="0.15"/>
+      <circle cx="60" cy="38" r="6" fill="var(--bg-obsidian)" opacity="0.9"/>
+      <circle cx="60" cy="82" r="6" fill="currentColor" opacity="0.9"/>
+    </svg>
+
+    <h1 class="title-hero">天 机</h1>
+    <div class="subtitle">Celestial Oracle</div>
+  </div>
+
+  <div class="action-sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">输入您的诞生时刻</div>
+
+    <!-- Gender Toggle -->
+    <div class="gender-toggle">
+      <div class="gender-pill"></div>
+      <label>
+        <input type="radio" name="gender" value="nil" checked>
+        <span>保密</span>
+      </label>
+      <label>
+        <input type="radio" name="gender" value="male">
+        <span>男</span>
+      </label>
+      <label>
+        <input type="radio" name="gender" value="female">
+        <span>女</span>
+      </label>
+    </div>
+
+    <!-- Date Selectors -->
+    <div class="input-grid">
+      <div class="input-block">
+        <span class="input-label">Year</span>
+        <select class="custom-select" id="selYear"></select>
+      </div>
+      <div class="input-block">
+        <span class="input-label">Month</span>
+        <select class="custom-select" id="selMonth">
+          <option value="1">正月</option>
+          <option value="2">二月</option>
+          <option value="3">三月</option>
+          <option value="4">四月</option>
+          <option value="5">五月</option>
+          <option value="6">六月</option>
+          <option value="7">七月</option>
+          <option value="8">八月</option>
+          <option value="9">九月</option>
+          <option value="10">十月</option>
+          <option value="11">冬月</option>
+          <option value="12">腊月</option>
+        </select>
+      </div>
+      <div class="input-block">
+        <span class="input-label">Day</span>
+        <select class="custom-select" id="selDay"></select>
+      </div>
+      <div class="input-block">
+        <span class="input-label">Hour</span>
+        <select class="custom-select" id="selHour">
+          <option value="-1">不确定时辰</option>
+          <option value="0">子时 (23-01)</option>
+          <option value="1">丑时 (01-03)</option>
+          <option value="2">寅时 (03-05)</option>
+          <option value="3">卯时 (05-07)</option>
+          <option value="4">辰时 (07-09)</option>
+          <option value="5">巳时 (09-11)</option>
+          <option value="6">午时 (11-13)</option>
+          <option value="7">未时 (13-15)</option>
+          <option value="8">申时 (15-17)</option>
+          <option value="9">酉时 (17-19)</option>
+          <option value="10">戌时 (19-21)</option>
+          <option value="11">亥时 (21-23)</option>
+        </select>
+      </div>
+    </div>
+
+    <button class="btn-submit" onclick="startReading(this)">
+      <span class="btn-text">立 即 排 盘</span>
+      <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      <div class="spinner"></div>
+    </button>
+  </div>
+
+  <script>
+    // Init dates
+    const selYear = document.getElementById('selYear');
+    for(let y=1940; y<=2026; y++) {
+      const op = document.createElement('option');
+      op.value = y; op.text = y+'年';
+      if(y===1995) op.selected = true;
+      selYear.appendChild(op);
+    }
+
+    const DAY_NAMES = ['初一','初二','初三','初四','初五','初六','初七','初八','初九','初十','十一','十二','十三','十四','十五','十六','十七','十八','十九','二十','廿一','廿二','廿三','廿四','廿五','廿六','廿七','廿八','廿九','三十'];
+    const selDay = document.getElementById('selDay');
+    for(let d=1; d<=30; d++) {
+      const op = document.createElement('option');
+      op.value = d; op.text = DAY_NAMES[d-1];
+      selDay.appendChild(op);
+    }
+
+    function startReading(btn) {
+      if(btn.classList.contains('loading')) return;
+      btn.classList.add('loading');
+      
+      // Animate background drastically
+      const bagua = document.querySelector('.bagua-icon');
+      bagua.style.animation = 'rotateSlow 1s linear infinite, floatOrb 1s ease-in-out infinite';
+      bagua.style.filter = 'drop-shadow(0 0 60px var(--glow-gold))';
+      
+      setTimeout(() => {
+        window.location.href = 'P02-chat.html';
+      }, 1500);
+    }
+  </script>
+</body>
+</html>

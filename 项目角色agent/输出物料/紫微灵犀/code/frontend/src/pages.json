@@ -1,0 +1,220 @@
+{
+  "easycom": {
+    "autoscan": true,
+    "custom": {
+      "^Base(.*)": "@/components/Base$1.vue",
+      "^Palace(.*)": "@/components/Palace$1.vue"
+    }
+  },
+  "pages": [
+    {
+      "path": "pages/index/index",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTextStyle": "white",
+        "navigationBarBackgroundColor": "#000000",
+        "backgroundColor": "#000000"
+      }
+    },
+    {
+      "path": "pages/login/login",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTextStyle": "white",
+        "navigationBarBackgroundColor": "#000000",
+        "backgroundColor": "#000000"
+      }
+    },
+    {
+      "path": "pages/profile-setup/profile-setup",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTextStyle": "white",
+        "navigationBarBackgroundColor": "#000000",
+        "backgroundColor": "#000000"
+      }
+    },
+    {
+      "path": "pages/profile/profile",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTextStyle": "white",
+        "navigationBarBackgroundColor": "#000000",
+        "backgroundColor": "#000000"
+      }
+    }
+  ],
+  "subPackages": [
+    {
+      "root": "sub-chart",
+      "pages": [
+        {
+          "path": "pages/chart/chart",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTextStyle": "white",
+            "navigationBarBackgroundColor": "#000000",
+            "backgroundColor": "#000000"
+          }
+        }
+      ]
+    },
+    {
+      "root": "sub-reading",
+      "pages": [
+        {
+          "path": "pages/reading/reading",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTextStyle": "white",
+            "navigationBarBackgroundColor": "#000000",
+            "backgroundColor": "#000000"
+          }
+        },
+        {
+          "path": "pages/report/report",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTextStyle": "white",
+            "navigationBarBackgroundColor": "#000000",
+            "backgroundColor": "#000000"
+          }
+        },
+        {
+          "path": "pages/my-templates/my-templates",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTextStyle": "white",
+            "navigationBarBackgroundColor": "#000000",
+            "backgroundColor": "#000000"
+          }
+        },
+        {
+          "path": "pages/my-reports/my-reports",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTextStyle": "white",
+            "navigationBarBackgroundColor": "#000000",
+            "backgroundColor": "#000000"
+          }
+        }
+      ]
+    },
+    {
+      "root": "sub-user",
+      "pages": [
+        {
+          "path": "pages/points/points",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTextStyle": "white",
+            "navigationBarBackgroundColor": "#000000",
+            "backgroundColor": "#000000"
+          }
+        },
+        {
+          "path": "pages/templates/templates",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTextStyle": "white",
+            "navigationBarBackgroundColor": "#000000",
+            "backgroundColor": "#000000"
+          }
+        },
+        {
+          "path": "pages/template-detail/template-detail",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTextStyle": "white",
+            "navigationBarBackgroundColor": "#000000",
+            "backgroundColor": "#000000"
+          }
+        },
+        {
+          "path": "pages/invite/invite",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTextStyle": "white",
+            "navigationBarBackgroundColor": "#000000",
+            "backgroundColor": "#000000"
+          }
+        }
+      ]
+    },
+    {
+      "root": "pages-admin",
+      "pages": [
+        {
+          "path": "login/login",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTextStyle": "white",
+            "navigationBarBackgroundColor": "#000000",
+            "backgroundColor": "#000000"
+          }
+        },
+        {
+          "path": "templates/templates",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTextStyle": "white",
+            "navigationBarBackgroundColor": "#000000",
+            "backgroundColor": "#000000"
+          }
+        },
+        {
+          "path": "users/users",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTextStyle": "white",
+            "navigationBarBackgroundColor": "#000000",
+            "backgroundColor": "#000000"
+          }
+        },
+        {
+          "path": "points-config/points-config",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTextStyle": "white",
+            "navigationBarBackgroundColor": "#000000",
+            "backgroundColor": "#000000"
+          }
+        },
+        {
+          "path": "stats/stats",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTextStyle": "white",
+            "navigationBarBackgroundColor": "#000000",
+            "backgroundColor": "#000000"
+          }
+        }
+      ]
+    }
+  ],
+  "tabBar": {
+    "custom": true,
+    "color": "rgba(255,255,255,0.4)",
+    "selectedColor": "#D4AF37",
+    "backgroundColor": "#000000",
+    "borderStyle": "black",
+    "height": "64px",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "主页"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "本我"
+      }
+    ]
+  },
+  "globalStyle": {
+    "navigationBarTextStyle": "white",
+    "navigationBarTitleText": "紫微灵犀",
+    "navigationBarBackgroundColor": "#000000",
+    "backgroundColor": "#000000",
+    "backgroundTextStyle": "light"
+  }
+}

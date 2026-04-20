@@ -1,0 +1,378 @@
+{
+  "results": [
+    {
+      "page": "Login",
+      "step": "Open app",
+      "expected": "Login page",
+      "actual": "Page loaded",
+      "screenshot": "001-initial-page.png",
+      "status": "INFO"
+    },
+    {
+      "page": "Login",
+      "step": "Fill credentials",
+      "expected": "Form filled",
+      "actual": "Credentials entered",
+      "screenshot": "002-login-form-filled.png",
+      "status": "PASS"
+    },
+    {
+      "page": "Login",
+      "step": "Submit login",
+      "expected": "Redirect to dashboard",
+      "actual": "Redirected to http://localhost:5173/",
+      "screenshot": "003-after-login.png",
+      "status": "PASS"
+    },
+    {
+      "page": "Login",
+      "step": "Console errors",
+      "expected": "0 errors",
+      "actual": "0 errors",
+      "screenshot": "-",
+      "status": "PASS"
+    },
+    {
+      "page": "Overview",
+      "step": "Project names visible",
+      "expected": "Avatar/AirFlow/DataHub/OPS",
+      "actual": "Project names not found in text",
+      "screenshot": "004-team-overview-full.png",
+      "status": "FAIL"
+    },
+    {
+      "page": "Overview",
+      "step": "Chart elements exist",
+      "expected": "Charts rendered (canvas/SVG)",
+      "actual": "canvas:0 SVG:0",
+      "screenshot": "004-team-overview-full.png",
+      "status": "FAIL"
+    },
+    {
+      "page": "Overview",
+      "step": "Sprint delivery section",
+      "expected": "Sprint data visible",
+      "actual": "Not found",
+      "screenshot": "004-team-overview-full.png",
+      "status": "WARN"
+    },
+    {
+      "page": "Overview",
+      "step": "Task distribution section",
+      "expected": "Task status data",
+      "actual": "Not found",
+      "screenshot": "004-team-overview-full.png",
+      "status": "WARN"
+    },
+    {
+      "page": "Overview",
+      "step": "OKR section",
+      "expected": "OKR data visible",
+      "actual": "Not found",
+      "screenshot": "004-team-overview-full.png",
+      "status": "WARN"
+    },
+    {
+      "page": "Overview",
+      "step": "Code activity section",
+      "expected": "Code activity data",
+      "actual": "Not found",
+      "screenshot": "004-team-overview-full.png",
+      "status": "WARN"
+    },
+    {
+      "page": "Overview",
+      "step": "Numeric data present",
+      "expected": "Numbers/percentages visible",
+      "actual": "0 number groups found",
+      "screenshot": "004-team-overview-full.png",
+      "status": "WARN"
+    },
+    {
+      "page": "Overview",
+      "step": "Console errors",
+      "expected": "0 errors",
+      "actual": "0 errors",
+      "screenshot": "004-team-overview-full.png",
+      "status": "PASS"
+    },
+    {
+      "page": "Project Detail",
+      "step": "Avatar project page",
+      "expected": "Avatar project data",
+      "actual": "Project name found",
+      "screenshot": "007-project-avatar-full.png",
+      "status": "PASS"
+    },
+    {
+      "page": "Project Detail",
+      "step": "Burndown/charts",
+      "expected": "Chart elements present",
+      "actual": "canvas:0 SVG:0",
+      "screenshot": "007-project-avatar-full.png",
+      "status": "WARN"
+    },
+    {
+      "page": "Project Detail",
+      "step": "Milestones",
+      "expected": "Milestone data visible",
+      "actual": "Found",
+      "screenshot": "007-project-avatar-full.png",
+      "status": "PASS"
+    },
+    {
+      "page": "Project Detail",
+      "step": "Task assignment",
+      "expected": "Member task data",
+      "actual": "Found",
+      "screenshot": "007-project-avatar-full.png",
+      "status": "PASS"
+    },
+    {
+      "page": "Project Detail",
+      "step": "Console errors",
+      "expected": "0 errors",
+      "actual": "0 errors",
+      "screenshot": "007-project-avatar-full.png",
+      "status": "PASS"
+    },
+    {
+      "page": "Member Detail",
+      "step": "Member name",
+      "expected": "Chen Qiang name visible",
+      "actual": "Found",
+      "screenshot": "009-member-chenqiang-full.png",
+      "status": "PASS"
+    },
+    {
+      "page": "Member Detail",
+      "step": "Contribution charts",
+      "expected": "Heatmap/charts present",
+      "actual": "canvas:0 SVG:0",
+      "screenshot": "009-member-chenqiang-full.png",
+      "status": "WARN"
+    },
+    {
+      "page": "Member Detail",
+      "step": "Task list",
+      "expected": "Task data visible",
+      "actual": "Found",
+      "screenshot": "009-member-chenqiang-full.png",
+      "status": "PASS"
+    },
+    {
+      "page": "Member Detail",
+      "step": "KPI scores",
+      "expected": "KPI data visible",
+      "actual": "Found",
+      "screenshot": "009-member-chenqiang-full.png",
+      "status": "PASS"
+    },
+    {
+      "page": "Member Detail",
+      "step": "Console errors",
+      "expected": "0 errors",
+      "actual": "0 errors",
+      "screenshot": "009-member-chenqiang-full.png",
+      "status": "PASS"
+    },
+    {
+      "page": "OKR",
+      "step": "Objective 1 - Delivery efficiency",
+      "expected": "Visible",
+      "actual": "Found",
+      "screenshot": "011-okr-page-full.png",
+      "status": "PASS"
+    },
+    {
+      "page": "OKR",
+      "step": "Objective 2 - Code quality",
+      "expected": "Visible",
+      "actual": "Found",
+      "screenshot": "011-okr-page-full.png",
+      "status": "PASS"
+    },
+    {
+      "page": "OKR",
+      "step": "Objective 3 - DataHub 2.0",
+      "expected": "Visible",
+      "actual": "Found",
+      "screenshot": "011-okr-page-full.png",
+      "status": "PASS"
+    },
+    {
+      "page": "OKR",
+      "step": "Progress percentages",
+      "expected": "68%/55%/42%",
+      "actual": "68:true 55:true 42:true",
+      "screenshot": "011-okr-page-full.png",
+      "status": "PASS"
+    },
+    {
+      "page": "OKR",
+      "step": "Key Results visible",
+      "expected": "KR data shown",
+      "actual": "Found",
+      "screenshot": "011-okr-page-full.png",
+      "status": "PASS"
+    },
+    {
+      "page": "OKR",
+      "step": "Console errors",
+      "expected": "0 errors",
+      "actual": "0 errors",
+      "screenshot": "011-okr-page-full.png",
+      "status": "PASS"
+    },
+    {
+      "page": "Git Activity",
+      "step": "Commit data",
+      "expected": "Commit stats visible",
+      "actual": "Found",
+      "screenshot": "013-git-activity-full.png",
+      "status": "PASS"
+    },
+    {
+      "page": "Git Activity",
+      "step": "PR data",
+      "expected": "PR metrics visible",
+      "actual": "Found",
+      "screenshot": "013-git-activity-full.png",
+      "status": "PASS"
+    },
+    {
+      "page": "Git Activity",
+      "step": "Heatmap/charts",
+      "expected": "Charts rendered",
+      "actual": "canvas:0 SVG:0",
+      "screenshot": "013-git-activity-full.png",
+      "status": "WARN"
+    },
+    {
+      "page": "Git Activity",
+      "step": "Console errors",
+      "expected": "0 errors",
+      "actual": "0 errors",
+      "screenshot": "013-git-activity-full.png",
+      "status": "PASS"
+    },
+    {
+      "page": "Admin",
+      "step": "User list",
+      "expected": "7+ users visible",
+      "actual": "7 users found",
+      "screenshot": "015-admin-page-users.png",
+      "status": "PASS"
+    },
+    {
+      "page": "Admin",
+      "step": "Role badges",
+      "expected": "Roles shown",
+      "actual": "Found",
+      "screenshot": "015-admin-page-users.png",
+      "status": "PASS"
+    },
+    {
+      "page": "Admin",
+      "step": "Author mappings tab",
+      "expected": "Tab clickable",
+      "actual": "Tab not found",
+      "screenshot": "015-admin-page-users.png",
+      "status": "WARN"
+    },
+    {
+      "page": "Admin",
+      "step": "Sync logs tab",
+      "expected": "Tab clickable",
+      "actual": "Tab not found",
+      "screenshot": "015-admin-page-users.png",
+      "status": "WARN"
+    },
+    {
+      "page": "Admin",
+      "step": "Console errors",
+      "expected": "0 errors",
+      "actual": "0 errors",
+      "screenshot": "015-admin-page-users.png",
+      "status": "PASS"
+    },
+    {
+      "page": "Filter",
+      "step": "Filter elements",
+      "expected": "Filter controls exist",
+      "actual": "No filter elements found",
+      "screenshot": "016-filter-not-found.png",
+      "status": "WARN"
+    },
+    {
+      "page": "Filter",
+      "step": "Console errors",
+      "expected": "0 errors",
+      "actual": "0 errors",
+      "screenshot": "-",
+      "status": "PASS"
+    },
+    {
+      "page": "Mobile",
+      "step": "Overview layout",
+      "expected": "Mobile layout renders",
+      "actual": "Rendered at 375x812",
+      "screenshot": "017-mobile-overview.png",
+      "status": "PASS"
+    },
+    {
+      "page": "Mobile",
+      "step": "Hamburger menu",
+      "expected": "Hamburger visible on mobile",
+      "actual": "Not found",
+      "screenshot": "017-mobile-overview.png",
+      "status": "WARN"
+    },
+    {
+      "page": "Mobile",
+      "step": "Admin page mobile",
+      "expected": "Table scrollable",
+      "actual": "Rendered at 375px",
+      "screenshot": "018-mobile-admin.png",
+      "status": "PASS"
+    },
+    {
+      "page": "Mobile",
+      "step": "OKR page mobile",
+      "expected": "OKR cards stack",
+      "actual": "Rendered at 375px",
+      "screenshot": "019-mobile-okr.png",
+      "status": "PASS"
+    },
+    {
+      "page": "Mobile",
+      "step": "Console errors",
+      "expected": "0 errors",
+      "actual": "0 errors",
+      "screenshot": "-",
+      "status": "PASS"
+    }
+  ],
+  "bugs": [
+    {
+      "id": "B-03",
+      "severity": "P1",
+      "type": "Data",
+      "desc": "Project names not visible on overview page",
+      "screenshot": "004-team-overview-full.png"
+    },
+    {
+      "id": "B-04",
+      "severity": "P1",
+      "type": "Render",
+      "desc": "No chart elements (canvas/SVG) found on overview page",
+      "screenshot": "004-team-overview-full.png"
+    }
+  ],
+  "summary": {
+    "pass": 29,
+    "fail": 2,
+    "warn": 12,
+    "total": 44
+  }
+}

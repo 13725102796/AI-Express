@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>紫微灵犀 — 终端接入</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --c-gold: #D4AF37;
+  --c-gold-dim: rgba(212, 175, 55, 0.4);
+  --c-bg: #000000;
+  --text-main: rgba(255,255,255,0.9);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+body { background: var(--c-bg); color: var(--text-main); fill: var(--text-main); font-family: 'Noto Serif SC', serif; min-height: 100vh; overflow-y: auto; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
+
+.starfield { position: fixed; inset: 0; z-index: -2; pointer-events: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Ccircle cx='50' cy='150' r='1' fill='rgba(212,175,55,0.4)'/%3E%3Ccircle cx='300' cy='80' r='1.5' fill='rgba(255,255,255,0.6)'/%3E%3Ccircle cx='120' cy='320' r='0.5' fill='rgba(212,175,55,0.2)'/%3E%3C/svg%3E"); background-size: 200px 200px; }
+.bg-ambient { position: fixed; inset: 0; z-index: -1; background-image: radial-gradient(circle at 50% 30%, rgba(212, 175, 55, 0.08) 0%, transparent 70%); }
+
+.state-switcher { position: fixed; top: 12px; right: 12px; z-index: 200; display: flex; flex-direction: column; gap: 4px; opacity: 0.85; }
+.state-switcher button { padding: 4px 10px; font-size: 10px; background: rgba(0,0,0,0.7); color: var(--c-gold); border: 1px solid var(--c-gold-dim); cursor: pointer; font-family: inherit; letter-spacing: 1px; }
+.state-switcher button.active { background: rgba(212,175,55,0.2); }
+
+.login-container { width: 100%; max-width: 400px; padding: 32px 24px; display: flex; flex-direction: column; align-items: center; position: relative; z-index: 10; }
+
+.geometry-emblem { position: relative; width: 100px; height: 100px; margin-bottom: 32px; display: flex; align-items: center; justify-content: center; }
+.emblem-outer { position: absolute; inset: 0; border: 1px dashed var(--c-gold-dim); border-radius: 50%; animation: spin 40s linear infinite; }
+.emblem-inner { position: absolute; inset: 15px; border: 1px solid var(--c-gold); transform: rotate(45deg); box-shadow: 0 0 30px rgba(212,175,55,0.1); animation: pulse-glow 4s ease-in-out infinite alternate; }
+.emblem-core { font-family: 'Noto Serif SC', serif; font-size: 28px; color: var(--c-gold); text-shadow: 0 0 20px rgba(212,175,55,0.8); z-index: 2; }
+@keyframes spin { 100% { transform: rotate(360deg); } }
+@keyframes pulse-glow { 100% { box-shadow: 0 0 50px rgba(212,175,55,0.3); border-color: rgba(212,175,55,0.8); } }
+
+.title-area { text-align: center; margin-bottom: 36px; }
+.title-main { font-size: 24px; letter-spacing: 6px; font-weight: 300; margin-bottom: 8px; color: #fff; }
+.title-sub { font-size: 11px; letter-spacing: 6px; color: var(--c-gold); }
+
+/* 模式切换 */
+.mode-toggle { display: flex; width: 100%; margin-bottom: 28px; border: 1px solid var(--c-gold-dim); border-radius: 99px; overflow: hidden; }
+.mode-btn { flex: 1; padding: 10px; text-align: center; font-size: 12px; letter-spacing: 4px; color: rgba(255,255,255,0.5); background: transparent; cursor: pointer; transition: 0.3s; font-family: inherit; border: none; }
+.mode-btn.active { background: rgba(212,175,55,0.15); color: var(--c-gold); }
+
+.form-group { width: 100%; position: relative; margin-bottom: 24px; }
+.form-input { width: 100%; background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.2); color: #fff; font-family: 'Noto Serif SC', serif; font-size: 16px; padding: 10px 0; outline: none; transition: 0.3s; text-align: center; letter-spacing: 2px; }
+.form-input:focus { border-bottom-color: var(--c-gold); box-shadow: 0 10px 10px -10px rgba(212,175,55,0.3); }
+.form-input.error { border-bottom-color: #ff5555; }
+.form-input::placeholder { color: rgba(255,255,255,0.2); font-size: 14px; letter-spacing: 4px; }
+.form-hint { font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 6px; text-align: center; letter-spacing: 1px; }
+.form-hint.error { color: #ff5555; }
+
+/* 服务条款 */
+.terms-row { display: flex; align-items: center; gap: 8px; width: 100%; margin-bottom: 16px; padding: 0 4px; }
+.terms-checkbox { width: 14px; height: 14px; border: 1px solid var(--c-gold-dim); background: transparent; cursor: pointer; flex-shrink: 0; position: relative; }
+.terms-checkbox.checked { background: var(--c-gold); }
+.terms-checkbox.checked::after { content: '✓'; position: absolute; inset: 0; color: #000; font-size: 11px; font-weight: bold; display: flex; align-items: center; justify-content: center; }
+.terms-text { font-size: 10px; color: rgba(255,255,255,0.5); letter-spacing: 0.5px; line-height: 1.6; }
+.terms-text a { color: var(--c-gold); text-decoration: none; }
+
+.action-btn { width: 100%; margin-top: 8px; background: transparent; border: 1px solid var(--c-gold); color: var(--c-gold); font-family: 'Noto Serif SC', serif; font-size: 14px; letter-spacing: 4px; padding: 16px; border-radius: 99px; text-decoration: none; text-align: center; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); cursor: pointer; box-shadow: inset 0 0 20px rgba(212,175,55,0.05); position: relative; overflow: hidden; }
+.action-btn:hover, .action-btn:active { background: rgba(212,175,55,0.1); box-shadow: 0 0 30px rgba(212,175,55,0.2), inset 0 0 20px rgba(212,175,55,0.2); }
+.action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.footer-note { margin-top: 28px; font-size: 11px; color: rgba(255,255,255,0.4); text-align: center; line-height: 1.8; letter-spacing: 1px; }
+.highlight { color: var(--c-gold); }
+
+.corner-dec { position: fixed; width: 20px; height: 20px; border: 1px solid var(--c-gold-dim); opacity: 0.5; pointer-events: none; }
+.ctl { top: 20px; left: 20px; border-right: none; border-bottom: none; }
+.ctr { top: 20px; right: 20px; border-left: none; border-bottom: none; }
+.cbl { bottom: 20px; left: 20px; border-right: none; border-top: none; }
+.cbr { bottom: 20px; right: 20px; border-left: none; border-top: none; }
+</style>
+</head>
+<body>
+
+<div class="starfield"></div><div class="bg-ambient"></div>
+<div class="corner-dec ctl"></div><div class="corner-dec ctr"></div>
+<div class="corner-dec cbl"></div><div class="corner-dec cbr"></div>
+
+<div class="state-switcher">
+  <button onclick="setState('login')" id="btn-login" class="active">登录</button>
+  <button onclick="setState('register')" id="btn-register">注册</button>
+  <button onclick="setState('error')" id="btn-error">错误</button>
+</div>
+
+<div class="login-container">
+
+  <div class="geometry-emblem">
+    <div class="emblem-outer"></div>
+    <div class="emblem-inner"></div>
+    <div class="emblem-core">枢</div>
+  </div>
+
+  <div class="title-area">
+    <div class="title-main">紫微灵犀</div>
+    <div class="title-sub">端点接入认证</div>
+  </div>
+
+  <!-- 登录/注册 模式切换 -->
+  <div class="mode-toggle">
+    <button class="mode-btn active" id="modeLogin" onclick="setState('login')">已有锚点（登录）</button>
+    <button class="mode-btn" id="modeReg" onclick="setState('register')">铸造新缘（注册）</button>
+  </div>
+
+  <div class="form-group">
+    <input type="tel" class="form-input" id="phoneInput" placeholder="输入灵犀密脉 (手机号码)" maxlength="11" oninput="validate()" />
+    <div class="form-hint" id="phoneHint">请输入 11 位中国大陆手机号</div>
+  </div>
+
+  <div class="form-group">
+    <input type="password" class="form-input" id="pwdInput" placeholder="输入源校验码 (密码)" oninput="validate()" />
+    <div class="form-hint" id="pwdHint">至少 8 位字符</div>
+  </div>
+
+  <div class="terms-row" id="termsRow">
+    <div class="terms-checkbox" id="termsBox" onclick="toggleTerms()"></div>
+    <div class="terms-text">
+      已阅读并同意<a href="#">《服务条款》</a>与<a href="#">《隐私政策》</a>，并知悉本服务为文化娱乐参考
+    </div>
+  </div>
+
+  <button class="action-btn" id="submitBtn" onclick="submit()">连接主枢界面 ✧</button>
+
+  <div class="footer-note" id="footerNote">
+    未记录的端点将自动创建本我锚点<br>
+    首次接入可获赠 <span class="highlight">100 灵犀点数</span>
+  </div>
+
+</div>
+
+<script>
+let currentMode = 'login';
+let termsChecked = false;
+
+function setState(s) {
+  document.querySelectorAll('.state-switcher button').forEach(b => b.classList.remove('active'));
+  document.getElementById('btn-' + s).classList.add('active');
+
+  if (s === 'login' || s === 'register') {
+    currentMode = s;
+    document.getElementById('modeLogin').classList.toggle('active', s === 'login');
+    document.getElementById('modeReg').classList.toggle('active', s === 'register');
+    document.getElementById('submitBtn').textContent = s === 'login' ? '连接主枢界面 ✧' : '铸造灵犀锚点 ✧';
+    // 注册模式才显示密码强度提示和服务条款
+    document.getElementById('pwdHint').style.display = s === 'register' ? 'block' : 'none';
+    document.getElementById('termsRow').style.display = s === 'register' ? 'flex' : 'none';
+    document.getElementById('footerNote').style.display = s === 'register' ? 'block' : 'none';
+    document.getElementById('phoneHint').classList.remove('error');
+    document.getElementById('phoneHint').textContent = '请输入 11 位中国大陆手机号';
+  } else if (s === 'error') {
+    document.getElementById('phoneInput').classList.add('error');
+    document.getElementById('phoneHint').classList.add('error');
+    document.getElementById('phoneHint').textContent = currentMode === 'register' ? '该手机号已注册，请直接登录' : '手机号或密码错误';
+  }
+}
+
+function validate() {
+  const phone = document.getElementById('phoneInput').value;
+  const pwd = document.getElementById('pwdInput').value;
+  const phoneOk = /^1\d{10}$/.test(phone);
+  const pwdOk = pwd.length >= 8;
+  const ready = phoneOk && pwdOk && (currentMode === 'login' || termsChecked);
+  document.getElementById('submitBtn').disabled = !ready;
+  document.getElementById('phoneInput').classList.remove('error');
+  document.getElementById('phoneHint').classList.remove('error');
+  document.getElementById('phoneHint').textContent = '请输入 11 位中国大陆手机号';
+}
+
+function toggleTerms() {
+  termsChecked = !termsChecked;
+  document.getElementById('termsBox').classList.toggle('checked', termsChecked);
+  validate();
+}
+
+function submit() {
+  const phone = document.getElementById('phoneInput').value;
+  const pwd = document.getElementById('pwdInput').value;
+  if (!/^1\d{10}$/.test(phone)) { setState('error'); return; }
+  if (pwd.length < 8) { document.getElementById('pwdHint').classList.add('error'); document.getElementById('pwdHint').textContent = '密码至少 8 位'; return; }
+  // 模拟提交：注册新用户跳 P06，登录已完善用户跳 P01
+  location.href = currentMode === 'register' ? 'P06-setup.html' : 'P01-home.html';
+}
+
+// 默认初始化
+validate();
+</script>
+
+</body>
+</html>

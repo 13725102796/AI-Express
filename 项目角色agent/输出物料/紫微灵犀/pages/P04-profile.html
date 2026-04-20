@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>紫微灵犀 — 缘主实体</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Noto+Serif+SC:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --c-gold: #D4AF37;
+  --c-gold-dim: rgba(212, 175, 55, 0.4);
+  --c-bg: #000000;
+  --text-main: rgba(255,255,255,0.9);
+  --form-bg: rgba(10, 10, 15, 0.8);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+body { background: var(--c-bg); color: var(--text-main); fill: var(--text-main); font-family: 'Noto Serif SC', serif; min-height: 100vh; overflow-x: hidden; padding-bottom: 100px; }
+
+.starfield { position: fixed; inset: 0; z-index: -2; pointer-events: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Ccircle cx='50' cy='150' r='1' fill='rgba(212,175,55,0.4)'/%3E%3Ccircle cx='300' cy='80' r='1.5' fill='rgba(255,255,255,0.6)'/%3E%3Ccircle cx='120' cy='320' r='0.5' fill='rgba(212,175,55,0.2)'/%3E%3C/svg%3E"); background-size: 200px 200px; }
+.bg-ambient { position: fixed; inset: 0; z-index: -1; background-image: radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.1) 0%, transparent 60%); }
+
+.container { max-width: 600px; margin: 0 auto; padding: 24px; }
+
+.profile-header { display: flex; align-items: center; gap: 24px; margin-bottom: 32px; margin-top: 20px; }
+.avatar { position: relative; width: 72px; height: 72px; display: flex; align-items: center; justify-content: center; margin-right: 8px; }
+.avatar::before { content: ''; position: absolute; inset: -6px; border: 1px dashed var(--c-gold-dim); border-radius: 50%; animation: spin 30s linear infinite; }
+.avatar::after { content: ''; position: absolute; inset: 0; border: 1px solid var(--c-gold); border-radius: 50%; box-shadow: inset 0 0 20px rgba(212,175,55,0.15), 0 0 15px rgba(212,175,55,0.05); background: radial-gradient(circle at center, rgba(212, 175, 55, 0.05) 0%, transparent 70%); }
+.avatar-inner { position: relative; z-index: 2; font-family: 'Noto Serif SC', serif; font-size: 26px; color: var(--c-gold); text-shadow: 0 0 15px rgba(212,175,55,0.4); font-weight: 400; }
+@keyframes spin { 100% { transform: rotate(360deg); } }
+
+.user-name { font-family: 'Noto Serif SC', serif; font-size: 22px; color: #fff; letter-spacing: 2px; margin-bottom: 4px; }
+.user-id { font-size: 11px; color: rgba(255,255,255,0.4); font-family: 'Noto Serif SC', serif; letter-spacing: 2px; margin-bottom: 4px; }
+.user-phone { font-size: 11px; color: rgba(212,175,55,0.6); letter-spacing: 1px; }
+
+.asset-panel { background: var(--form-bg); border: 1px solid var(--c-gold-dim); backdrop-filter: blur(20px); padding: 28px 24px; margin-bottom: 32px; display: flex; justify-content: space-between; align-items: center; border-radius: 12px; box-shadow: inset 0 0 20px rgba(212,175,55,0.05); cursor: pointer; transition: 0.3s; text-decoration: none; color: inherit; }
+.asset-panel:hover { border-color: var(--c-gold); box-shadow: inset 0 0 20px rgba(212,175,55,0.1), 0 0 20px rgba(212,175,55,0.1); }
+.asset-label { font-family: 'Noto Serif SC', serif; font-size: 10px; color: rgba(255,255,255,0.5); letter-spacing: 2px; margin-bottom: 6px; }
+.asset-value { font-family: 'Noto Serif SC', serif; font-size: 32px; color: var(--c-gold); }
+.asset-arrow { color: var(--c-gold-dim); font-size: 20px; }
+
+.menu-list { display: flex; flex-direction: column; gap: 8px; }
+.menu-item { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; background: rgba(10,10,15,0.5); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; color: rgba(255,255,255,0.85); text-decoration: none; transition: 0.3s; }
+.menu-item:hover { background: rgba(212,175,55,0.05); border-color: var(--c-gold-dim); padding-left: 32px; }
+.menu-left { display: flex; align-items: center; gap: 16px; }
+.menu-icon { font-family: 'Noto Serif SC', serif; font-size: 14px; color: var(--c-gold); width: 24px; text-align: center; }
+.menu-title { font-family: 'Noto Serif SC', serif; font-size: 14px; letter-spacing: 1px; }
+.menu-badge { font-size: 10px; color: var(--c-gold); background: rgba(212,175,55,0.1); padding: 2px 8px; border-radius: 99px; margin-left: 8px; letter-spacing: 1px; }
+.menu-arrow { color: var(--c-gold-dim); font-family: 'Noto Serif SC', serif; }
+
+.menu-divider { height: 1px; background: rgba(212,175,55,0.1); margin: 16px 0 8px; }
+.menu-item.danger { border-color: rgba(255,80,80,0.2); }
+.menu-item.danger:hover { background: rgba(255,80,80,0.05); border-color: rgba(255,80,80,0.4); }
+.menu-item.danger .menu-icon, .menu-item.danger .menu-title { color: #ff5555; }
+
+.tab-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #000; border-top: 1px solid var(--c-gold-dim); display: flex; justify-content: space-around; padding: 12px 0 24px 0; z-index: 100; }
+.tab-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: rgba(255,255,255,0.3); text-decoration: none; transition: 0.3s; }
+.tab-item.active { color: var(--c-gold); }
+.tab-icon { font-size: 20px; }
+.tab-label { font-family: 'Noto Serif SC', serif; font-size: 8px; letter-spacing: 1px; }
+</style>
+</head>
+<body>
+
+<div class="starfield"></div><div class="bg-ambient"></div>
+
+<div class="container">
+
+  <div class="profile-header">
+    <div class="avatar"><div class="avatar-inner">李</div></div>
+    <div>
+      <div class="user-name">李伟（缘主）</div>
+      <div class="user-id">时空印记: 8092-3412</div>
+      <div class="user-phone">138****8888</div>
+    </div>
+  </div>
+
+  <a href="P10-points.html" class="asset-panel">
+    <div>
+      <div class="asset-label">灵犀点数</div>
+      <div class="asset-value">2,850 ¤</div>
+    </div>
+    <span class="asset-arrow">→</span>
+  </a>
+
+  <div class="menu-list">
+    <a href="P12-my-reports.html" class="menu-item">
+      <div class="menu-left"><span class="menu-icon">I</span><span class="menu-title">神谕印记<span class="menu-badge">3</span></span></div>
+      <span class="menu-arrow">→</span>
+    </a>
+    <a href="P11-my-templates.html" class="menu-item">
+      <div class="menu-left"><span class="menu-icon">II</span><span class="menu-title">已启封模块<span class="menu-badge">4</span></span></div>
+      <span class="menu-arrow">→</span>
+    </a>
+    <a href="P10-points.html" class="menu-item">
+      <div class="menu-left"><span class="menu-icon">III</span><span class="menu-title">灵犀本源（积分明细）</span></div>
+      <span class="menu-arrow">→</span>
+    </a>
+    <a href="P06-setup.html" class="menu-item">
+      <div class="menu-left"><span class="menu-icon">IV</span><span class="menu-title">时空坐标管理</span></div>
+      <span class="menu-arrow">→</span>
+    </a>
+    <a href="P13-invite.html" class="menu-item">
+      <div class="menu-left"><span class="menu-icon">V</span><span class="menu-title">引灵结缘（邀请好友）</span></div>
+      <span class="menu-arrow">→</span>
+    </a>
+
+    <div class="menu-divider"></div>
+
+    <a href="#" class="menu-item danger" onclick="logout(event)">
+      <div class="menu-left"><span class="menu-icon">O</span><span class="menu-title">切断灵犀链接</span></div>
+      <span class="menu-arrow"></span>
+    </a>
+  </div>
+
+</div>
+
+<div class="tab-bar">
+  <a href="P01-home.html" class="tab-item"><div class="tab-icon">⌂</div><div class="tab-label">主页</div></a>
+  <a href="P02-paipan.html" class="tab-item"><div class="tab-icon">✧</div><div class="tab-label">排盘</div></a>
+  <a href="P03-reading.html" class="tab-item"><div class="tab-icon">◎</div><div class="tab-label">解盘</div></a>
+  <a href="P04-profile.html" class="tab-item active"><div class="tab-icon">👤</div><div class="tab-label">本我</div></a>
+</div>
+
+<script>
+function logout(e) {
+  e.preventDefault();
+  if (confirm('确认切断当前灵犀链接？')) {
+    location.href = 'P05-login.html';
+  }
+}
+</script>
+
+</body>
+</html>

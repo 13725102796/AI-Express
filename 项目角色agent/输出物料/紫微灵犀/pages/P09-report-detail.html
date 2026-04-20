@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>紫微灵犀 — 神谕全卷</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root { --c-gold: #D4AF37; --c-gold-dim: rgba(212, 175, 55, 0.4); --c-bg: #000000; --text-main: rgba(255,255,255,0.9); --form-bg: rgba(10, 10, 15, 0.8); }
+* { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+body { background: var(--c-bg); color: var(--text-main); font-family: 'Noto Serif SC', serif; min-height: 100vh; padding-bottom: 96px; overflow-x: hidden; }
+
+.starfield { position: fixed; inset: 0; z-index: -2; pointer-events: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Ccircle cx='50' cy='150' r='1' fill='rgba(212,175,55,0.4)'/%3E%3Ccircle cx='300' cy='80' r='1.5' fill='rgba(255,255,255,0.6)'/%3E%3Ccircle cx='120' cy='320' r='0.5' fill='rgba(212,175,55,0.2)'/%3E%3C/svg%3E"); background-size: 200px 200px; }
+.bg-ambient { position: fixed; inset: 0; z-index: -1; background-image: radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.08) 0%, transparent 70%); }
+
+.nav { position: sticky; top: 0; z-index: 100; padding: 16px 24px; display: flex; align-items: center; background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent); border-bottom: 1px solid rgba(212,175,55,0.1); backdrop-filter: blur(10px); }
+.nav-back { color: var(--c-gold); text-decoration: none; font-size: 12px; letter-spacing: 2px; }
+
+.state-switcher { position: fixed; top: 60px; right: 12px; z-index: 200; display: flex; flex-direction: column; gap: 4px; opacity: 0.85; }
+.state-switcher button { padding: 4px 10px; font-size: 10px; background: rgba(0,0,0,0.7); color: var(--c-gold); border: 1px solid var(--c-gold-dim); cursor: pointer; font-family: inherit; }
+.state-switcher button.active { background: rgba(212,175,55,0.2); }
+
+.aigc-badge-fixed { position: fixed; right: 16px; bottom: 80px; z-index: 99; padding: 8px 14px; border: 1px solid var(--c-gold-dim); border-radius: 99px; background: rgba(0,0,0,0.7); backdrop-filter: blur(10px); font-size: 10px; color: var(--c-gold); letter-spacing: 1px; pointer-events: none; display: flex; gap: 6px; align-items: center; }
+.aigc-badge-fixed::before { content: '⚠'; font-size: 11px; }
+
+.container { max-width: 800px; margin: 0 auto; padding: 24px; }
+
+.report-header { text-align: center; margin-bottom: 24px; padding: 24px 16px; border-bottom: 1px solid var(--c-gold-dim); }
+.report-title { font-size: 22px; color: var(--c-gold); letter-spacing: 4px; font-weight: 600; margin-bottom: 12px; }
+.report-meta { font-size: 11px; color: rgba(255,255,255,0.5); letter-spacing: 1.5px; line-height: 1.8; }
+.report-meta span { color: var(--c-gold); }
+
+.report-card { background: var(--form-bg); border: 1px solid var(--c-gold-dim); padding: 36px 28px; border-radius: 12px; backdrop-filter: blur(20px); }
+.report-content { font-size: 15px; color: rgba(255,255,255,0.85); line-height: 2.2; font-weight: 300; }
+.report-content p { margin-bottom: 18px; }
+.highlight { color: var(--c-gold); font-weight: 600; border-bottom: 1px solid var(--c-gold-dim); padding-bottom: 1px; }
+.report-content h3 { font-size: 17px; color: var(--c-gold); letter-spacing: 2px; margin: 28px 0 12px; padding-left: 12px; border-left: 2px solid var(--c-gold); font-weight: 400; }
+
+.aigc-disclaimer { display: flex; gap: 12px; align-items: flex-start; padding: 16px 0 0; border-top: 1px solid rgba(212,175,55,0.1); margin-top: 32px; }
+.aigc-icon { color: var(--c-gold); font-size: 16px; flex-shrink: 0; }
+.aigc-text { font-size: 11px; color: rgba(255,255,255,0.45); line-height: 1.7; }
+
+.cta-bar { position: fixed; bottom: 0; left: 0; width: 100%; padding: 16px 20px 24px; background: linear-gradient(to top, #000 50%, rgba(0,0,0,0)); display: flex; gap: 12px; z-index: 100; border-top: 1px solid var(--c-gold-dim); }
+.cta-btn { flex: 1; padding: 14px; border: 1px solid var(--c-gold); color: var(--c-gold); background: transparent; border-radius: 99px; font-family: inherit; font-size: 13px; letter-spacing: 3px; cursor: pointer; transition: 0.3s; }
+.cta-btn:hover { background: rgba(212,175,55,0.1); }
+.cta-btn.secondary { border-color: var(--c-gold-dim); color: rgba(212,175,55,0.7); }
+
+.empty-state { padding: 80px 24px; text-align: center; color: rgba(255,255,255,0.5); }
+
+/* 分享 modal（同 P03） */
+.share-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 999; display: none; align-items: center; justify-content: center; padding: 24px; backdrop-filter: blur(8px); }
+.share-mask.show { display: flex; }
+.share-card { background: linear-gradient(135deg, #1a0e2e, #000); border: 1px solid var(--c-gold); padding: 32px 24px; max-width: 360px; width: 100%; border-radius: 12px; box-shadow: 0 0 50px rgba(212,175,55,0.3); }
+.share-card-title { font-size: 16px; color: var(--c-gold); letter-spacing: 4px; text-align: center; margin-bottom: 16px; }
+.share-card-excerpt { font-size: 13px; color: rgba(255,255,255,0.85); line-height: 1.8; padding: 16px; background: rgba(0,0,0,0.5); border-left: 2px solid var(--c-gold); margin-bottom: 16px; }
+.share-card-watermark { font-size: 9px; color: rgba(212,175,55,0.6); text-align: center; padding: 8px 0; border-top: 1px solid var(--c-gold-dim); letter-spacing: 1px; }
+.share-actions { display: flex; gap: 8px; margin-top: 20px; }
+.share-action { flex: 1; padding: 10px; border: 1px solid var(--c-gold-dim); color: var(--c-gold); background: transparent; cursor: pointer; font-family: inherit; font-size: 11px; letter-spacing: 2px; border-radius: 99px; }
+</style>
+</head>
+<body>
+
+<div class="starfield"></div><div class="bg-ambient"></div>
+<div class="aigc-badge-fixed">AI · gemini-2.5-pro</div>
+
+<div class="state-switcher">
+  <button onclick="setState('normal')" id="btn-normal" class="active">正常</button>
+  <button onclick="setState('loading')" id="btn-loading">加载</button>
+  <button onclick="setState('notfound')" id="btn-notfound">不存在</button>
+</div>
+
+<nav class="nav">
+  <a href="P12-my-reports.html" class="nav-back">← 返回印记</a>
+</nav>
+
+<div id="mainView">
+  <div class="container">
+
+    <div class="report-header">
+      <div class="report-title">事业财帛全景观</div>
+      <div class="report-meta">
+        2026-04-15 · <span>1,234</span> 字 · 模板 v3<br>
+        缘主：李伟（乾造） · 1995 乙亥年生
+      </div>
+    </div>
+
+    <div class="report-card">
+      <div class="report-content">
+        <p>缘主你好，您的命宫主星为<span class="highlight">紫微</span>与<span class="highlight">天府</span>，乃是极具领导力与稳重心态的核心格局。这种组合昭示着您天生具备掌控大局的能量，但同时需要警惕因过度求稳而错过的破局窗口。</p>
+
+        <h3>I · 官禄宫深度解析</h3>
+        <p>您的官禄宫位于<span class="highlight">卯位太阳化权</span>，太阳乃官禄主星，化权则赋予了执行力与决策权重。这意味着您在事业上更适合处于决策层而非执行层，过早地承担管理职责对您是有利的。</p>
+
+        <h3>II · 财帛宫格局</h3>
+        <p>财帛宫中<span class="highlight">武曲化禄</span>，武曲乃正财星，化禄则预示着现金流的实质性跃升。但需要注意，武曲性刚，财来财去都较为剧烈，建议建立强制储蓄机制，避免被高消费习惯吞噬。</p>
+
+        <h3>III · 官财联动象</h3>
+        <p>当前大限走入丙申（<span class="highlight">2024-2033</span> 年），正是事业破局的关键周期。官禄三方四正会照吉星偏多，但夫妻宫受流年巨门化忌波及，在追求扩张的同时，切莫忽视与伴侣的情感沟通，今年易因口舌引发气运损耗。</p>
+
+        <h3>IV · 神谕建议</h3>
+        <p>宜守善蓄能，<span class="highlight">规避高杠杆风险</span>。下半年将有贵客自西方而来，需留意合作契机。本命年（2031 辛亥）将是事业格局质变的临界点，前期所有积累都将在此节点显现价值。</p>
+      </div>
+
+      <div class="aigc-disclaimer">
+        <div class="aigc-icon">⚠</div>
+        <div class="aigc-text">
+          本报告由 AI（gemini-2.5-pro）生成，仅供文化娱乐参考，不构成医疗、法律、投资等任何决策建议。<br>
+          命运齿轮的最终咬合器，永远是缘主自身的意志。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cta-bar">
+    <button class="cta-btn secondary" onclick="openShare()">引灵结缘</button>
+    <button class="cta-btn" onclick="if(confirm('再次推演将消耗 10 ¤'))location.href='P03-reading.html'">再次推演（耗 10 ¤）</button>
+  </div>
+</div>
+
+<div class="empty-state" id="loadingView" style="display:none;">
+  神谕调取中...
+</div>
+
+<div class="empty-state" id="notfoundView" style="display:none;">
+  神谕印记已散逸于星海 · 该报告不存在或已被删除
+</div>
+
+<!-- 分享 modal -->
+<div class="share-mask" id="shareMask" onclick="if(event.target===this)closeShare()">
+  <div class="share-card">
+    <div class="share-card-title">事业财帛全景观</div>
+    <div class="share-card-excerpt">缘主命宫主星为紫微与天府，乃极具领导力与稳重心态之核心格局。当前大限走入丙申，正是事业破局关键周期...</div>
+    <div class="share-card-watermark">⚠ 本内容由 AI 生成 · 仅供文化娱乐参考 · 紫微灵犀</div>
+    <div class="share-actions">
+      <button class="share-action" onclick="alert('已复制结缘链路')">复制链路</button>
+      <button class="share-action" onclick="closeShare()">闭合</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function setState(s) {
+  document.querySelectorAll('.state-switcher button').forEach(b => b.classList.remove('active'));
+  document.getElementById('btn-' + s).classList.add('active');
+  document.getElementById('mainView').style.display = s === 'normal' ? 'block' : 'none';
+  document.getElementById('loadingView').style.display = s === 'loading' ? 'block' : 'none';
+  document.getElementById('notfoundView').style.display = s === 'notfound' ? 'block' : 'none';
+}
+function openShare() { document.getElementById('shareMask').classList.add('show'); }
+function closeShare() { document.getElementById('shareMask').classList.remove('show'); }
+</script>
+
+</body>
+</html>

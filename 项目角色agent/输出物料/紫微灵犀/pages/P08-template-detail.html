@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>紫微灵犀 — 神谕透析</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root { --c-gold: #D4AF37; --c-gold-dim: rgba(212, 175, 55, 0.4); --c-bg: #000000; --text-main: rgba(255,255,255,0.9); --form-bg: rgba(10, 10, 15, 0.8); }
+* { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+body { background: var(--c-bg); color: var(--text-main); fill: var(--text-main); font-family: 'Noto Serif SC', serif; min-height: 100vh; padding-bottom: 96px; overflow-x: hidden; }
+
+.starfield { position: fixed; inset: 0; z-index: -2; pointer-events: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Ccircle cx='50' cy='150' r='1' fill='rgba(212,175,55,0.4)'/%3E%3Ccircle cx='300' cy='80' r='1.5' fill='rgba(255,255,255,0.6)'/%3E%3Ccircle cx='120' cy='320' r='0.5' fill='rgba(212,175,55,0.2)'/%3E%3C/svg%3E"); background-size: 200px 200px; }
+.bg-ambient { position: fixed; inset: 0; z-index: -1; background-image: radial-gradient(circle at 50% -10%, rgba(212, 175, 55, 0.1) 0%, transparent 70%); }
+
+.nav { position: sticky; top: 0; z-index: 100; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent); border-bottom: 1px solid rgba(212,175,55,0.1); backdrop-filter: blur(10px); }
+.nav-back { color: var(--c-gold); text-decoration: none; font-size: 12px; letter-spacing: 2px; }
+
+.state-switcher { position: fixed; top: 60px; right: 12px; z-index: 200; display: flex; flex-direction: column; gap: 4px; opacity: 0.85; }
+.state-switcher button { padding: 4px 10px; font-size: 10px; background: rgba(0,0,0,0.7); color: var(--c-gold); border: 1px solid var(--c-gold-dim); cursor: pointer; font-family: inherit; }
+.state-switcher button.active { background: rgba(212,175,55,0.2); }
+
+.container { max-width: 600px; margin: 0 auto; padding: 24px; }
+
+/* 模板装饰头 */
+.tpl-hero { text-align: center; padding: 24px 16px 32px; border: 1px solid var(--c-gold-dim); border-radius: 16px; margin-bottom: 24px; background: linear-gradient(180deg, rgba(212,175,55,0.04), rgba(0,0,0,0)); position: relative; overflow: hidden; }
+.tpl-hero::before { content: '☯'; position: absolute; right: -20px; top: -20px; font-size: 140px; color: rgba(212,175,55,0.04); pointer-events: none; }
+.tpl-hero-icon { width: 50px; height: 50px; border: 1px solid var(--c-gold); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px; color: var(--c-gold); font-size: 22px; box-shadow: 0 0 20px rgba(212,175,55,0.2); }
+.tpl-name { font-size: 24px; color: var(--c-gold); letter-spacing: 4px; margin-bottom: 12px; font-weight: 600; }
+.tpl-tags { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+.tpl-tag { font-size: 11px; padding: 3px 12px; border: 1px solid var(--c-gold-dim); color: rgba(212,175,55,0.85); border-radius: 4px; letter-spacing: 1px; }
+
+/* 详细说明 */
+.section { margin-bottom: 28px; }
+.section-title { font-size: 12px; color: var(--c-gold); letter-spacing: 4px; padding: 8px 0; border-bottom: 1px solid var(--c-gold-dim); margin-bottom: 16px; }
+.section-body { font-size: 14px; color: rgba(255,255,255,0.8); line-height: 1.9; letter-spacing: 0.5px; }
+
+/* 维度清单 */
+.dim-list { display: flex; flex-direction: column; gap: 12px; }
+.dim-item { display: flex; gap: 14px; padding: 12px 16px; background: rgba(10,10,15,0.5); border: 1px solid rgba(212,175,55,0.1); border-radius: 8px; }
+.dim-num { color: var(--c-gold); font-size: 18px; font-weight: 600; min-width: 28px; }
+.dim-text { font-size: 13px; color: rgba(255,255,255,0.8); line-height: 1.7; }
+
+/* 示例预览（脱敏 blur） */
+.preview-card { padding: 20px 18px; background: rgba(10,10,15,0.6); border: 1px solid var(--c-gold-dim); border-radius: 12px; position: relative; }
+.preview-text { font-size: 13px; color: rgba(255,255,255,0.75); line-height: 1.9; }
+.preview-text .blur { filter: blur(5px); user-select: none; color: var(--c-gold); }
+.preview-mask { text-align: center; padding: 16px 0 0; font-size: 11px; color: var(--c-gold); letter-spacing: 2px; border-top: 1px dashed var(--c-gold-dim); margin-top: 16px; }
+
+/* 元数据 */
+.tpl-meta { display: flex; justify-content: space-around; padding: 16px 0; border-top: 1px solid rgba(212,175,55,0.1); border-bottom: 1px solid rgba(212,175,55,0.1); margin: 24px 0; font-size: 11px; color: rgba(255,255,255,0.5); letter-spacing: 1px; }
+.tpl-meta strong { color: var(--c-gold); display: block; font-size: 18px; margin-bottom: 4px; font-weight: 600; }
+
+/* 底部 CTA */
+.cta-bar { position: fixed; bottom: 0; left: 0; width: 100%; padding: 16px 20px 24px; background: linear-gradient(to top, #000 50%, rgba(0,0,0,0)); display: flex; align-items: center; gap: 14px; z-index: 100; border-top: 1px solid var(--c-gold-dim); }
+.cta-cost { color: rgba(255,255,255,0.7); font-size: 13px; flex-shrink: 0; }
+.cta-cost strong { color: var(--c-gold); font-size: 22px; margin-right: 2px; }
+.cta-btn { flex: 1; padding: 14px; border: 1px solid var(--c-gold); color: var(--c-gold); background: transparent; border-radius: 99px; font-family: inherit; font-size: 14px; letter-spacing: 4px; cursor: pointer; transition: 0.3s; }
+.cta-btn:hover { background: rgba(212,175,55,0.1); box-shadow: 0 0 20px rgba(212,175,55,0.2); }
+.cta-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.cta-warn { color: #ff8888; font-size: 11px; padding: 6px 0 0; text-align: center; letter-spacing: 1px; display: none; }
+.cta-warn.show { display: block; }
+
+/* 解锁 modal */
+.modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 999; display: none; align-items: center; justify-content: center; padding: 24px; backdrop-filter: blur(8px); }
+.modal-mask.show { display: flex; }
+.modal-card { background: var(--form-bg); border: 1px solid var(--c-gold); padding: 28px 24px; max-width: 360px; width: 100%; border-radius: 12px; text-align: center; box-shadow: 0 0 50px rgba(212,175,55,0.3); }
+.modal-title { font-size: 16px; color: var(--c-gold); letter-spacing: 4px; margin-bottom: 16px; }
+.modal-text { font-size: 13px; color: rgba(255,255,255,0.7); line-height: 1.7; margin-bottom: 24px; }
+.modal-text strong { color: var(--c-gold); }
+.modal-actions { display: flex; gap: 12px; }
+.modal-btn { flex: 1; padding: 12px; border: 1px solid var(--c-gold-dim); color: var(--c-gold); background: transparent; border-radius: 99px; font-family: inherit; font-size: 12px; letter-spacing: 2px; cursor: pointer; }
+.modal-btn.primary { border-color: var(--c-gold); background: rgba(212,175,55,0.1); }
+</style>
+</head>
+<body>
+
+<div class="starfield"></div><div class="bg-ambient"></div>
+
+<div class="state-switcher">
+  <button onclick="setState('locked')" id="btn-locked" class="active">未解锁</button>
+  <button onclick="setState('unlocked')" id="btn-unlocked">已解锁</button>
+  <button onclick="setState('insufficient')" id="btn-insufficient">积分不足</button>
+</div>
+
+<nav class="nav">
+  <a href="P07-templates.html" class="nav-back">← 返回殿堂</a>
+</nav>
+
+<div class="container">
+
+  <div class="tpl-hero">
+    <div class="tpl-hero-icon">✧</div>
+    <div class="tpl-name">事业财帛全景观</div>
+    <div class="tpl-tags"><span class="tpl-tag">事业</span><span class="tpl-tag">财帛</span><span class="tpl-tag">官禄</span></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">神谕介绍</div>
+    <div class="section-body">深度联动您的官禄宫与财帛宫，结合大限流年走势，为您呈现完整的事业发展蓝图与财富积累节奏。揭示职业方向最佳切入点、财富杠杆机遇窗口、以及高风险周期的规避策略。</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">推演维度</div>
+    <div class="dim-list">
+      <div class="dim-item"><span class="dim-num">I</span><span class="dim-text">官禄宫主辅星深度分析 —— 揭示您的职业天赋与适合的发展路径</span></div>
+      <div class="dim-item"><span class="dim-num">II</span><span class="dim-text">财帛宫格局解读 —— 分辨偏财与正财，判断财富累积的核心模式</span></div>
+      <div class="dim-item"><span class="dim-num">III</span><span class="dim-text">官财联动象 —— 工作变现效率、副业可行性、合伙创业格局</span></div>
+      <div class="dim-item"><span class="dim-num">IV</span><span class="dim-text">大限叠加流年 —— 当前阶段的关键事件与未来 3 年的财富时间窗口</span></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">推演示例（脱敏预览）</div>
+    <div class="preview-card">
+      <div class="preview-text">
+        缘主官禄宫主星为<span class="blur">紫微化权</span>，配合财帛宫<span class="blur">武曲化禄</span>之格局，呈现典型的<span class="blur">领袖型创富者</span>气场...<br><br>
+        当前大限走入<span class="blur">丙申宫位</span>，预示<span class="blur">2026-2028</span>年间，您将迎来<span class="blur">事业突破窗口</span>...
+      </div>
+      <div class="preview-mask">⚜ 启封后查阅完整 1,200 字推演 ⚜</div>
+    </div>
+  </div>
+
+  <div class="tpl-meta">
+    <div><strong>5,621</strong>缘主已启封</div>
+    <div><strong>1,200</strong>平均推演字数</div>
+    <div><strong>4.8</strong>缘主好评</div>
+  </div>
+
+</div>
+
+<div class="cta-bar" id="ctaBar">
+  <div class="cta-cost"><strong>30</strong>¤</div>
+  <button class="cta-btn" id="ctaBtn" onclick="handleCTA()">立即启封</button>
+</div>
+<div class="cta-warn" id="ctaWarn">灵犀点数不足，还差 12 ¤</div>
+
+<!-- 解锁确认 modal -->
+<div class="modal-mask" id="confirmModal" onclick="if(event.target===this)closeModal()">
+  <div class="modal-card">
+    <div class="modal-title">启封确认</div>
+    <div class="modal-text">将消耗 <strong>30 灵犀点数</strong> 启封「事业财帛全景观」模块。<br>启封后可永久使用，每次推演消耗 <strong>10 ¤</strong>。</div>
+    <div class="modal-actions">
+      <button class="modal-btn" onclick="closeModal()">再想想</button>
+      <button class="modal-btn primary" onclick="confirmUnlock()">确认启封</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let state = 'locked';
+
+function setState(s) {
+  state = s;
+  document.querySelectorAll('.state-switcher button').forEach(b => b.classList.remove('active'));
+  document.getElementById('btn-' + s).classList.add('active');
+  const btn = document.getElementById('ctaBtn');
+  const warn = document.getElementById('ctaWarn');
+  warn.classList.remove('show');
+  btn.disabled = false;
+  if (s === 'locked') { btn.textContent = '立即启封'; }
+  else if (s === 'unlocked') { btn.textContent = '开始推演（耗 10 ¤）'; }
+  else if (s === 'insufficient') { btn.textContent = '积分不足'; btn.disabled = true; warn.classList.add('show'); }
+}
+
+function handleCTA() {
+  if (state === 'locked') document.getElementById('confirmModal').classList.add('show');
+  else if (state === 'unlocked') location.href = 'P03-reading.html';
+}
+
+function closeModal() { document.getElementById('confirmModal').classList.remove('show'); }
+function confirmUnlock() {
+  closeModal();
+  setState('unlocked');
+  // 简单 toast
+  setTimeout(() => alert('启封成功 · 已扣除 30 ¤'), 100);
+}
+</script>
+
+</body>
+</html>

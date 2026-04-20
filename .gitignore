@@ -5,6 +5,10 @@ __pycache__/
 *.pyc
 .venv/
 venv/
+.venv-*/
+**/.venv/
+**/.venv-*/
+**/venv/
 
 # Build outputs
 .next/

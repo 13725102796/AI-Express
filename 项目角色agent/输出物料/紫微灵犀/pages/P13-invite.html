@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>紫微灵犀 — 引灵结缘</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root { --c-gold: #D4AF37; --c-gold-dim: rgba(212, 175, 55, 0.4); --c-bg: #000000; --text-main: rgba(255,255,255,0.9); --form-bg: rgba(10, 10, 15, 0.8); }
+* { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+body { background: var(--c-bg); color: var(--text-main); font-family: 'Noto Serif SC', serif; min-height: 100vh; padding-bottom: 40px; overflow-x: hidden; }
+.starfield { position: fixed; inset: 0; z-index: -2; pointer-events: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Ccircle cx='50' cy='150' r='1' fill='rgba(212,175,55,0.4)'/%3E%3Ccircle cx='300' cy='80' r='1.5' fill='rgba(255,255,255,0.6)'/%3E%3Ccircle cx='120' cy='320' r='0.5' fill='rgba(212,175,55,0.2)'/%3E%3C/svg%3E"); background-size: 200px 200px; }
+.bg-ambient { position: fixed; inset: 0; z-index: -1; background-image: radial-gradient(circle at 50% -10%, rgba(212, 175, 55, 0.1) 0%, transparent 70%); }
+.nav { position: sticky; top: 0; z-index: 100; padding: 16px 24px; display: flex; align-items: center; background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent); border-bottom: 1px solid rgba(212,175,55,0.1); backdrop-filter: blur(10px); }
+.nav-back { color: var(--c-gold); text-decoration: none; font-size: 12px; letter-spacing: 2px; }
+.state-switcher { position: fixed; top: 60px; right: 12px; z-index: 200; display: flex; flex-direction: column; gap: 4px; opacity: 0.85; }
+.state-switcher button { padding: 4px 10px; font-size: 10px; background: rgba(0,0,0,0.7); color: var(--c-gold); border: 1px solid var(--c-gold-dim); cursor: pointer; font-family: inherit; }
+.state-switcher button.active { background: rgba(212,175,55,0.2); }
+
+.container { max-width: 600px; margin: 0 auto; padding: 24px; }
+
+.invite-hero { padding: 32px 24px; background: linear-gradient(135deg, rgba(10,10,15,0.9), rgba(10,10,15,0.4)); border: 1px solid var(--c-gold); border-radius: 16px; text-align: center; box-shadow: inset 0 0 30px rgba(212,175,55,0.08), 0 0 30px rgba(212,175,55,0.05); margin-bottom: 24px; }
+.invite-label { font-size: 11px; color: rgba(255,255,255,0.5); letter-spacing: 4px; margin-bottom: 16px; }
+.invite-code { font-size: 36px; color: var(--c-gold); letter-spacing: 8px; font-weight: 600; text-shadow: 0 0 20px rgba(212,175,55,0.4); margin-bottom: 16px; font-family: 'Noto Serif SC', serif; }
+.copy-btn { padding: 10px 28px; border: 1px solid var(--c-gold); color: var(--c-gold); background: transparent; border-radius: 99px; font-family: inherit; font-size: 12px; letter-spacing: 2px; cursor: pointer; transition: 0.3s; }
+.copy-btn:hover { background: rgba(212,175,55,0.15); box-shadow: 0 0 20px rgba(212,175,55,0.2); }
+
+.rule-card { padding: 16px 20px; background: rgba(10,10,15,0.5); border: 1px solid rgba(212,175,55,0.15); border-radius: 8px; margin-bottom: 24px; }
+.rule-text { font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.9; letter-spacing: 0.5px; }
+.rule-text strong { color: var(--c-gold); }
+
+.stat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+.stat-card { padding: 18px; background: rgba(10,10,15,0.5); border: 1px solid rgba(212,175,55,0.1); border-radius: 12px; text-align: center; }
+.stat-value { font-size: 28px; color: var(--c-gold); font-weight: 300; letter-spacing: 1px; margin-bottom: 4px; }
+.stat-label { font-size: 11px; color: rgba(255,255,255,0.5); letter-spacing: 2px; }
+
+.section-title { font-size: 12px; color: var(--c-gold); letter-spacing: 4px; padding: 8px 0; border-bottom: 1px solid var(--c-gold-dim); margin-bottom: 16px; }
+
+.invitee-list { display: flex; flex-direction: column; gap: 8px; }
+.invitee-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: rgba(10,10,15,0.5); border: 1px solid rgba(212,175,55,0.08); border-radius: 8px; }
+.invitee-left { display: flex; align-items: center; gap: 12px; }
+.invitee-icon { width: 28px; height: 28px; border: 1px solid var(--c-gold-dim); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--c-gold); font-size: 11px; }
+.invitee-info { display: flex; flex-direction: column; gap: 2px; }
+.invitee-phone { font-size: 12px; color: rgba(255,255,255,0.85); letter-spacing: 1px; }
+.invitee-time { font-size: 10px; color: rgba(255,255,255,0.4); }
+.invitee-reward { color: var(--c-gold); font-weight: 600; font-size: 14px; }
+
+.poster-btn { display: block; width: 100%; padding: 16px; margin-top: 24px; border: 1px solid var(--c-gold); color: var(--c-gold); background: transparent; border-radius: 99px; font-family: inherit; font-size: 14px; letter-spacing: 4px; cursor: pointer; transition: 0.3s; }
+.poster-btn:hover { background: rgba(212,175,55,0.1); }
+
+.empty-state { padding: 40px 24px; text-align: center; color: rgba(255,255,255,0.4); font-size: 12px; letter-spacing: 2px; }
+
+/* 海报 modal */
+.modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 999; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 24px; backdrop-filter: blur(10px); overflow-y: auto; }
+.modal-mask.show { display: flex; }
+.poster { background: linear-gradient(180deg, #1a0e2e 0%, #000 70%); border: 2px solid var(--c-gold); padding: 40px 32px; max-width: 320px; width: 100%; border-radius: 16px; text-align: center; box-shadow: 0 0 60px rgba(212,175,55,0.3); }
+.poster-emblem { width: 60px; height: 60px; margin: 0 auto 20px; border: 1px solid var(--c-gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--c-gold); font-size: 24px; box-shadow: 0 0 20px rgba(212,175,55,0.3); }
+.poster-title { font-size: 22px; color: var(--c-gold); letter-spacing: 6px; margin-bottom: 8px; }
+.poster-subtitle { font-size: 11px; color: rgba(255,255,255,0.5); letter-spacing: 2px; margin-bottom: 24px; }
+.poster-text { font-size: 13px; color: rgba(255,255,255,0.85); line-height: 1.8; margin-bottom: 24px; padding: 16px; border: 1px dashed var(--c-gold-dim); border-radius: 8px; }
+.poster-text strong { color: var(--c-gold); }
+.poster-qr { width: 110px; height: 110px; margin: 0 auto 12px; background: #fff; padding: 8px; border-radius: 4px; }
+.poster-qr-img { width: 100%; height: 100%; background-image: linear-gradient(45deg, #000 25%, transparent 25%), linear-gradient(-45deg, #000 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #000 75%), linear-gradient(-45deg, transparent 75%, #000 75%); background-size: 8px 8px; background-position: 0 0, 0 4px, 4px -4px, -4px 0; }
+.poster-code { font-size: 13px; color: var(--c-gold); letter-spacing: 4px; margin-bottom: 16px; }
+.poster-watermark { font-size: 9px; color: rgba(212,175,55,0.6); letter-spacing: 1px; padding-top: 12px; border-top: 1px solid rgba(212,175,55,0.2); }
+.modal-close { display: block; margin: 16px auto 0; padding: 10px 32px; border: 1px solid var(--c-gold-dim); color: var(--c-gold); background: transparent; border-radius: 99px; font-family: inherit; font-size: 12px; letter-spacing: 2px; cursor: pointer; }
+</style>
+</head>
+<body>
+<div class="starfield"></div><div class="bg-ambient"></div>
+
+<div class="state-switcher">
+  <button onclick="setState('normal')" id="btn-normal" class="active">有邀请</button>
+  <button onclick="setState('empty')" id="btn-empty">空</button>
+</div>
+
+<nav class="nav"><a href="P04-profile.html" class="nav-back">← 返回缘主</a></nav>
+
+<div class="container">
+
+  <div class="invite-hero">
+    <div class="invite-label">您的灵犀邀请码</div>
+    <div class="invite-code">ZWLX-A8K2</div>
+    <button class="copy-btn" onclick="alert('灵犀链路已复制 · zwlx.app/?ref=ZWLX-A8K2')">复制邀请链路</button>
+  </div>
+
+  <div class="rule-card">
+    <div class="rule-text">
+      每邀请 1 位缘主接入紫微灵犀，您与对方<strong>各得 50 灵犀点数</strong>。<br>
+      被邀请缘主额外获得首次接入礼包（<strong>100 ¤</strong>）。<br>
+      邀请奖励无上限，分享越多，灵犀越丰盈。
+    </div>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat-card">
+      <div class="stat-value">2</div>
+      <div class="stat-label">已引灵缘主</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">100 ¤</div>
+      <div class="stat-label">累计获得</div>
+    </div>
+  </div>
+
+  <div class="section-title">引灵记录</div>
+
+  <div class="invitee-list" id="list">
+    <div class="invitee-row">
+      <div class="invitee-left">
+        <div class="invitee-icon">王</div>
+        <div class="invitee-info">
+          <span class="invitee-phone">138****6789</span>
+          <span class="invitee-time">2026-04-10 已接入</span>
+        </div>
+      </div>
+      <span class="invitee-reward">+50 ¤</span>
+    </div>
+    <div class="invitee-row">
+      <div class="invitee-left">
+        <div class="invitee-icon">陈</div>
+        <div class="invitee-info">
+          <span class="invitee-phone">186****2233</span>
+          <span class="invitee-time">2026-04-08 已接入</span>
+        </div>
+      </div>
+      <span class="invitee-reward">+50 ¤</span>
+    </div>
+  </div>
+
+  <div class="empty-state" id="emptyView" style="display:none;">尚未引灵任何缘主 · 快去分享吧</div>
+
+  <button class="poster-btn" onclick="openPoster()">生成结缘海报</button>
+
+</div>
+
+<!-- 海报 modal -->
+<div class="modal-mask" id="posterModal" onclick="if(event.target===this)closePoster()">
+  <div class="poster">
+    <div class="poster-emblem">枢</div>
+    <div class="poster-title">紫微灵犀</div>
+    <div class="poster-subtitle">古典智慧 · AI 解读</div>
+    <div class="poster-text">
+      李伟（缘主）邀您共赴星海<br>
+      接入即获 <strong>100 灵犀点数</strong><br>
+      <span style="font-size:10px; color: rgba(255,255,255,0.5);">⚠ 本服务为文化娱乐参考</span>
+    </div>
+    <div class="poster-qr"><div class="poster-qr-img"></div></div>
+    <div class="poster-code">邀请码 ZWLX-A8K2</div>
+    <div class="poster-watermark">⚠ 由 AI 驱动 · 仅供文化娱乐参考 · 紫微灵犀</div>
+  </div>
+  <button class="modal-close" onclick="closePoster()">闭合</button>
+</div>
+
+<script>
+function setState(s) {
+  document.querySelectorAll('.state-switcher button').forEach(b => b.classList.remove('active'));
+  document.getElementById('btn-' + s).classList.add('active');
+  document.getElementById('list').style.display = s === 'normal' ? 'flex' : 'none';
+  document.getElementById('emptyView').style.display = s === 'empty' ? 'block' : 'none';
+}
+function openPoster() { document.getElementById('posterModal').classList.add('show'); }
+function closePoster() { document.getElementById('posterModal').classList.remove('show'); }
+</script>
+
+</body>
+</html>

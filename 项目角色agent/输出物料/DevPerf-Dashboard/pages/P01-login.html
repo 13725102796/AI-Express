@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DevPerf Dashboard - Login</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ================================================================
+   DESIGN TOKENS (from demo.html)
+   ================================================================ */
+:root {
+  --color-primary: oklch(0.45 0.12 255);
+  --color-primary-light: oklch(0.55 0.10 255);
+  --color-primary-dark: oklch(0.35 0.14 255);
+  --color-primary-surface: oklch(0.95 0.02 255);
+  --color-secondary: oklch(0.55 0.03 250);
+  --color-accent: oklch(0.75 0.15 75);
+  --color-accent-hover: oklch(0.70 0.17 75);
+  --color-success: oklch(0.55 0.15 160);
+  --color-success-surface: oklch(0.93 0.04 160);
+  --color-warning: oklch(0.65 0.16 70);
+  --color-error: oklch(0.55 0.18 25);
+  --color-error-surface: oklch(0.93 0.04 25);
+  --color-bg: oklch(0.985 0.005 250);
+  --color-bg-elevated: oklch(1.0 0.0 0);
+  --color-bg-sunken: oklch(0.96 0.008 250);
+  --color-bg-dark: oklch(0.15 0.02 255);
+  --color-text-primary: oklch(0.20 0.02 250);
+  --color-text-secondary: oklch(0.45 0.02 250);
+  --color-text-tertiary: oklch(0.60 0.015 250);
+  --color-text-on-primary: oklch(0.98 0.005 250);
+  --color-border: oklch(0.88 0.01 250);
+  --color-border-strong: oklch(0.78 0.015 250);
+  --color-divider: oklch(0.92 0.008 250);
+  --font-heading: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-body: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --text-xs: 0.64rem;
+  --text-sm: 0.8rem;
+  --text-base: 1rem;
+  --text-md: 1.125rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.563rem;
+  --text-2xl: 1.953rem;
+  --text-3xl: 2.441rem;
+  --leading-tight: 1.2;
+  --leading-normal: 1.5;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --weight-extrabold: 800;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --shadow-sm: 0 1px 2px oklch(0.20 0.02 250 / 0.04), 0 1px 3px oklch(0.20 0.02 250 / 0.06);
+  --shadow-md: 0 2px 4px oklch(0.20 0.02 250 / 0.04), 0 4px 8px oklch(0.20 0.02 250 / 0.06), 0 8px 16px oklch(0.20 0.02 250 / 0.04);
+  --shadow-lg: 0 4px 8px oklch(0.20 0.02 250 / 0.03), 0 8px 16px oklch(0.20 0.02 250 / 0.05), 0 16px 32px oklch(0.20 0.02 250 / 0.06), 0 24px 48px oklch(0.20 0.02 250 / 0.04);
+  --shadow-xl: 0 8px 16px oklch(0.20 0.02 250 / 0.04), 0 16px 32px oklch(0.20 0.02 250 / 0.06), 0 32px 64px oklch(0.20 0.02 250 / 0.08);
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+  --duration-instant: 100ms;
+  --duration-fast: 200ms;
+  --duration-normal: 300ms;
+  --duration-slow: 500ms;
+  --duration-entrance: 600ms;
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ================================================================
+   STATE SWITCHER (preview only)
+   ================================================================ */
+.state-switcher {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10000;
+  background: var(--color-bg-dark);
+  padding: var(--space-2) var(--space-4);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-text-on-primary);
+}
+.state-switcher span {
+  opacity: 0.6;
+  margin-right: var(--space-2);
+}
+.state-btn {
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid oklch(0.40 0.02 250);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-on-primary);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out-quart);
+}
+.state-btn:hover { background: oklch(0.25 0.02 255); }
+.state-btn.active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+/* ================================================================
+   BASE RESET
+   ================================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+body {
+  font-family: var(--font-body);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-normal);
+  color: var(--color-text-primary);
+  background: var(--color-bg);
+  padding-top: 36px; /* space for state switcher */
+}
+
+/* ================================================================
+   LOGIN PAGE LAYOUT
+   ================================================================ */
+.login-page {
+  display: flex;
+  min-height: calc(100vh - 36px);
+}
+
+/* -- Brand Side (left 50%) -- */
+.login-brand {
+  flex: 1;
+  background: var(--color-primary);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: var(--space-12);
+  position: relative;
+  overflow: hidden;
+}
+.login-brand::before {
+  content: '';
+  position: absolute;
+  top: -20%;
+  right: -20%;
+  width: 60%;
+  height: 60%;
+  border-radius: 50%;
+  background: oklch(0.50 0.10 255 / 0.2);
+  pointer-events: none;
+}
+.login-brand::after {
+  content: '';
+  position: absolute;
+  bottom: -15%;
+  left: -10%;
+  width: 45%;
+  height: 45%;
+  border-radius: 50%;
+  background: oklch(0.40 0.08 255 / 0.15);
+  pointer-events: none;
+}
+.brand-content {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  max-width: 400px;
+}
+.brand-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-8);
+}
+.brand-logo svg {
+  width: 48px;
+  height: 48px;
+}
+.brand-logo-text {
+  font-family: var(--font-heading);
+  font-weight: var(--weight-extrabold);
+  font-size: var(--text-xl);
+  color: var(--color-text-on-primary);
+  letter-spacing: -0.02em;
+}
+.brand-tagline {
+  font-family: var(--font-heading);
+  font-weight: var(--weight-bold);
+  font-size: var(--text-2xl);
+  color: var(--color-text-on-primary);
+  line-height: var(--leading-tight);
+  margin-bottom: var(--space-4);
+}
+.brand-description {
+  font-size: var(--text-base);
+  color: oklch(0.85 0.03 255);
+  line-height: var(--leading-normal);
+}
+/* Decorative data visualization dots */
+.brand-viz {
+  display: flex;
+  gap: var(--space-2);
+  justify-content: center;
+  margin-top: var(--space-10);
+}
+.brand-viz-bar {
+  width: 8px;
+  border-radius: var(--radius-sm);
+  background: oklch(0.70 0.08 255 / 0.4);
+  animation: vizPulse 2s ease-in-out infinite;
+}
+.brand-viz-bar:nth-child(1) { height: 40px; animation-delay: 0s; }
+.brand-viz-bar:nth-child(2) { height: 64px; animation-delay: 0.2s; }
+.brand-viz-bar:nth-child(3) { height: 48px; animation-delay: 0.4s; }
+.brand-viz-bar:nth-child(4) { height: 72px; animation-delay: 0.6s; }
+.brand-viz-bar:nth-child(5) { height: 56px; animation-delay: 0.8s; }
+.brand-viz-bar:nth-child(6) { height: 80px; animation-delay: 1.0s; }
+.brand-viz-bar:nth-child(7) { height: 44px; animation-delay: 1.2s; }
+
+@keyframes vizPulse {
+  0%, 100% { opacity: 0.4; transform: scaleY(1); }
+  50% { opacity: 0.8; transform: scaleY(1.15); }
+}
+
+/* -- Form Side (right 50%) -- */
+.login-form-side {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: var(--space-12);
+  background: var(--color-bg);
+}
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  animation: fadeInUp var(--duration-entrance) var(--ease-out-expo);
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.login-card-title {
+  font-family: var(--font-heading);
+  font-weight: var(--weight-bold);
+  font-size: var(--text-xl);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-2);
+}
+.login-card-subtitle {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-8);
+}
+
+/* -- Alert Bars -- */
+.alert {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  margin-bottom: var(--space-6);
+  display: none;
+  align-items: center;
+  gap: var(--space-2);
+  animation: fadeInUp var(--duration-normal) var(--ease-out-quart);
+}
+.alert.visible { display: flex; }
+.alert--error {
+  background: var(--color-error-surface);
+  color: var(--color-error);
+  border: 1px solid oklch(0.55 0.18 25 / 0.2);
+}
+.alert--info {
+  background: var(--color-primary-surface);
+  color: var(--color-primary);
+  border: 1px solid oklch(0.45 0.12 255 / 0.2);
+}
+.alert svg { flex-shrink: 0; width: 16px; height: 16px; }
+
+/* -- Form Elements -- */
+.form-group {
+  margin-bottom: var(--space-5);
+}
+.form-label {
+  display: block;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-2);
+}
+.input-wrapper {
+  position: relative;
+}
+.form-input {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  color: var(--color-text-primary);
+  background: var(--color-bg-elevated);
+  transition: all var(--duration-fast) var(--ease-out-quart);
+  outline: none;
+}
+.form-input::placeholder {
+  color: var(--color-text-tertiary);
+}
+.form-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px oklch(0.45 0.12 255 / 0.12);
+}
+.form-input.error {
+  border-color: var(--color-error);
+  box-shadow: 0 0 0 3px oklch(0.55 0.18 25 / 0.1);
+}
+.form-error {
+  font-size: var(--text-xs);
+  color: var(--color-error);
+  margin-top: var(--space-1);
+  display: none;
+}
+.form-error.visible { display: block; }
+
+/* Password toggle */
+.password-toggle {
+  position: absolute;
+  right: var(--space-3);
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-tertiary);
+  padding: var(--space-1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color var(--duration-fast) var(--ease-out-quart);
+}
+.password-toggle:hover { color: var(--color-text-secondary); }
+.password-toggle svg { width: 20px; height: 20px; }
+.form-input[type="password"] + .password-toggle .icon-eye-off { display: none; }
+.form-input[type="text"] + .password-toggle .icon-eye { display: none; }
+
+/* -- Login Button -- */
+.btn-login {
+  width: 100%;
+  padding: var(--space-3) var(--space-6);
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
+  color: var(--color-text-on-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out-quart);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 48px;
+  margin-top: var(--space-6);
+}
+.btn-login:hover:not(:disabled) {
+  background: var(--color-primary-light);
+  box-shadow: var(--shadow-sm);
+}
+.btn-login:active:not(:disabled) {
+  background: var(--color-primary-dark);
+  transform: scale(0.98);
+}
+.btn-login:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.btn-login .spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid oklch(0.98 0.005 250 / 0.3);
+  border-top-color: var(--color-text-on-primary);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  display: none;
+}
+.btn-login.loading .spinner { display: block; }
+.btn-login.loading .btn-text { display: none; }
+.btn-login.loading .btn-loading-text { display: inline; }
+.btn-login .btn-loading-text { display: none; }
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* -- Footer -- */
+.login-footer {
+  margin-top: var(--space-10);
+  text-align: center;
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+}
+
+/* -- Lockout Timer -- */
+.lockout-timer {
+  display: none;
+  text-align: center;
+  font-size: var(--text-sm);
+  color: var(--color-error);
+  font-weight: var(--weight-medium);
+  margin-top: var(--space-3);
+  font-variant-numeric: tabular-nums;
+}
+.lockout-timer.visible { display: block; }
+
+/* ================================================================
+   TOAST
+   ================================================================ */
+.toast-container {
+  position: fixed;
+  top: 48px;
+  right: var(--space-4);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.toast {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  animation: toastIn var(--duration-normal) var(--ease-out-expo);
+  min-width: 240px;
+}
+.toast--success {
+  background: var(--color-success-surface);
+  color: var(--color-success);
+  border: 1px solid oklch(0.55 0.15 160 / 0.2);
+}
+.toast--error {
+  background: var(--color-error-surface);
+  color: var(--color-error);
+  border: 1px solid oklch(0.55 0.18 25 / 0.2);
+}
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(20px) scale(0.95); }
+  to { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+/* ================================================================
+   RESPONSIVE
+   ================================================================ */
+@media (max-width: 768px) {
+  .login-brand { display: none; }
+  .login-form-side {
+    padding: var(--space-6);
+  }
+  .login-card {
+    max-width: 100%;
+  }
+  body { padding-top: 36px; }
+}
+
+/* ================================================================
+   REDUCED MOTION
+   ================================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- STATE SWITCHER (preview only) -->
+<div class="state-switcher">
+  <span>P01 Login</span>
+  <button class="state-btn active" onclick="setState('default')">Default</button>
+  <button class="state-btn" onclick="setState('submitting')">Submitting</button>
+  <button class="state-btn" onclick="setState('error')">Login Error</button>
+  <button class="state-btn" onclick="setState('locked')">Account Locked</button>
+  <button class="state-btn" onclick="setState('expired')">Token Expired</button>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- LOGIN PAGE -->
+<div class="login-page">
+
+  <!-- Brand Side -->
+  <div class="login-brand">
+    <div class="brand-content">
+      <div class="brand-logo">
+        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="48" height="48" rx="12" fill="oklch(0.55 0.10 255 / 0.3)"/>
+          <path d="M14 32V20l10-6 10 6v12l-10 6-10-6z" stroke="white" stroke-width="2" fill="none"/>
+          <path d="M14 20l10 6 10-6M24 26v12" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="24" cy="18" r="3" fill="oklch(0.75 0.15 75)" stroke="white" stroke-width="1.5"/>
+        </svg>
+        <span class="brand-logo-text">DevPerf</span>
+      </div>
+      <h1 class="brand-tagline">研发效能数据<br>一目了然</h1>
+      <p class="brand-description">基于 Plane + Gitea 的轻量级研发效能聚合仪表盘，为管理层提供实时的团队产出透明化窗口</p>
+      <div class="brand-viz">
+        <div class="brand-viz-bar"></div>
+        <div class="brand-viz-bar"></div>
+        <div class="brand-viz-bar"></div>
+        <div class="brand-viz-bar"></div>
+        <div class="brand-viz-bar"></div>
+        <div class="brand-viz-bar"></div>
+        <div class="brand-viz-bar"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form Side -->
+  <div class="login-form-side">
+    <div class="login-card">
+      <h2 class="login-card-title">登录到 Dashboard</h2>
+      <p class="login-card-subtitle">使用您的工作邮箱和密码登录</p>
+
+      <!-- Alerts -->
+      <div class="alert alert--error" id="alertError">
+        <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 110 14A7 7 0 018 1zm0 10.5a.75.75 0 100-1.5.75.75 0 000 1.5zM8 4a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 018 4z"/></svg>
+        <span id="alertErrorText">邮箱或密码错误</span>
+      </div>
+      <div class="alert alert--info" id="alertInfo">
+        <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 110 14A7 7 0 018 1zm0 3a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 018 4zm0 8a.75.75 0 100-1.5.75.75 0 000 1.5z"/></svg>
+        <span>登录已过期，请重新登录</span>
+      </div>
+
+      <!-- Form -->
+      <form id="loginForm" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="email">邮箱地址</label>
+          <div class="input-wrapper">
+            <input class="form-input" type="email" id="email" placeholder="请输入邮箱地址" autocomplete="email" value="zhang.wei@jasonqiyuan.com">
+          </div>
+          <div class="form-error" id="emailError">请输入有效邮箱地址</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">密码</label>
+          <div class="input-wrapper">
+            <input class="form-input" type="password" id="password" placeholder="请输入密码" autocomplete="current-password" value="SecurePass123!">
+            <button type="button" class="password-toggle" id="passwordToggle" aria-label="Toggle password visibility">
+              <svg class="icon-eye" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1.5 10s3.5-6 8.5-6 8.5 6 8.5 6-3.5 6-8.5 6-8.5-6-8.5-6z"/>
+                <circle cx="10" cy="10" r="3"/>
+              </svg>
+              <svg class="icon-eye-off" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M8.5 4.2A8 8 0 0118.5 10s-1.4 2.4-3.7 4.2M11.2 14.8c-.4 0-.8.1-1.2.1C5 15 1.5 10 1.5 10s1-1.5 2.8-3"/>
+                <path d="M7.5 7.5l5 5"/>
+                <line x1="2" y1="2" x2="18" y2="18"/>
+              </svg>
+            </button>
+          </div>
+          <div class="form-error" id="passwordError">密码不能为空且至少 6 位</div>
+        </div>
+
+        <button type="submit" class="btn-login" id="loginBtn">
+          <div class="spinner"></div>
+          <span class="btn-text">登录</span>
+          <span class="btn-loading-text">登录中...</span>
+        </button>
+      </form>
+
+      <div class="lockout-timer" id="lockoutTimer">
+        账号已锁定，请 <span id="lockoutCountdown">15:00</span> 后重试
+      </div>
+
+      <div class="login-footer">
+        &copy; 2026 DevPerf Dashboard. 内部使用
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ================================================================
+   LOGIN PAGE LOGIC
+   ================================================================ */
+
+const form = document.getElementById('loginForm');
+const emailInput = document.getElementById('email');
+const passwordInput = document.getElementById('password');
+const loginBtn = document.getElementById('loginBtn');
+const alertError = document.getElementById('alertError');
+const alertErrorText = document.getElementById('alertErrorText');
+const alertInfo = document.getElementById('alertInfo');
+const lockoutTimer = document.getElementById('lockoutTimer');
+const lockoutCountdown = document.getElementById('lockoutCountdown');
+const passwordToggle = document.getElementById('passwordToggle');
+const toastContainer = document.getElementById('toastContainer');
+
+let failCount = 0;
+let lockoutInterval = null;
+
+// Password visibility toggle
+passwordToggle.addEventListener('click', () => {
+  const isPassword = passwordInput.type === 'password';
+  passwordInput.type = isPassword ? 'text' : 'password';
+});
+
+// Email validation on blur
+emailInput.addEventListener('blur', () => {
+  const emailError = document.getElementById('emailError');
+  const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput.value);
+  if (emailInput.value && !isValid) {
+    emailInput.classList.add('error');
+    emailError.classList.add('visible');
+  } else {
+    emailInput.classList.remove('error');
+    emailError.classList.remove('visible');
+  }
+});
+
+emailInput.addEventListener('focus', () => {
+  emailInput.classList.remove('error');
+  document.getElementById('emailError').classList.remove('visible');
+});
+
+passwordInput.addEventListener('focus', () => {
+  passwordInput.classList.remove('error');
+  document.getElementById('passwordError').classList.remove('visible');
+});
+
+// Form submission
+form.addEventListener('submit', (e) => {
+  e.preventDefault();
+
+  // Hide alerts
+  alertError.classList.remove('visible');
+  alertInfo.classList.remove('visible');
+
+  // Validate
+  const email = emailInput.value.trim();
+  const password = passwordInput.value;
+  let valid = true;
+
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    emailInput.classList.add('error');
+    document.getElementById('emailError').classList.add('visible');
+    valid = false;
+  }
+  if (!password || password.length < 6) {
+    passwordInput.classList.add('error');
+    document.getElementById('passwordError').classList.add('visible');
+    valid = false;
+  }
+
+  if (!valid) return;
+
+  // Submit
+  loginBtn.classList.add('loading');
+  loginBtn.disabled = true;
+
+  // Simulate API call
+  setTimeout(() => {
+    loginBtn.classList.remove('loading');
+    loginBtn.disabled = false;
+
+    // Simulate success for demo
+    if (email === 'zhang.wei@jasonqiyuan.com' && password === 'SecurePass123!') {
+      showToast('success', '登录成功，正在跳转...');
+      setTimeout(() => {
+        // In real app: router.push('/')
+      }, 1500);
+    } else {
+      failCount++;
+      if (failCount >= 5) {
+        startLockout();
+      } else {
+        alertErrorText.textContent = '邮箱或密码错误';
+        alertError.classList.add('visible');
+        passwordInput.value = '';
+        passwordInput.focus();
+        setTimeout(() => alertError.classList.remove('visible'), 3000);
+      }
+    }
+  }, 1500);
+});
+
+function startLockout() {
+  alertErrorText.textContent = '账号已锁定，请 15 分钟后重试';
+  alertError.classList.add('visible');
+  lockoutTimer.classList.add('visible');
+  loginBtn.disabled = true;
+
+  let remaining = 900; // 15 minutes
+  updateCountdown(remaining);
+
+  lockoutInterval = setInterval(() => {
+    remaining--;
+    updateCountdown(remaining);
+    if (remaining <= 0) {
+      clearInterval(lockoutInterval);
+      lockoutTimer.classList.remove('visible');
+      alertError.classList.remove('visible');
+      loginBtn.disabled = false;
+      failCount = 0;
+    }
+  }, 1000);
+}
+
+function updateCountdown(seconds) {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  lockoutCountdown.textContent = `${m}:${s.toString().padStart(2, '0')}`;
+}
+
+function showToast(type, message) {
+  const toast = document.createElement('div');
+  toast.className = `toast toast--${type}`;
+  toast.innerHTML = `
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+      ${type === 'success'
+        ? '<path d="M8 1a7 7 0 110 14A7 7 0 018 1zm3.3 4.7a.75.75 0 00-1.06-1.06L7 7.88 5.78 6.66a.75.75 0 00-1.06 1.06l1.75 1.75a.75.75 0 001.06 0l3.75-3.75z"/>'
+        : '<path d="M8 1a7 7 0 110 14A7 7 0 018 1zm0 10.5a.75.75 0 100-1.5.75.75 0 000 1.5zM8 4a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 018 4z"/>'}
+    </svg>
+    <span>${message}</span>
+  `;
+  toastContainer.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+// State switcher for preview
+function setState(state) {
+  // Reset
+  alertError.classList.remove('visible');
+  alertInfo.classList.remove('visible');
+  lockoutTimer.classList.remove('visible');
+  loginBtn.classList.remove('loading');
+  loginBtn.disabled = false;
+  if (lockoutInterval) clearInterval(lockoutInterval);
+
+  document.querySelectorAll('.state-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+
+  switch (state) {
+    case 'default':
+      break;
+    case 'submitting':
+      loginBtn.classList.add('loading');
+      loginBtn.disabled = true;
+      break;
+    case 'error':
+      alertErrorText.textContent = '邮箱或密码错误';
+      alertError.classList.add('visible');
+      break;
+    case 'locked':
+      alertErrorText.textContent = '账号已锁定，请 15 分钟后重试';
+      alertError.classList.add('visible');
+      lockoutTimer.classList.add('visible');
+      loginBtn.disabled = true;
+      updateCountdown(892);
+      break;
+    case 'expired':
+      alertInfo.classList.add('visible');
+      break;
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,125 @@
+@import "tailwindcss";
+
+/* ============================================================
+   DESIGN TOKENS (Premium WOW VIP Aesthetics)
+   ============================================================ */
+:root {
+  /* --- Obsidian Base --- */
+  --bg-obsidian:          oklch(0.12 0.01 260); 
+  --bg-obsidian-light:    oklch(0.18 0.02 260);
+  
+  /* --- Luminous Gold & Neon Accents --- */
+  --glow-gold:            oklch(0.85 0.16 85);
+  --glow-gold-dim:        oklch(0.70 0.14 80);
+
+  /* --- Text Hierarchy --- */
+  --text-pure:            oklch(0.98 0.01 260);
+  --text-dim:             oklch(0.75 0.02 260);
+  --text-ghost:           oklch(0.50 0.02 260);
+
+  /* --- Glassmorphism --- */
+  --glass-bg:             oklch(0.18 0.02 260 / 0.45);
+  --glass-bg-hover:       oklch(0.22 0.03 260 / 0.55);
+  --glass-border:         oklch(0.98 0.01 260 / 0.12);
+  --glass-border-gold:    oklch(0.85 0.16 85 / 0.3);
+
+  /* --- Shadows --- */
+  --shadow-luminous:      0 0 24px oklch(0.85 0.16 85 / 0.2), 0 4px 16px oklch(0 0 0 / 0.5);
+  --shadow-glass:         0 8px 32px oklch(0 0 0 / 0.4);
+  --shadow-glow-active:   0 0 40px oklch(0.85 0.16 85 / 0.4);
+
+  /* --- Kinetic Elastic Easing --- */
+  --ease-elastic:         cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-smooth:          cubic-bezier(0.25, 1, 0.5, 1);
+  --duration-base:        400ms;
+
+  /* --- Radius --- */
+  --radius-md:            16px;
+  --radius-lg:            24px;
+  --radius-xl:            32px;
+  --radius-full:          9999px;
+
+  /* --- Fonts --- */
+  --font-display:         'ZCOOL XiaoWei', 'KaiTi', serif;
+  --font-body:            system-ui, 'Noto Sans SC', sans-serif;
+  --font-magic:           'Fraunces', 'Georgia', serif;
+}
+
+/* ============================================================
+   MOBILE-FIRST RESET
+   ============================================================ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  background-color: var(--bg-obsidian);
+  color: var(--text-pure);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: oklch(1 1 1 / 0.1);
+  border-radius: var(--radius-full);
+}
+
+/* ============================================================
+   TYPOGRAPHY
+   ============================================================ */
+.font-display { font-family: var(--font-display); }
+.font-body { font-family: var(--font-body); }
+.font-magic { font-family: var(--font-magic); font-style: italic; letter-spacing: 0.1em; color: var(--glow-gold); }
+
+/* ============================================================
+   ANIMATIONS
+   ============================================================ */
+@keyframes floatOrb {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-10px) scale(1.02); filter: drop-shadow(0 0 48px var(--glow-gold)); }
+}
+@keyframes rotateSlow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideUp {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+@keyframes shine {
+  0% { transform: translateX(-100%); }
+  20%, 100% { transform: translateX(100%); }
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes bounceDot {
+  0%, 80%, 100% { transform: scale(0); }
+  40% { transform: scale(1); }
+}
+
+/* Reduced motion fallback */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

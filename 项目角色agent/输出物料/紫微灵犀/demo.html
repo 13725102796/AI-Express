@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>紫微灵犀 — Editorial Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,500;1,400&family=Noto+Serif+SC:wght@300;400;500;600&family=Plus+Jakarta+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   Design Tokens : Impeccable Editorial (水墨朱砂)
+   ============================================================ */
+:root {
+  /* 色彩系统 - OKLCH (60-30-10 Rule) 
+     背景带极弱暖棕色调 (chroma 0.01) 防止死灰
+  */
+  --c-bg-base:       oklch(15% 0.01 50); /* Dark Ink */
+  --c-surface:       oklch(22% 0.01 50); /* Lighter Ink */
+  --c-surface-hover: oklch(28% 0.01 50);
+  
+  --c-text-primary:  oklch(95% 0.01 70); /* Warm Paper */
+  --c-text-secondary:oklch(75% 0.01 70);
+  --c-text-tertiary: oklch(55% 0.01 70);
+  
+  --c-accent-red:    oklch(52% 0.18 25); /* 朱砂 Cinnabar */
+  --c-accent-gold:   oklch(80% 0.08 85); /* 哑金 Aged Gold */
+  
+  --c-border:        oklch(35% 0.01 50);
+  --c-border-strong: oklch(45% 0.01 50);
+
+  /* 字体系统 - 彻底告别标准粗黑体 */
+  --f-serif: 'Cormorant', 'Noto Serif SC', serif;
+  --f-sans:  'Plus Jakarta Sans', system-ui, sans-serif;
+  --f-num:   'Cormorant', serif;
+
+  /* 模块化字号 (Ratio 1.333) */
+  --fs-xs:  0.75rem;   /* 12px */
+  --fs-sm:  0.875rem;  /* 14px */
+  --fs-base: 1rem;     /* 16px */
+  --fs-lg:  1.25rem;   /* 20px */
+  --fs-xl:  1.5rem;    /* 24px */
+  --fs-2xl: 2rem;      /* 32px */
+  --fs-3xl: 2.5rem;    /* 40px */
+  --fs-4xl: 3.5rem;    /* 56px */
+  --fs-5xl: 4.5rem;    /* 72px */
+
+  /* 间距系统 - 4pt 倍数 */
+  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; 
+  --s-6: 24px; --s-8: 32px; --s-12: 48px; --s-16: 64px; --s-24: 96px;
+
+  /* 动效与缓动 (Exponential, NO bounce) */
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out-expo: cubic-bezier(0.87, 0, 0.13, 1);
+  --d-fast: 150ms; --d-base: 300ms; --d-slow: 600ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+/* ============================================================
+   Reset & Basics
+   ============================================================ */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--f-serif); font-size: var(--fs-base); line-height: 1.6;
+  color: var(--c-text-primary); background-color: var(--c-bg-base);
+  -webkit-font-smoothing: antialiased; letter-spacing: 0.02em;
+}
+::selection { background: var(--c-accent-red); color: var(--c-bg-base); }
+.container { max-width: 1200px; margin: 0 auto; padding: 0 var(--s-6); }
+
+/* ============================================================
+   Typography Editorial Style
+   ============================================================ */
+h1, h2, h3, h4 { font-weight: 400; line-height: 1.2; }
+.text-serif { font-family: var(--f-serif); }
+.text-sans { font-family: var(--f-sans); letter-spacing: 0em; }
+.text-num { font-family: var(--f-num); font-variant-numeric: tabular-nums; }
+.text-italic { font-style: italic; }
+
+.eyebrow { 
+  font-family: var(--f-sans); font-size: var(--fs-xs); 
+  text-transform: uppercase; letter-spacing: 0.1em; 
+  color: var(--c-accent-gold); margin-bottom: var(--s-4); display: block;
+}
+
+/* ============================================================
+   Components (No Glassmorphism, Brutalist/Editorial finesse)
+   ============================================================ */
+/* Button: 完整状态链 */
+.btn {
+  display: inline-flex; align-items: center; gap: var(--s-3);
+  padding: var(--s-3) var(--s-6); font-family: var(--f-sans); font-size: var(--fs-sm);
+  background: transparent; border: 1px solid var(--c-border); color: var(--c-text-primary);
+  cursor: pointer; transition: all var(--d-fast) var(--ease-out-quint);
+  text-decoration: none; border-radius: 0; /* 锋利的直角，拒绝通用圆角 */
+}
+.btn:hover { border-color: var(--c-text-primary); background: var(--c-surface); }
+.btn:active { transform: scale(0.98); }
+.btn:focus-visible { outline: 2px solid var(--c-accent-gold); outline-offset: 4px; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; border-color: var(--c-border); background: transparent; }
+
+.btn-primary { background: var(--c-accent-red); border-color: var(--c-accent-red); color: var(--c-text-primary); }
+.btn-primary:hover { background: oklch(45% 0.18 25); border-color: oklch(45% 0.18 25); }
+
+/* Input Focus Glow */
+.input-group { margin-bottom: var(--s-6); }
+.input-label { display: block; font-family: var(--f-sans); font-size: var(--fs-xs); color: var(--c-text-secondary); margin-bottom: var(--s-2); }
+.input {
+  width: 100%; padding: var(--s-4); font-family: var(--f-sans); font-size: var(--fs-base);
+  background: var(--c-surface); border: 1px solid var(--c-border); color: var(--c-text-primary);
+  transition: all var(--d-base) var(--ease-out-quint); border-radius: 0;
+}
+.input:focus { outline: none; border-color: var(--c-accent-gold); background: var(--c-bg-base); box-shadow: 0 0 0 1px var(--c-accent-gold); }
+
+/* Editorial Card (NO nesting, NO massive shadows) */
+.ed-card {
+  border-top: 1px solid var(--c-border); padding: var(--s-6) 0;
+  transition: border-color var(--d-base) var(--ease-out-quint);
+  cursor: pointer; display: flex; flex-direction: column;
+}
+.ed-card:hover { border-color: var(--c-accent-gold); }
+.ed-card-meta { font-family: var(--f-sans); font-size: var(--fs-xs); color: var(--c-text-tertiary); margin-bottom: var(--s-3); display: flex; justify-content: space-between;}
+.ed-card-title { font-size: var(--fs-lg); margin-bottom: var(--s-3); color: var(--c-text-primary); }
+.ed-card-desc { font-family: var(--f-sans); font-size: var(--fs-sm); color: var(--c-text-secondary); line-height: 1.6; }
+
+/* ============================================================
+   Layouts & Sections
+   ============================================================ */
+.section { padding: var(--s-24) 0; border-bottom: 1px solid var(--c-border); }
+
+/* Hero: Asymmetric, huge typography */
+.hero { display: grid; grid-template-columns: 1fr; gap: var(--s-12); padding: 120px 0 var(--s-24); border-bottom: 1px solid var(--c-border); }
+@media(min-width: 1024px) {
+  .hero { grid-template-columns: 5fr 4fr; align-items: start; gap: var(--s-24); }
+}
+.hero h1 { font-size: var(--fs-5xl); letter-spacing: -0.02em; margin-bottom: var(--s-8); }
+.hero-sub { font-family: var(--f-sans); font-size: var(--fs-lg); font-weight: 300; color: var(--c-text-secondary); max-width: 38ch; line-height: 1.8; margin-bottom: var(--s-8); }
+
+/* Minimal Chart (No grid boxes, just elegant rings and text) */
+.minimal-chart {
+  aspect-ratio: 1; border: 1px dashed var(--c-border-strong); border-radius: 50%;
+  position: relative; display: flex; align-items: center; justify-content: center;
+  padding: var(--s-4);
+}
+.minimal-chart::before { content: ''; position: absolute; inset: 24px; border: 1px solid var(--c-border); border-radius: 50%; }
+.chart-center { text-align: center; }
+.chart-center h3 { font-size: var(--fs-2xl); color: var(--c-accent-red); margin-bottom: var(--s-2); }
+.chart-center p { font-family: var(--f-sans); font-size: var(--fs-xs); color: var(--c-text-secondary); letter-spacing: 0.1em; }
+.chart-node {
+  position: absolute; font-size: var(--fs-xs); font-family: var(--f-sans); color: var(--c-text-secondary);
+  background: var(--c-bg-base); padding: 0 4px;
+}
+.node-top { top: -10px; left: 50%; transform: translateX(-50%); }
+.node-bottom { bottom: -10px; left: 50%; transform: translateX(-50%); }
+.node-left { left: -10px; top: 50%; transform: translateY(-50%); }
+.node-right { right: -10px; top: 50%; transform: translateY(-50%); }
+
+/* Swatches */
+.grid-swatch { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--s-6); margin-top: var(--s-12); }
+.swatch-item { display: flex; flex-direction: column; gap: var(--s-3); }
+.swatch-color { height: 120px; border: 1px solid var(--c-border); }
+.swatch-info { font-family: var(--f-sans); }
+.swatch-name { font-size: var(--fs-sm); color: var(--c-text-primary); margin-bottom: 0px; }
+.swatch-val { font-size: var(--fs-xs); color: var(--c-text-tertiary); font-variant-numeric: tabular-nums; }
+
+/* Scale */
+.type-scale { display: flex; flex-direction: column; margin-top: var(--s-8); }
+.type-row { display: grid; grid-template-columns: 120px 1fr; gap: var(--s-6); border-top: 1px solid var(--c-border); padding: var(--s-6) 0; align-items: baseline; }
+.type-label { font-family: var(--f-sans); font-size: var(--fs-xs); color: var(--c-text-tertiary); }
+
+/* Reveal Animation */
+.reveal { opacity: 0; transform: translateY(24px); transition: all var(--d-slow) var(--ease-out-quint); }
+.reveal.in { opacity: 1; transform: translateY(0); }
+
+</style>
+</head>
+<body>
+
+<div class="container">
+  
+  <header style="padding: var(--s-6) 0; border-bottom: 1px solid var(--c-border); display: flex; justify-content: space-between; align-items: center; font-family: var(--f-sans); font-size: var(--fs-sm);">
+    <div>紫微灵犀 / ZIWEI DOUSHU</div>
+    <div style="color: var(--c-text-secondary); text-transform: uppercase; letter-spacing: 0.05em;">Editorial Design Standard</div>
+  </header>
+
+  <section class="hero reveal">
+    <div>
+      <span class="eyebrow">Philosophical Astrology</span>
+      <h1>命理不是判决<br><span class="text-italic" style="color: var(--c-text-secondary);">是生命的天气预报。</span></h1>
+      <p class="hero-sub">在宏大叙事与算法泛滥的时代，我们回归古典克制的美学。拒绝刺眼的渐变与虚浮的毛玻璃，用墨与朱砂，雕刻十二宫的深度真实。</p>
+      <div style="display: flex; gap: var(--s-4);">
+        <button class="btn btn-primary">开启解析</button>
+        <button class="btn">阅读设计哲学</button>
+      </div>
+    </div>
+    <div class="minimal-chart">
+      <div class="chart-node node-top">午 · 福德</div>
+      <div class="chart-node node-bottom">子 · 财帛</div>
+      <div class="chart-node node-left">卯 · 兄弟</div>
+      <div class="chart-node node-right">酉 · 交友</div>
+      <div class="chart-center">
+        <h3>紫微</h3>
+        <p>辰宫 / 命主</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section reveal">
+    <span class="eyebrow">01 — Color & Contrast</span>
+    <h2>水墨朱砂 (Ink & Cinnabar)</h2>
+    <p class="text-sans" style="max-width: 60ch; font-size: var(--fs-sm); color: var(--c-text-secondary); margin-top: var(--s-4);">
+      严格采用 OKLCH 色彩空间。中性色全部带有 Chroma 0.01 的暖色倾向，避免 "AI" 常见的生硬纯黑 #000。朱砂红只用于最核心的强调，而非随处可见。
+    </p>
+
+    <div class="grid-swatch">
+      <div class="swatch-item">
+        <div class="swatch-color" style="background: var(--c-bg-base);"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Dark Ink (主背景)</div>
+          <div class="swatch-val">oklch(15% 0.01 50)</div>
+        </div>
+      </div>
+      <div class="swatch-item">
+        <div class="swatch-color" style="background: var(--c-surface);"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Lighter Ink (浮层)</div>
+          <div class="swatch-val">oklch(22% 0.01 50)</div>
+        </div>
+      </div>
+      <div class="swatch-item">
+        <div class="swatch-color" style="background: var(--c-text-primary);"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Warm Paper (主文字)</div>
+          <div class="swatch-val">oklch(95% 0.01 70) • AAA</div>
+        </div>
+      </div>
+      <div class="swatch-item">
+        <div class="swatch-color" style="background: var(--c-accent-red);"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Cinnabar (朱砂核心)</div>
+          <div class="swatch-val">oklch(52% 0.18 25) • AA</div>
+        </div>
+      </div>
+      <div class="swatch-item">
+        <div class="swatch-color" style="background: var(--c-accent-gold);"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Aged Gold (暗金副主)</div>
+          <div class="swatch-val">oklch(80% 0.08 85) • AAA</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section reveal">
+    <span class="eyebrow">02 — Typography</span>
+    <h2>模块化排版 (Ratio 1.333)</h2>
+    <p class="text-sans" style="max-width: 60ch; font-size: var(--fs-sm); color: var(--c-text-secondary); margin-top: var(--s-4);">
+      抛弃缺乏情感的通用黑体大杂烩。标题与内容承载使用 Serif，功能与数据注释使用 Sans。保持充分的行高与段距。
+    </p>
+
+    <div class="type-scale">
+      <div class="type-row">
+        <div class="type-label">H1 (5XL)<br>Serif 400</div>
+        <div style="font-size: var(--fs-5xl); line-height: 1.1;">紫微星在辰</div>
+      </div>
+      <div class="type-row">
+        <div class="type-label">H2 (3XL)<br>Serif 400</div>
+        <div style="font-size: var(--fs-3xl); line-height: 1.2;">大限流年分析</div>
+      </div>
+      <div class="type-row">
+        <div class="type-label">H3 (XL)<br>Serif 400</div>
+        <div style="font-size: var(--fs-xl); line-height: 1.3;">财帛宫·破军独坐</div>
+      </div>
+      <div class="type-row">
+        <div class="type-label">Body (Base)<br>Serif 400</div>
+        <div style="font-size: var(--fs-base); line-height: 1.6; max-width: 60ch;">破军在此代表财务起伏较大，具有强烈的开创欲望。在 35 岁前的投资容易经历大破大立。建议用保守储蓄对冲风险，而不是随波逐流。</div>
+      </div>
+      <div class="type-row">
+        <div class="type-label">Caption (XS)<br>Sans 400</div>
+        <div class="text-sans" style="font-size: var(--fs-xs); color: var(--c-text-secondary);">由 Impeccable Design Agent 渲染 · 2026-04</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section reveal">
+    <span class="eyebrow">03 — Components & UX</span>
+    <h2>实用主义无卡片 (No Nested Cards)</h2>
+    <p class="text-sans" style="max-width: 60ch; font-size: var(--fs-sm); color: var(--c-text-secondary); margin-top: var(--s-4); margin-bottom: var(--s-12);">
+      不为装裱而装裱。列表通过边框而非四周的盒子区分，悬浮通过线条色彩变化而非刺眼的阴影暗示。UX 文案真实且刺痛。
+    </p>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--s-12); align-items: start;">
+      
+      <!-- 列表/卡片 -->
+      <div>
+        <h4 class="text-sans" style="font-size: var(--fs-xs); color: var(--c-text-tertiary); margin-bottom: var(--s-6); text-transform: uppercase;">A. Insight List</h4>
+        <div class="ed-card">
+          <div class="ed-card-meta"><span>事业格局</span> <span style="color: var(--c-accent-red);">免费</span></div>
+          <div class="ed-card-title">二十年大限，沉浮皆有定数</div>
+          <div class="ed-card-desc">深度解读官禄宫与大限的交汇。不要在下行周期过度透支杠杆。</div>
+        </div>
+        <div class="ed-card">
+          <div class="ed-card-meta"><span>婚姻桃花</span> <span style="color: var(--c-accent-gold);">50 积分</span></div>
+          <div class="ed-card-title">桃花不只风月，也是人际杠杆</div>
+          <div class="ed-card-desc">夫妻宫天机巨门，言语之争难免。理解争吵底层的权力结构更为关键。</div>
+        </div>
+      </div>
+
+      <!-- 表单交互 -->
+      <div>
+        <h4 class="text-sans" style="font-size: var(--fs-xs); color: var(--c-text-tertiary); margin-bottom: var(--s-6); text-transform: uppercase;">B. Interactive States</h4>
+        <form action="#" onsubmit="event.preventDefault();">
+          <div class="input-group">
+            <label class="input-label">出生年份 (农历)</label>
+            <input class="input" type="text" placeholder="例如：1988" />
+          </div>
+          <div class="input-group">
+            <label class="input-label">关注的困惑领域</label>
+            <textarea class="input" rows="3" placeholder="事业停滞、婚姻危机..."></textarea>
+          </div>
+          <div style="display: flex; gap: var(--s-3); margin-top: var(--s-8);">
+            <button class="btn btn-primary" type="button">解锁命盘</button>
+            <button class="btn" disabled>积分不足</button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </section>
+
+</div>
+
+<script>
+  // Simple intersection observer for reveal effect
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('in');
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+
+</body>
+</html>

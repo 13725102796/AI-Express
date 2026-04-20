@@ -1,0 +1,68 @@
+/**
+ * 紫微灵犀 设计系统全局 SCSS 变量（uni-app 全局自动注入，所有 .vue 自动可用）
+ *
+ * 硬约束：严格对齐 page-specs.md 第 0 节，禁止引入紫金御阁风（#2D1B69 / #D4A84B）
+ */
+
+/* ========== 主色（page-specs.md 第 0.1 节） ========== */
+$c-gold: #D4AF37; // 经典金，主品牌色
+$c-gold-dim: rgba(212, 175, 55, 0.4); // 半透金，边框/分隔线
+$c-gold-soft: rgba(212, 175, 55, 0.1); // 更浅金，背景态
+$c-bg: #000000; // 纯黑底
+$text-main: rgba(255, 255, 255, 0.9); // 主文字
+$text-secondary: rgba(255, 255, 255, 0.6); // 次文字
+$text-dim: rgba(255, 255, 255, 0.4); // 弱文字
+$text-subtle: rgba(255, 255, 255, 0.3); // 极弱文字
+$text-faint: rgba(255, 255, 255, 0.2); // 几乎隐去
+$form-bg: rgba(10, 10, 15, 0.8); // 表单/卡片底，毛玻璃
+
+/* 辅助色 */
+$c-error: #ff3333; // 错误警示（P04 切断链接）
+$c-success: rgba(212, 175, 55, 0.8); // 成功态复用金
+
+/* ========== 字体 ========== */
+$font-serif: "Noto Serif SC", serif;
+$font-latin: "Cinzel", "Noto Serif SC", serif;
+
+/* ========== 字号梯度 ========== */
+$fs-title: 22px; // 主标题
+$fs-section: 14px; // 区块标题
+$fs-card-title: 16px; // 卡片标题
+$fs-body: 14px; // 正文
+$fs-caption: 12px; // 副文本
+$fs-small: 10px; // 小标签
+$fs-number-lg: 44px; // 大数字（积分）
+$fs-number-md: 32px;
+
+/* ========== 布局 ========== */
+$container-max: 600px; // 常规容器最大宽度
+$container-chart: 800px; // 命盘相关页
+$spacing-base: 8px;
+$spacing-sm: 8px;
+$spacing-md: 16px;
+$spacing-lg: 24px;
+$spacing-xl: 32px;
+$spacing-2xl: 40px;
+
+$radius-sm: 4px;
+$radius-md: 8px;
+$radius-lg: 12px;
+$radius-pill: 99px;
+
+/* ========== 动效 ========== */
+$ease-magic: cubic-bezier(0.16, 1, 0.3, 1);
+$ease-smooth: cubic-bezier(0.25, 1, 0.5, 1);
+$dur-fast: 0.3s;
+$dur-base: 0.4s;
+$dur-slow: 0.6s;
+
+/* ========== 阴影/发光 ========== */
+$shadow-gold-glow: 0 0 15px rgba(212, 175, 55, 0.2);
+$shadow-gold-glow-lg: 0 0 30px rgba(212, 175, 55, 0.2);
+$shadow-gold-inset: inset 0 0 20px rgba(212, 175, 55, 0.2);
+$shadow-gold-inset-sm: inset 0 0 30px rgba(212, 175, 55, 0.05);
+
+/* ========== uni-app 内置变量 overrides（兼容性，不使用） ========== */
+$uni-color-primary: #D4AF37;
+$uni-text-color: rgba(255, 255, 255, 0.9);
+$uni-bg-color: #000000;

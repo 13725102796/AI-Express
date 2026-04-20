@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>主控核心 — 缘主管理</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root { --c-gold: #D4AF37; --c-gold-dim: rgba(212, 175, 55, 0.4); --c-bg: #000000; --text-main: rgba(255,255,255,0.9); }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--c-bg); color: var(--text-main); font-family: 'Noto Serif SC', serif; min-height: 100vh; display: flex; }
+.starfield { position: fixed; inset: 0; z-index: -2; pointer-events: none; opacity: 0.5; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Ccircle cx='50' cy='150' r='1' fill='rgba(212,175,55,0.4)'/%3E%3Ccircle cx='300' cy='80' r='1.5' fill='rgba(255,255,255,0.6)'/%3E%3C/svg%3E"); background-size: 200px 200px; }
+
+.sidebar { width: 200px; min-height: 100vh; background: rgba(10,10,15,0.9); border-right: 1px solid var(--c-gold-dim); padding: 24px 0; flex-shrink: 0; position: sticky; top: 0; }
+.side-logo { padding: 0 24px 24px; border-bottom: 1px solid rgba(212,175,55,0.15); margin-bottom: 16px; }
+.side-logo-title { font-size: 16px; color: var(--c-gold); letter-spacing: 4px; font-weight: 600; }
+.side-logo-sub { font-size: 9px; color: rgba(255,255,255,0.4); letter-spacing: 3px; margin-top: 4px; }
+.side-menu { display: flex; flex-direction: column; }
+.side-item { padding: 14px 24px; color: rgba(255,255,255,0.6); text-decoration: none; font-size: 13px; letter-spacing: 1px; border-left: 2px solid transparent; transition: 0.3s; }
+.side-item:hover { background: rgba(212,175,55,0.05); color: var(--c-gold); }
+.side-item.active { background: rgba(212,175,55,0.08); color: var(--c-gold); border-left-color: var(--c-gold); }
+.side-divider { height: 1px; background: rgba(212,175,55,0.1); margin: 16px 24px; }
+
+.main { flex: 1; min-width: 0; }
+.topbar { padding: 14px 32px; background: rgba(10,10,15,0.6); border-bottom: 1px solid rgba(212,175,55,0.1); display: flex; justify-content: space-between; align-items: center; backdrop-filter: blur(10px); }
+.topbar-title { font-size: 14px; color: rgba(255,255,255,0.7); letter-spacing: 2px; }
+.topbar-user { display: flex; align-items: center; gap: 12px; font-size: 12px; color: rgba(255,255,255,0.6); }
+.topbar-user a { color: var(--c-gold); text-decoration: none; padding: 4px 12px; border: 1px solid var(--c-gold-dim); border-radius: 99px; font-size: 11px; }
+
+.content { padding: 32px; max-width: 1400px; }
+.page-title { font-size: 22px; color: var(--c-gold); letter-spacing: 4px; margin-bottom: 24px; font-weight: 600; }
+
+.action-bar { display: flex; gap: 12px; margin-bottom: 20px; align-items: center; }
+.search-input { flex: 1; max-width: 320px; padding: 10px 14px; background: rgba(0,0,0,0.5); border: 1px solid var(--c-gold-dim); color: #fff; font-family: inherit; font-size: 13px; outline: none; }
+.btn-ghost { padding: 10px 16px; background: transparent; border: 1px solid var(--c-gold-dim); color: rgba(212,175,55,0.85); font-family: inherit; font-size: 12px; cursor: pointer; }
+
+.table-wrap { background: rgba(10,10,15,0.6); border: 1px solid rgba(212,175,55,0.1); overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { padding: 14px 16px; background: rgba(212,175,55,0.05); color: var(--c-gold); font-weight: 400; letter-spacing: 1.5px; text-align: left; border-bottom: 1px solid var(--c-gold-dim); font-size: 11px; }
+td { padding: 14px 16px; color: rgba(255,255,255,0.8); border-bottom: 1px solid rgba(212,175,55,0.06); }
+tr:hover td { background: rgba(212,175,55,0.03); }
+.act { padding: 4px 10px; background: transparent; border: 1px solid var(--c-gold-dim); color: var(--c-gold); cursor: pointer; font-family: inherit; font-size: 11px; }
+.point-cell { color: var(--c-gold); font-weight: 600; }
+
+.pagination { padding: 16px; display: flex; justify-content: center; gap: 4px; border-top: 1px solid rgba(212,175,55,0.06); }
+.pg-btn { padding: 6px 12px; background: transparent; border: 1px solid var(--c-gold-dim); color: rgba(212,175,55,0.7); cursor: pointer; font-family: inherit; font-size: 12px; }
+.pg-btn.active { background: rgba(212,175,55,0.15); color: var(--c-gold); }
+</style>
+</head>
+<body>
+<div class="starfield"></div>
+
+<aside class="sidebar">
+  <div class="side-logo">
+    <div class="side-logo-title">紫微灵犀</div>
+    <div class="side-logo-sub">主控核心</div>
+  </div>
+  <nav class="side-menu">
+    <a href="A05-admin-stats.html" class="side-item">数据概览</a>
+    <a href="A02-admin-templates.html" class="side-item">神谕模块管理</a>
+    <a href="A04-admin-points-config.html" class="side-item">灵犀经济配置</a>
+    <a href="A03-admin-users.html" class="side-item active">缘主管理</a>
+    <div class="side-divider"></div>
+    <a href="A01-admin-login.html" class="side-item">切断接入</a>
+  </nav>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-title">缘主管理（仅查看）</div>
+    <div class="topbar-user">操守者：admin <a href="A01-admin-login.html">退出</a></div>
+  </div>
+
+  <div class="content">
+    <h1 class="page-title">缘主管理</h1>
+
+    <div class="action-bar">
+      <input type="text" class="search-input" placeholder="按手机号或时空印记搜索..." />
+      <button class="btn-ghost">导出 CSV</button>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>时空印记</th><th>手机号</th><th>注册时间</th><th>灵犀点数</th><th>已启封</th><th>神谕印记</th><th>引灵数</th><th>操作</th>
+        </tr></thead>
+        <tbody>
+          <tr><td>8092-3412</td><td>138****8888</td><td>2026-04-10</td><td class="point-cell">2,850 ¤</td><td>4</td><td>3</td><td>2</td><td><button class="act">查看</button></td></tr>
+          <tr><td>7251-9023</td><td>186****6789</td><td>2026-04-10</td><td class="point-cell">120 ¤</td><td>0</td><td>0</td><td>0</td><td><button class="act">查看</button></td></tr>
+          <tr><td>6438-2891</td><td>139****2233</td><td>2026-04-08</td><td class="point-cell">230 ¤</td><td>1</td><td>1</td><td>0</td><td><button class="act">查看</button></td></tr>
+          <tr><td>5901-8124</td><td>137****4567</td><td>2026-04-07</td><td class="point-cell">580 ¤</td><td>2</td><td>4</td><td>1</td><td><button class="act">查看</button></td></tr>
+          <tr><td>4823-6712</td><td>185****0102</td><td>2026-04-05</td><td class="point-cell">90 ¤</td><td>0</td><td>0</td><td>0</td><td><button class="act">查看</button></td></tr>
+          <tr><td>3712-5409</td><td>176****7890</td><td>2026-04-03</td><td class="point-cell">1,420 ¤</td><td>3</td><td>5</td><td>3</td><td><button class="act">查看</button></td></tr>
+          <tr><td>2596-1834</td><td>131****3456</td><td>2026-04-02</td><td class="point-cell">340 ¤</td><td>1</td><td>2</td><td>0</td><td><button class="act">查看</button></td></tr>
+          <tr><td>1487-9012</td><td>199****5678</td><td>2026-04-01</td><td class="point-cell">100 ¤</td><td>0</td><td>0</td><td>0</td><td><button class="act">查看</button></td></tr>
+        </tbody>
+      </table>
+
+      <div class="pagination">
+        <button class="pg-btn">‹</button>
+        <button class="pg-btn active">1</button>
+        <button class="pg-btn">2</button>
+        <button class="pg-btn">3</button>
+        <button class="pg-btn">…</button>
+        <button class="pg-btn">7</button>
+        <button class="pg-btn">›</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+</body>
+</html>

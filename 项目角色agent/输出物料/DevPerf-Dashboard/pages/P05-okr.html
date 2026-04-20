@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DevPerf Dashboard - OKR Board</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--color-primary:oklch(0.45 0.12 255);--color-primary-light:oklch(0.55 0.10 255);--color-primary-dark:oklch(0.35 0.14 255);--color-primary-surface:oklch(0.95 0.02 255);--color-accent:oklch(0.75 0.15 75);--color-accent-hover:oklch(0.70 0.17 75);--color-success:oklch(0.55 0.15 160);--color-success-surface:oklch(0.93 0.04 160);--color-warning:oklch(0.65 0.16 70);--color-warning-text:oklch(0.55 0.18 70);--color-error:oklch(0.55 0.18 25);--color-error-surface:oklch(0.93 0.04 25);--color-bg:oklch(0.985 0.005 250);--color-bg-elevated:oklch(1.0 0.0 0);--color-bg-sunken:oklch(0.96 0.008 250);--color-bg-dark:oklch(0.15 0.02 255);--color-text-primary:oklch(0.20 0.02 250);--color-text-secondary:oklch(0.45 0.02 250);--color-text-tertiary:oklch(0.60 0.015 250);--color-text-on-primary:oklch(0.98 0.005 250);--color-border:oklch(0.88 0.01 250);--color-divider:oklch(0.92 0.008 250);--font-heading:'Plus Jakarta Sans',system-ui,sans-serif;--font-body:'Plus Jakarta Sans',system-ui,sans-serif;--font-mono:'JetBrains Mono',monospace;--text-xs:0.64rem;--text-sm:0.8rem;--text-base:1rem;--text-md:1.125rem;--text-lg:1.25rem;--text-xl:1.563rem;--text-2xl:1.953rem;--leading-tight:1.2;--leading-normal:1.5;--weight-regular:400;--weight-medium:500;--weight-semibold:600;--weight-bold:700;--weight-extrabold:800;--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;--space-8:32px;--space-10:40px;--space-12:48px;--shadow-sm:0 1px 2px oklch(0.20 0.02 250/0.04),0 1px 3px oklch(0.20 0.02 250/0.06);--shadow-md:0 2px 4px oklch(0.20 0.02 250/0.04),0 4px 8px oklch(0.20 0.02 250/0.06),0 8px 16px oklch(0.20 0.02 250/0.04);--radius-sm:6px;--radius-md:8px;--radius-lg:12px;--radius-xl:16px;--radius-full:9999px;--duration-fast:200ms;--duration-normal:300ms;--duration-entrance:600ms;--ease-out-quart:cubic-bezier(0.25,1,0.5,1);--ease-out-expo:cubic-bezier(0.16,1,0.3,1)}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}html{font-size:16px;-webkit-font-smoothing:antialiased}body{font-family:var(--font-body);color:var(--color-text-primary);background:var(--color-bg);padding-top:36px}
+.state-switcher{position:fixed;top:0;left:0;right:0;z-index:10000;background:var(--color-bg-dark);padding:var(--space-2) var(--space-4);display:flex;align-items:center;gap:var(--space-2);font-family:var(--font-mono);font-size:var(--text-xs);color:var(--color-text-on-primary)}.state-switcher span{opacity:.6;margin-right:var(--space-2)}.state-btn{padding:var(--space-1) var(--space-3);border:1px solid oklch(0.40 0.02 250);border-radius:var(--radius-sm);background:transparent;color:var(--color-text-on-primary);font-family:var(--font-mono);font-size:var(--text-xs);cursor:pointer;transition:all var(--duration-fast)}.state-btn:hover{background:oklch(0.25 0.02 255)}.state-btn.active{background:var(--color-primary);border-color:var(--color-primary)}
+.app-layout{display:flex;min-height:calc(100vh - 36px)}.sidebar{width:240px;background:var(--color-bg-elevated);border-right:1px solid var(--color-border);position:fixed;top:36px;bottom:0;left:0;z-index:100;display:flex;flex-direction:column}.sidebar-header{padding:var(--space-5);border-bottom:1px solid var(--color-divider);display:flex;align-items:center;gap:var(--space-3)}.sidebar-logo{width:32px;height:32px;background:var(--color-primary);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center}.sidebar-brand{font-family:var(--font-heading);font-weight:var(--weight-bold);font-size:var(--text-md)}.sidebar-nav{flex:1;padding:var(--space-3)}.nav-item{display:flex;align-items:center;gap:var(--space-3);padding:var(--space-3) var(--space-4);border-radius:var(--radius-md);color:var(--color-text-secondary);font-size:var(--text-sm);font-weight:var(--weight-medium);cursor:pointer;transition:all var(--duration-fast);text-decoration:none;position:relative}.nav-item:hover{background:var(--color-bg-sunken);color:var(--color-text-primary)}.nav-item.active{background:var(--color-primary-surface);color:var(--color-primary);font-weight:var(--weight-semibold)}.nav-item.active::before{content:'';position:absolute;left:0;top:var(--space-2);bottom:var(--space-2);width:3px;background:var(--color-primary);border-radius:0 2px 2px 0}.nav-item svg{width:20px;height:20px;flex-shrink:0}.sidebar-user{padding:var(--space-4) var(--space-5);border-top:1px solid var(--color-divider);display:flex;align-items:center;gap:var(--space-3)}.user-avatar{width:36px;height:36px;border-radius:var(--radius-full);background:var(--color-primary);display:flex;align-items:center;justify-content:center;color:var(--color-text-on-primary);font-weight:var(--weight-semibold);font-size:var(--text-sm)}.user-name{font-size:var(--text-sm);font-weight:var(--weight-semibold)}.user-role{font-size:var(--text-xs);color:var(--color-text-tertiary)}
+.main-content{margin-left:240px;flex:1;min-width:0}
+.content-header{padding:var(--space-5) var(--space-6);border-bottom:1px solid var(--color-divider);background:var(--color-bg-elevated);display:flex;align-items:center;justify-content:space-between;gap:var(--space-4);flex-wrap:wrap}
+.page-title{font-family:var(--font-heading);font-weight:var(--weight-bold);font-size:var(--text-lg)}
+.header-actions{display:flex;gap:var(--space-3);align-items:center}
+.filter-select{padding:var(--space-2) var(--space-3);padding-right:var(--space-8);border:1px solid var(--color-border);border-radius:var(--radius-md);background:var(--color-bg-elevated);font-family:var(--font-body);font-size:var(--text-sm);color:var(--color-text-primary);appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748B' d='M3 4.5l3 3 3-3'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;cursor:pointer;transition:border-color var(--duration-fast)}.filter-select:focus{border-color:var(--color-primary);outline:none;box-shadow:0 0 0 3px oklch(0.45 0.12 255/0.1)}
+.btn-primary{padding:var(--space-2) var(--space-4);border:none;border-radius:var(--radius-md);background:var(--color-primary);color:var(--color-text-on-primary);font-family:var(--font-body);font-size:var(--text-sm);font-weight:var(--weight-semibold);cursor:pointer;display:flex;align-items:center;gap:var(--space-2);transition:all var(--duration-fast)}.btn-primary:hover{background:var(--color-primary-light);box-shadow:var(--shadow-sm)}.btn-primary:active{background:var(--color-primary-dark);transform:scale(0.98)}
+
+/* OKR CARDS */
+.okr-container{padding:var(--space-6);display:flex;flex-direction:column;gap:var(--space-5)}
+.obj-card{background:var(--color-bg-elevated);border:1px solid var(--color-border);border-radius:var(--radius-lg);overflow:hidden;transition:box-shadow var(--duration-fast);animation:cardIn var(--duration-entrance) var(--ease-out-expo) both}
+.obj-card:hover{box-shadow:var(--shadow-sm)}
+@keyframes cardIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.obj-card:nth-child(1){animation-delay:0ms}.obj-card:nth-child(2){animation-delay:80ms}.obj-card:nth-child(3){animation-delay:160ms}.obj-card:nth-child(4){animation-delay:240ms}.obj-card:nth-child(5){animation-delay:320ms}
+.obj-header{display:flex;align-items:center;gap:var(--space-4);padding:var(--space-5);cursor:pointer;transition:background var(--duration-fast)}
+.obj-header:hover{background:var(--color-bg-sunken)}
+.obj-expand{width:24px;height:24px;display:flex;align-items:center;justify-content:center;transition:transform var(--duration-fast);flex-shrink:0}
+.obj-expand.open{transform:rotate(90deg)}
+.obj-info{flex:1;min-width:0}
+.obj-title{font-weight:var(--weight-semibold);font-size:var(--text-base);margin-bottom:var(--space-1)}
+.obj-meta{font-size:var(--text-xs);color:var(--color-text-tertiary);display:flex;gap:var(--space-3)}
+.obj-progress-container{display:flex;align-items:center;gap:var(--space-3);min-width:180px}
+.obj-progress-bar{flex:1;height:8px;background:var(--color-bg-sunken);border-radius:var(--radius-full);overflow:hidden}
+.obj-progress-fill{height:100%;border-radius:var(--radius-full);transition:width var(--duration-entrance) var(--ease-out-expo)}
+.obj-pct{font-family:var(--font-heading);font-weight:var(--weight-bold);font-size:var(--text-md);font-variant-numeric:tabular-nums;min-width:48px;text-align:right}
+.pct-low{color:var(--color-error)}.pct-mid{color:var(--color-accent)}.pct-good{color:var(--color-primary)}.pct-great{color:var(--color-success)}
+
+/* KR LIST */
+.kr-list{display:none;padding:0 var(--space-5) var(--space-5);border-top:1px solid var(--color-divider)}
+.kr-list.open{display:block}
+.kr-item{display:flex;align-items:center;gap:var(--space-4);padding:var(--space-3) var(--space-4);border-radius:var(--radius-md);transition:background var(--duration-fast);margin-top:var(--space-2)}
+.kr-item:hover{background:var(--color-bg-sunken)}
+.kr-title{flex:1;font-size:var(--text-sm);min-width:0}
+.kr-progress{display:flex;align-items:center;gap:var(--space-3);min-width:240px}
+.kr-bar{flex:1;height:6px;background:var(--color-bg-sunken);border-radius:var(--radius-full);overflow:hidden}
+.kr-bar-fill{height:100%;border-radius:var(--radius-full);transition:width var(--duration-entrance) var(--ease-out-expo)}
+.kr-value{font-size:var(--text-sm);font-variant-numeric:tabular-nums;color:var(--color-text-secondary);min-width:100px;text-align:right;cursor:pointer;padding:var(--space-1) var(--space-2);border-radius:var(--radius-sm);transition:background var(--duration-fast)}
+.kr-value:hover{background:var(--color-primary-surface)}
+.kr-weight{font-size:var(--text-xs);color:var(--color-text-tertiary);background:var(--color-bg-sunken);padding:var(--space-1) var(--space-2);border-radius:var(--radius-full);flex-shrink:0}
+.kr-edit-input{width:60px;padding:var(--space-1) var(--space-2);border:2px solid var(--color-primary);border-radius:var(--radius-sm);font-family:var(--font-body);font-size:var(--text-sm);text-align:right;outline:none;font-variant-numeric:tabular-nums}
+
+/* TOAST */
+.toast-container{position:fixed;top:48px;right:var(--space-4);z-index:9999;display:flex;flex-direction:column;gap:var(--space-2)}
+.toast{padding:var(--space-3) var(--space-4);border-radius:var(--radius-md);font-size:var(--text-sm);font-weight:var(--weight-medium);box-shadow:var(--shadow-md);display:flex;align-items:center;gap:var(--space-2);animation:toastIn var(--duration-normal) var(--ease-out-expo);min-width:200px}
+.toast--success{background:var(--color-success-surface);color:var(--color-success);border:1px solid oklch(0.55 0.15 160/0.2)}
+@keyframes toastIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+
+/* EMPTY */
+.empty-state{display:none;flex-direction:column;align-items:center;justify-content:center;padding:var(--space-12);text-align:center}.empty-state.visible{display:flex}
+.error-state{display:none;flex-direction:column;align-items:center;justify-content:center;padding:var(--space-12);text-align:center}.error-state.visible{display:flex}
+.btn-retry{padding:var(--space-2) var(--space-4);border:1px solid var(--color-border);border-radius:var(--radius-md);background:var(--color-bg-elevated);color:var(--color-text-primary);font-size:var(--text-sm);cursor:pointer;margin-top:var(--space-3);transition:all var(--duration-fast)}.btn-retry:hover{border-color:var(--color-primary);color:var(--color-primary)}
+
+@media(max-width:768px){.sidebar{display:none}.main-content{margin-left:0}.content-header{padding:var(--space-4);flex-direction:column;align-items:flex-start}.okr-container{padding:var(--space-4)}.kr-progress{min-width:140px;flex-wrap:wrap}}
+@media(prefers-reduced-motion:reduce){*{animation-duration:0.01ms!important;transition-duration:0.01ms!important}}
+</style>
+</head>
+<body>
+<div class="state-switcher">
+  <span>P05 OKR</span>
+  <button class="state-btn active" onclick="setState('normal')">Normal</button>
+  <button class="state-btn" onclick="setState('empty')">Empty</button>
+  <button class="state-btn" onclick="setState('readonly')">Read-only</button>
+  <button class="state-btn" onclick="setState('error')">Error</button>
+</div>
+<div class="toast-container" id="toastContainer"></div>
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sidebar-header"><div class="sidebar-logo"><svg viewBox="0 0 18 18" fill="none"><path d="M4 13V7l5-3 5 3v6l-5 3-5-3z" stroke="white" stroke-width="1.5" fill="none"/><circle cx="9" cy="6" r="1.5" fill="oklch(0.75 0.15 75)"/></svg></div><span class="sidebar-brand">DevPerf</span></div>
+    <nav class="sidebar-nav">
+      <a class="nav-item" href="P02-overview.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="7" height="7" rx="2"/><rect x="11" y="2" width="7" height="7" rx="2"/><rect x="2" y="11" width="7" height="7" rx="2"/><rect x="11" y="11" width="7" height="7" rx="2"/></svg>Overview</a>
+      <a class="nav-item active" href="#"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="8"/><circle cx="10" cy="10" r="5"/><circle cx="10" cy="10" r="2"/></svg>OKR Board</a>
+      <a class="nav-item" href="P06-git.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="6" r="2"/><circle cx="14" cy="6" r="2"/><circle cx="10" cy="14" r="2"/><path d="M6 8v2a4 4 0 004 4m4-8v2a4 4 0 01-4 4"/></svg>Git Activity</a>
+      <a class="nav-item" href="P07-admin.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 2a3 3 0 013 3v2a3 3 0 01-6 0V5a3 3 0 013-3zM3 18v-1a7 7 0 0114 0v1"/></svg>Admin</a>
+    </nav>
+    <div class="sidebar-user"><div class="user-avatar">ZW</div><div><div class="user-name">Zhang Wei</div><div class="user-role">admin</div></div></div>
+  </aside>
+  <main class="main-content">
+    <header class="content-header">
+      <h1 class="page-title">OKR Board</h1>
+      <div class="header-actions">
+        <select class="filter-select" id="periodFilter"><option>2026-Q2</option><option>2026-Q1</option></select>
+        <button class="btn-primary" id="addObjBtn" onclick="alert('Create Objective modal would open here')">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="2" x2="7" y2="12"/><line x1="2" y1="7" x2="12" y2="7"/></svg>
+          New Objective
+        </button>
+      </div>
+    </header>
+
+    <div class="okr-container" id="normalState"></div>
+    <div class="empty-state" id="emptyState"><svg width="64" height="64" viewBox="0 0 64 64" fill="none" stroke="var(--color-text-tertiary)" stroke-width="1.5"><circle cx="32" cy="32" r="24"/><circle cx="32" cy="32" r="16"/><circle cx="32" cy="32" r="8"/></svg><div style="font-weight:var(--weight-semibold);color:var(--color-text-secondary);margin-top:var(--space-4)">No OKR for this period</div><div style="font-size:var(--text-sm);color:var(--color-text-tertiary)">Click "New Objective" to get started.</div></div>
+    <div class="error-state" id="errorState"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="var(--color-error)" stroke-width="1.5"><circle cx="24" cy="24" r="20"/><path d="M24 14v12M24 30v2"/></svg><div style="font-weight:var(--weight-semibold);color:var(--color-text-secondary);margin-top:var(--space-4)">Failed to load OKR data</div><button class="btn-retry" onclick="setState('normal')">Retry</button></div>
+  </main>
+</div>
+<script>
+const okrData=[
+  {id:"obj-001",title:"Improve Dev Delivery Efficiency 30%",owner:"Zhang Wei",project:"Global",pct:72,krs:[
+    {id:"kr-001",title:"Sprint avg delivery rate reaches 85%",target:85,current:82,unit:"%",weight:3,pct:96.5},
+    {id:"kr-002",title:"PR avg merge time drops to 24h",target:24,current:31,unit:"h",weight:2,pct:77.4},
+    {id:"kr-003",title:"Bug density drops to 0.3/feature",target:0.3,current:0.42,unit:"/feat",weight:2,pct:71.4}
+  ]},
+  {id:"obj-002",title:"Complete Q2 Product Roadmap",owner:"Li Ming",project:"Avatar",pct:58,krs:[
+    {id:"kr-004",title:"Avatar Platform V2 launches",target:100,current:65,unit:"%",weight:5,pct:65},
+    {id:"kr-005",title:"AirFlow engine core features complete",target:100,current:50,unit:"%",weight:3,pct:50},
+    {id:"kr-006",title:"DataHub connects 10 data sources",target:10,current:7,unit:"sources",weight:2,pct:70}
+  ]},
+  {id:"obj-003",title:"Build DevOps Automation System",owner:"Chen Hao",project:"DevOps",pct:85,krs:[
+    {id:"kr-007",title:"CI/CD pipeline coverage 100%",target:100,current:95,unit:"%",weight:3,pct:95},
+    {id:"kr-008",title:"Deploy frequency reaches 2x/day",target:2,current:1.8,unit:"/day",weight:2,pct:90}
+  ]},
+  {id:"obj-004",title:"Improve Engineering Culture",owner:"Zhang Wei",project:"Global",pct:45,krs:[
+    {id:"kr-009",title:"Code Review participation reaches 80%",target:80,current:62,unit:"%",weight:3,pct:77.5},
+    {id:"kr-010",title:"Tech sharing 2x/month",target:2,current:1,unit:"/month",weight:1,pct:50},
+    {id:"kr-011",title:"New hire first delivery within 30d",target:30,current:35,unit:"days",weight:2,pct:85.7}
+  ]},
+  {id:"obj-005",title:"Optimize Customer Management Flow",owner:"Zhao Li",project:"CRM",pct:62,krs:[
+    {id:"kr-012",title:"Customer response time drops to 4h",target:4,current:5.2,unit:"h",weight:3,pct:76.9},
+    {id:"kr-013",title:"Customer satisfaction reaches 90%",target:90,current:82,unit:"%",weight:2,pct:91.1}
+  ]}
+];
+
+let isReadonly = false;
+
+function pctClass(p){return p<30?'pct-low':p<60?'pct-mid':p<80?'pct-good':'pct-great'}
+function pctColor(p){return p<30?'var(--color-error)':p<60?'var(--color-accent)':p<80?'var(--color-primary)':'var(--color-success)'}
+
+function renderOKR(){
+  const container=document.getElementById('normalState');
+  container.innerHTML='';
+  okrData.forEach((obj,i)=>{
+    const card=document.createElement('div');
+    card.className='obj-card';
+    card.innerHTML=`
+      <div class="obj-header" onclick="toggleObj('${obj.id}')">
+        <div class="obj-expand" id="expand-${obj.id}"><svg width="16" height="16" viewBox="0 0 16 16" fill="var(--color-text-tertiary)"><path d="M6 4l4 4-4 4"/></svg></div>
+        <div class="obj-info">
+          <div class="obj-title">${obj.title}</div>
+          <div class="obj-meta"><span>${obj.owner}</span><span>${obj.project}</span></div>
+        </div>
+        <div class="obj-progress-container">
+          <div class="obj-progress-bar"><div class="obj-progress-fill" style="width:${obj.pct}%;background:${pctColor(obj.pct)}" id="objbar-${obj.id}"></div></div>
+          <span class="obj-pct ${pctClass(obj.pct)}" id="objpct-${obj.id}">${obj.pct}%</span>
+        </div>
+      </div>
+      <div class="kr-list" id="krlist-${obj.id}">
+        ${obj.krs.map(kr=>`
+          <div class="kr-item">
+            <div class="kr-title">${kr.title}</div>
+            <div class="kr-progress">
+              <div class="kr-bar"><div class="kr-bar-fill" style="width:${kr.pct}%;background:${pctColor(kr.pct)}" id="krbar-${kr.id}"></div></div>
+              <span class="kr-value" id="krval-${kr.id}" onclick="${isReadonly?'':'startEdit(\"'+kr.id+'\",'+kr.current+','+kr.target+',\"'+kr.unit+'\")'}">${kr.current}${kr.unit} / ${kr.target}${kr.unit}</span>
+              <span class="kr-weight">w:${kr.weight}</span>
+            </div>
+          </div>
+        `).join('')}
+        ${!isReadonly?`<div style="padding:var(--space-3) var(--space-4)"><button style="background:none;border:1px dashed var(--color-border);border-radius:var(--radius-md);padding:var(--space-2) var(--space-4);color:var(--color-text-tertiary);font-size:var(--text-sm);cursor:pointer;width:100%;transition:all var(--duration-fast)" onmouseover="this.style.borderColor='var(--color-primary)';this.style.color='var(--color-primary)'" onmouseout="this.style.borderColor='var(--color-border)';this.style.color='var(--color-text-tertiary)'" onclick="alert('Add KR form would appear here')">+ Add Key Result</button></div>`:''}
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function toggleObj(id){
+  const list=document.getElementById('krlist-'+id);
+  const expand=document.getElementById('expand-'+id);
+  list.classList.toggle('open');
+  expand.classList.toggle('open');
+}
+
+function startEdit(krId,current,target,unit){
+  if(isReadonly)return;
+  const el=document.getElementById('krval-'+krId);
+  const input=document.createElement('input');
+  input.className='kr-edit-input';
+  input.type='number';
+  input.step='any';
+  input.value=current;
+  el.innerHTML='';
+  el.appendChild(input);
+  input.focus();
+  input.select();
+  const finish=()=>{
+    const newVal=parseFloat(input.value);
+    if(!isNaN(newVal)&&newVal>=0){
+      const kr=okrData.flatMap(o=>o.krs).find(k=>k.id===krId);
+      if(kr){
+        kr.current=newVal;
+        kr.pct=Math.min(100,Math.round((newVal/kr.target)*100));
+        // Recalc parent objective
+        const parentObj=okrData.find(o=>o.krs.some(k=>k.id===krId));
+        if(parentObj){
+          const totalWeight=parentObj.krs.reduce((s,k)=>s+k.weight,0);
+          parentObj.pct=Math.round(parentObj.krs.reduce((s,k)=>s+(k.pct*k.weight),0)/totalWeight);
+          document.getElementById('objbar-'+parentObj.id).style.width=parentObj.pct+'%';
+          document.getElementById('objbar-'+parentObj.id).style.background=pctColor(parentObj.pct);
+          document.getElementById('objpct-'+parentObj.id).textContent=parentObj.pct+'%';
+          document.getElementById('objpct-'+parentObj.id).className='obj-pct '+pctClass(parentObj.pct);
+        }
+        document.getElementById('krbar-'+krId).style.width=kr.pct+'%';
+        document.getElementById('krbar-'+krId).style.background=pctColor(kr.pct);
+        showToast('KR progress updated');
+      }
+    }
+    el.textContent=`${(okrData.flatMap(o=>o.krs).find(k=>k.id===krId)||{current}).current}${unit} / ${target}${unit}`;
+    el.onclick=()=>startEdit(krId,(okrData.flatMap(o=>o.krs).find(k=>k.id===krId)||{current}).current,target,unit);
+  };
+  input.addEventListener('blur',finish);
+  input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();input.blur()}if(e.key==='Escape'){input.value=current;input.blur()}});
+}
+
+function showToast(msg){
+  const t=document.createElement('div');
+  t.className='toast toast--success';
+  t.innerHTML=`<svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><path d="M7 0a7 7 0 110 14A7 7 0 017 0zm2.8 4.2a.6.6 0 00-.85-.85L6 6.3 5.05 5.35a.6.6 0 00-.85.85l1.5 1.5a.6.6 0 00.85 0l3.25-3.5z"/></svg><span>${msg}</span>`;
+  document.getElementById('toastContainer').appendChild(t);
+  setTimeout(()=>t.remove(),3000);
+}
+
+function setState(state){
+  ['normalState','emptyState','errorState'].forEach(id=>{const el=document.getElementById(id);if(el){el.style.display='none';el.classList.remove('visible')}});
+  document.querySelectorAll('.state-btn').forEach(b=>b.classList.remove('active'));
+  if(event&&event.target)event.target.classList.add('active');
+  const addBtn=document.getElementById('addObjBtn');
+  isReadonly=state==='readonly';
+  switch(state){
+    case'normal':isReadonly=false;addBtn.style.display='flex';renderOKR();document.getElementById('normalState').style.display='flex';break;
+    case'empty':addBtn.style.display='flex';document.getElementById('emptyState').style.display='flex';document.getElementById('emptyState').classList.add('visible');break;
+    case'readonly':addBtn.style.display='none';renderOKR();document.getElementById('normalState').style.display='flex';break;
+    case'error':addBtn.style.display='flex';document.getElementById('errorState').style.display='flex';document.getElementById('errorState').classList.add('visible');break;
+  }
+}
+
+renderOKR();
+document.getElementById('normalState').style.display='flex';
+</script>
+</body>
+</html>

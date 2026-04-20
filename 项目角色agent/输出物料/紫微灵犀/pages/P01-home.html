@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>紫微灵犀 — 终端引力</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Noto+Serif+SC:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --c-gold: #D4AF37;
+  --c-gold-dim: rgba(212, 175, 55, 0.4);
+  --c-bg: #000000;
+  --text-main: rgba(255,255,255,0.9);
+  --form-bg: rgba(10, 10, 15, 0.8);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+body {
+  background: var(--c-bg); color: var(--text-main); fill: var(--text-main);
+  font-family: 'Noto Serif SC', serif; min-height: 100vh; overflow-x: hidden; padding-bottom: 100px;
+}
+
+.starfield { position: fixed; inset: 0; z-index: -2; pointer-events: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Ccircle cx='50' cy='150' r='1' fill='rgba(212,175,55,0.4)'/%3E%3Ccircle cx='300' cy='80' r='1.5' fill='rgba(255,255,255,0.6)'/%3E%3Ccircle cx='120' cy='320' r='0.5' fill='rgba(212,175,55,0.2)'/%3E%3C/svg%3E"); background-size: 200px 200px; }
+.bg-ambient { position: fixed; inset: 0; z-index: -1; background-image: radial-gradient(circle at 50% -20%, rgba(212, 175, 55, 0.08) 0%, transparent 70%); }
+
+.nav { position: sticky; top: 0; z-index: 100; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent); border-bottom: 1px solid rgba(212,175,55,0.1); backdrop-filter: blur(10px); }
+.nav-brand { font-family: 'Noto Serif SC', serif; font-size: 18px; font-weight: 600; color: var(--c-gold); letter-spacing: 2px; }
+
+/* 状态切换栏（仅预览，开发时移除） */
+.state-switcher { position: fixed; top: 60px; right: 12px; z-index: 200; display: flex; flex-direction: column; gap: 4px; opacity: 0.85; }
+.state-switcher button { padding: 4px 10px; font-size: 10px; background: rgba(0,0,0,0.7); color: var(--c-gold); border: 1px solid var(--c-gold-dim); cursor: pointer; font-family: inherit; letter-spacing: 1px; }
+.state-switcher button.active { background: rgba(212,175,55,0.2); }
+
+.container { max-width: 600px; margin: 0 auto; padding: 24px; }
+
+.points-board {
+  background: linear-gradient(135deg, rgba(10, 10, 15, 0.9) 0%, rgba(10, 10, 15, 0.4) 100%);
+  border: 1px solid var(--c-gold-dim); backdrop-filter: blur(20px);
+  padding: 32px 24px; margin-bottom: 24px; position: relative; overflow: hidden; border-radius: 12px;
+  box-shadow: inset 0 0 30px rgba(212,175,55,0.05);
+}
+.points-watermark-container { position: absolute; right: -10px; top: 50%; padding-bottom: 8px; transform: translateY(-50%); width: 120px; height: 120px; pointer-events: none; }
+.points-watermark { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 120px; color: rgba(212,175,55,0.05); font-family: 'Noto Serif SC', serif; line-height: 0; transform: rotate(15deg); transition: transform 2.5s cubic-bezier(0.25, 1, 0.5, 1); transform-origin: center center; }
+.points-content { display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 2; }
+.points-title { font-size: 12px; color: rgba(255,255,255,0.5); letter-spacing: 2px; font-family: 'Noto Serif SC', serif; margin-bottom: 12px; }
+.points-data { display: flex; align-items: baseline; gap: 8px; }
+.points-value { font-size: 44px; font-weight: 300; line-height: 1; font-family: 'Noto Serif SC', serif; color: var(--text-main); display: inline-block; transition: transform 0.3s, color 0.3s; }
+.points-unit { font-size: 20px; color: var(--c-gold); }
+
+.sign-btn { background: transparent; border: 1px solid var(--c-gold-dim); color: var(--c-gold); font-size: 12px; padding: 10px 20px; border-radius: 99px; transition: all 0.3s ease; cursor: pointer; letter-spacing: 2px; text-transform: uppercase; }
+.sign-btn:hover { background: rgba(212,175,55,0.1); border-color: var(--c-gold); box-shadow: 0 0 15px rgba(212,175,55,0.2); }
+.sign-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* 签到状态条（P0 补丁） */
+.checkin-strip { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; background: rgba(10,10,15,0.6); border: 1px solid rgba(212,175,55,0.15); border-radius: 8px; margin-bottom: 32px; font-size: 12px; }
+.checkin-left { display: flex; align-items: center; gap: 12px; color: rgba(255,255,255,0.6); }
+.checkin-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--c-gold); box-shadow: 0 0 8px rgba(212,175,55,0.6); animation: pulse-dot 2s infinite; }
+.checkin-dot.signed { background: rgba(255,255,255,0.3); box-shadow: none; animation: none; }
+@keyframes pulse-dot { 0%,100% { opacity:1; } 50% { opacity:0.5; } }
+.checkin-streak { color: var(--c-gold); font-weight: 600; letter-spacing: 1px; }
+.checkin-reward { color: rgba(255,255,255,0.4); }
+
+/* 命盘概览卡片（P0 补丁） */
+.chart-overview { background: var(--form-bg); border: 1px solid var(--c-gold-dim); border-radius: 12px; padding: 24px; margin-bottom: 32px; backdrop-filter: blur(20px); position: relative; }
+.chart-overview-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.chart-overview-title { font-size: 14px; color: var(--c-gold); letter-spacing: 4px; }
+.chart-overview-link { font-size: 11px; color: rgba(255,255,255,0.5); letter-spacing: 1px; text-decoration: none; transition: 0.3s; }
+.chart-overview-link:hover { color: var(--c-gold); }
+.chart-mini { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; aspect-ratio: 1; max-width: 240px; margin: 0 auto 16px; }
+.mini-cell { border: 1px solid rgba(212,175,55,0.2); padding: 4px 2px; font-size: 8px; text-align: center; color: var(--c-gold); display: flex; align-items: center; justify-content: center; line-height: 1.2; background: rgba(0,0,0,0.3); }
+.mini-cell.center { grid-column: span 2; grid-row: span 2; background: rgba(212,175,55,0.05); border-color: var(--c-gold-dim); font-size: 10px; color: rgba(255,255,255,0.7); flex-direction: column; gap: 2px; }
+.mini-cell.empty { background: transparent; border: none; }
+.chart-overview-info { font-size: 11px; color: rgba(255,255,255,0.5); text-align: center; line-height: 1.6; }
+
+/* 命盘空状态 */
+.chart-empty { text-align: center; padding: 40px 24px; }
+.chart-empty-text { font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 20px; letter-spacing: 1px; }
+.chart-empty-cta { display: inline-block; padding: 12px 32px; border: 1px solid var(--c-gold); color: var(--c-gold); border-radius: 99px; text-decoration: none; font-size: 12px; letter-spacing: 4px; transition: 0.3s; }
+.chart-empty-cta:hover { background: rgba(212,175,55,0.1); }
+
+.section-title { font-family: 'Noto Serif SC', serif; font-size: 14px; font-weight: 400; margin-bottom: 24px; letter-spacing: 4px; color: rgba(255,255,255,0.8); text-align: center; border-bottom: 1px solid var(--c-gold-dim); padding-bottom: 12px; padding-top: 12px; }
+
+.marketplace { display: grid; grid-template-columns: 1fr; gap: 16px; }
+.pkg-card { padding: 24px; cursor: pointer; transition: transform 0.4s, border-color 0.4s; display: flex; flex-direction: column; gap: 8px; background: rgba(10,10,15,0.5); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; text-decoration: none; color: inherit; }
+.pkg-card:hover { transform: translateY(-4px); border-color: var(--c-gold-dim); background: rgba(212,175,55,0.02); }
+.pkg-header { display: flex; justify-content: space-between; align-items: center; }
+.pkg-title { font-size: 16px; color: var(--c-gold); font-weight: 600; }
+.pkg-price { font-family: 'Noto Serif SC', serif; font-size: 14px; color: #fff; }
+.pkg-desc { font-size: 12px; color: rgba(255,255,255,0.5); line-height: 1.8; margin-top: 8px; }
+.pkg-tags { display: flex; gap: 8px; margin-top: 4px; flex-wrap: wrap; }
+.pkg-tag { font-size: 10px; padding: 2px 8px; border: 1px solid var(--c-gold-dim); color: var(--c-gold); border-radius: 4px; letter-spacing: 1px; }
+.pkg-premium { border-color: var(--c-gold-dim); box-shadow: inset 0 0 20px rgba(212,175,55,0.05); }
+
+/* 最新报告入口（P0 补丁） */
+.latest-report { background: rgba(10,10,15,0.5); border: 1px solid rgba(212,175,55,0.15); border-radius: 8px; padding: 18px 20px; margin-top: 24px; display: flex; justify-content: space-between; align-items: center; text-decoration: none; color: inherit; transition: 0.3s; }
+.latest-report:hover { border-color: var(--c-gold-dim); background: rgba(212,175,55,0.02); }
+.latest-report-left { display: flex; flex-direction: column; gap: 4px; }
+.latest-report-label { font-size: 10px; color: var(--c-gold); letter-spacing: 2px; }
+.latest-report-name { font-size: 13px; color: rgba(255,255,255,0.85); }
+.latest-report-time { font-size: 10px; color: rgba(255,255,255,0.4); }
+.latest-report-arrow { color: var(--c-gold-dim); font-size: 18px; }
+
+.tab-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #000; border-top: 1px solid var(--c-gold-dim); display: flex; justify-content: space-around; padding: 12px 0 24px 0; z-index: 100; }
+.tab-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: rgba(255,255,255,0.3); text-decoration: none; transition: 0.3s; }
+.tab-item.active { color: var(--c-gold); }
+.tab-icon { font-size: 20px; }
+.tab-label { font-family: 'Noto Serif SC', serif; font-size: 8px; letter-spacing: 1px; }
+</style>
+</head>
+<body>
+
+<div class="starfield"></div><div class="bg-ambient"></div>
+
+<!-- 状态切换栏（预览用） -->
+<div class="state-switcher">
+  <button onclick="setState('signed')" id="btn-signed">已签到</button>
+  <button onclick="setState('unsigned')" id="btn-unsigned" class="active">未签到</button>
+  <button onclick="setState('no-chart')" id="btn-no-chart">未排盘</button>
+</div>
+
+<nav class="nav">
+  <div class="nav-brand">紫微灵犀 / 终端主脑</div>
+</nav>
+
+<div class="container">
+
+  <div class="points-board">
+    <div class="points-watermark-container">
+      <div class="points-watermark">☯</div>
+    </div>
+    <div class="points-content">
+      <div>
+        <div class="points-title">当前灵犀点数</div>
+        <div class="points-data"><span class="points-value">2,850</span><span class="points-unit">¤</span></div>
+      </div>
+      <button class="sign-btn" id="signBtn" onclick="acquireAether()">汲取灵力</button>
+    </div>
+  </div>
+
+  <!-- 签到状态条 -->
+  <div class="checkin-strip" id="checkinStrip">
+    <div class="checkin-left">
+      <span class="checkin-dot" id="checkinDot"></span>
+      <span id="checkinStatus">今日尚未汲取灵力</span>
+    </div>
+    <div>
+      <span class="checkin-streak" id="checkinStreak">连续 3 日</span>
+      <span class="checkin-reward" id="checkinReward"> · 今日 +12 ¤</span>
+    </div>
+  </div>
+
+  <!-- 命盘概览（已排盘） -->
+  <div class="chart-overview" id="chartOverview">
+    <div class="chart-overview-header">
+      <span class="chart-overview-title">本我命盘</span>
+      <a href="P02-paipan.html" class="chart-overview-link">查看完整 →</a>
+    </div>
+    <div class="chart-mini">
+      <div class="mini-cell">巳<br>天机</div>
+      <div class="mini-cell">午<br>紫微</div>
+      <div class="mini-cell">未<br>太阴</div>
+      <div class="mini-cell">申<br>贪狼</div>
+      <div class="mini-cell">辰<br>七杀</div>
+      <div class="mini-cell center">命主：廉贞<br>身主：天梁<br>木三局</div>
+      <div class="mini-cell">酉<br>巨门</div>
+      <div class="mini-cell">卯<br>太阳</div>
+      <div class="mini-cell">戌<br>天相</div>
+      <div class="mini-cell">寅<br>武曲</div>
+      <div class="mini-cell">丑<br>天同</div>
+      <div class="mini-cell">子<br>天梁</div>
+      <div class="mini-cell">亥<br>七杀</div>
+    </div>
+    <div class="chart-overview-info">乙亥年 · 早子时 · 乾造</div>
+  </div>
+
+  <!-- 命盘空状态（未排盘） -->
+  <div class="chart-overview chart-empty" id="chartEmpty" style="display:none;">
+    <div class="chart-empty-text">尚未铸造命盘</div>
+    <a href="P06-setup.html" class="chart-empty-cta">立即铸造</a>
+  </div>
+
+  <div class="section-title">紫微殿堂中枢</div>
+
+  <div class="marketplace">
+    <a href="P08-template-detail.html?id=1" class="pkg-card">
+      <div class="pkg-header">
+        <span class="pkg-title">命格初探</span><span class="pkg-price">限免</span>
+      </div>
+      <p class="pkg-desc">剖析命宫主星组合，确立基本性格特征与人生总基调。</p>
+      <div class="pkg-tags"><span class="pkg-tag">命宫</span><span class="pkg-tag">性格</span></div>
+    </a>
+
+    <a href="P08-template-detail.html?id=3" class="pkg-card pkg-premium">
+      <div class="pkg-header">
+        <span class="pkg-title">事业财帛全景观</span><span class="pkg-price">30 <span>¤</span></span>
+      </div>
+      <p class="pkg-desc">官禄宫与财帛宫深度联动分析，揭示职业方向与财富节奏。</p>
+      <div class="pkg-tags"><span class="pkg-tag">事业</span><span class="pkg-tag">财帛</span></div>
+    </a>
+
+    <a href="P08-template-detail.html?id=5" class="pkg-card">
+      <div class="pkg-header">
+        <span class="pkg-title">流年运程详批</span><span class="pkg-price">50 <span>¤</span></span>
+      </div>
+      <p class="pkg-desc">当前大限叠加流年盘解读，本命年关键事件预警。</p>
+      <div class="pkg-tags"><span class="pkg-tag">大限</span><span class="pkg-tag">流年</span></div>
+    </a>
+  </div>
+
+  <a href="P09-report-detail.html?id=last" class="latest-report" id="latestReport">
+    <div class="latest-report-left">
+      <span class="latest-report-label">最新神谕印记</span>
+      <span class="latest-report-name">事业财帛全景观</span>
+      <span class="latest-report-time">2 日前 · 1,234 字</span>
+    </div>
+    <span class="latest-report-arrow">→</span>
+  </a>
+</div>
+
+<div class="tab-bar">
+  <a href="P01-home.html" class="tab-item active"><div class="tab-icon">⌂</div><div class="tab-label">主页</div></a>
+  <a href="P02-paipan.html" class="tab-item"><div class="tab-icon">✧</div><div class="tab-label">排盘</div></a>
+  <a href="P03-reading.html" class="tab-item"><div class="tab-icon">◎</div><div class="tab-label">解盘</div></a>
+  <a href="P04-profile.html" class="tab-item"><div class="tab-icon">👤</div><div class="tab-label">本我</div></a>
+</div>
+
+<script>
+let currentRot = 15;
+let currentPoints = 2850;
+let isAcquiring = false;
+let isSigned = false;
+
+// 签到天数到积分的映射（PRD 3.3 + 3.8）
+const STREAK_REWARDS = [5, 8, 10, 12, 15, 18, 20];
+let streakDay = 3; // 假数据：当前连续 3 天
+
+function setState(state) {
+  document.querySelectorAll('.state-switcher button').forEach(b => b.classList.remove('active'));
+  document.getElementById('btn-' + state).classList.add('active');
+
+  const overview = document.getElementById('chartOverview');
+  const empty = document.getElementById('chartEmpty');
+  const strip = document.getElementById('checkinStrip');
+  const dot = document.getElementById('checkinDot');
+  const status = document.getElementById('checkinStatus');
+  const reward = document.getElementById('checkinReward');
+  const btn = document.getElementById('signBtn');
+
+  if (state === 'signed') {
+    overview.style.display = 'block'; empty.style.display = 'none';
+    isSigned = true;
+    dot.classList.add('signed');
+    status.textContent = '今日已汲取灵力';
+    reward.textContent = ' · 已得 +10 ¤';
+    btn.disabled = true; btn.textContent = '已汲取';
+  } else if (state === 'unsigned') {
+    overview.style.display = 'block'; empty.style.display = 'none';
+    isSigned = false;
+    dot.classList.remove('signed');
+    status.textContent = '今日尚未汲取灵力';
+    reward.textContent = ` · 今日 +${STREAK_REWARDS[Math.min(streakDay, 6)]} ¤`;
+    btn.disabled = false; btn.textContent = '汲取灵力';
+  } else if (state === 'no-chart') {
+    overview.style.display = 'none'; empty.style.display = 'block';
+  }
+}
+
+function acquireAether() {
+  if (isAcquiring || isSigned) return;
+  isAcquiring = true;
+
+  const watermark = document.querySelector('.points-watermark');
+  const valueEl = document.querySelector('.points-value');
+  const btn = document.getElementById('signBtn');
+  const reward = STREAK_REWARDS[Math.min(streakDay, 6)];
+
+  currentRot += 360;
+  watermark.style.transform = `rotate(${currentRot}deg)`;
+  btn.style.opacity = '0.5'; btn.innerText = '凝结中...'; btn.style.pointerEvents = 'none';
+
+  setTimeout(() => {
+    currentPoints += reward;
+    valueEl.innerText = currentPoints.toLocaleString();
+    valueEl.style.transform = 'scale(1.15)';
+    valueEl.style.color = 'var(--c-gold)';
+    valueEl.style.textShadow = '0 0 20px rgba(212,175,55,0.6)';
+
+    isSigned = true;
+    streakDay += 1;
+    document.getElementById('checkinDot').classList.add('signed');
+    document.getElementById('checkinStatus').textContent = '今日已汲取灵力';
+    document.getElementById('checkinStreak').textContent = `连续 ${streakDay} 日`;
+    document.getElementById('checkinReward').textContent = ` · 已得 +${reward} ¤`;
+
+    btn.style.opacity = '1'; btn.innerText = '已汲取'; btn.disabled = true;
+
+    setTimeout(() => {
+      valueEl.style.transform = 'scale(1)';
+      valueEl.style.color = 'var(--text-main)';
+      valueEl.style.textShadow = 'none';
+      isAcquiring = false;
+    }, 500);
+  }, 1500);
+}
+</script>
+
+</body>
+</html>

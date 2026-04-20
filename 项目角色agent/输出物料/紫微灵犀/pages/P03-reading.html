@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>紫微灵犀 — 神谕推演</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Noto+Serif+SC:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --c-gold: #D4AF37;
+  --c-gold-dim: rgba(212, 175, 55, 0.4);
+  --c-bg: #000000;
+  --text-main: rgba(255,255,255,0.9);
+  --form-bg: rgba(10, 10, 15, 0.8);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+body { background: var(--c-bg); color: var(--text-main); fill: var(--text-main); font-family: 'Noto Serif SC', serif; min-height: 100vh; overflow-x: hidden; padding-bottom: 100px; }
+
+.starfield { position: fixed; inset: 0; z-index: -2; pointer-events: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Ccircle cx='50' cy='150' r='1' fill='rgba(212,175,55,0.4)'/%3E%3Ccircle cx='300' cy='80' r='1.5' fill='rgba(255,255,255,0.6)'/%3E%3Ccircle cx='120' cy='320' r='0.5' fill='rgba(212,175,55,0.2)'/%3E%3C/svg%3E"); background-size: 200px 200px; }
+.bg-ambient { position: fixed; inset: 0; z-index: -1; background-image: radial-gradient(circle at 50% 10%, rgba(212, 175, 55, 0.1) 0%, transparent 80%); }
+
+.nav { position: sticky; top: 0; z-index: 100; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent); border-bottom: 1px solid rgba(212,175,55,0.1); backdrop-filter: blur(10px); }
+.nav-back { color: var(--c-gold); text-decoration: none; font-size: 12px; letter-spacing: 2px; font-family: 'Noto Serif SC', serif; }
+.nav-title { font-size: 10px; color: rgba(212,175,55,0.5); font-family: 'Noto Serif SC', serif; letter-spacing: 2px; }
+
+.state-switcher { position: fixed; top: 60px; right: 12px; z-index: 200; display: flex; flex-direction: column; gap: 4px; opacity: 0.85; }
+.state-switcher button { padding: 4px 10px; font-size: 10px; background: rgba(0,0,0,0.7); color: var(--c-gold); border: 1px solid var(--c-gold-dim); cursor: pointer; font-family: inherit; letter-spacing: 1px; }
+.state-switcher button.active { background: rgba(212,175,55,0.2); }
+
+.container { max-width: 800px; margin: 0 auto; padding: 24px; }
+
+.reading-header { text-align: center; margin-bottom: 32px; position: relative; }
+.header-title { font-family: 'Noto Serif SC', serif; font-size: 24px; color: var(--c-gold); letter-spacing: 4px; margin-bottom: 12px; }
+.header-badge { display: inline-block; padding: 6px 16px; border: 1px solid var(--c-gold-dim); font-size: 10px; color: var(--c-gold); letter-spacing: 2px; }
+
+.pulse-orb { width: 40px; height: 40px; margin: 0 auto 24px; background: transparent; border: 1px solid var(--c-gold); transform: rotate(45deg); display: flex; align-items: center; justify-content: center; animation: pulse 2s infinite; }
+.pulse-orb::after { content:''; width: 20px; height: 20px; background: rgba(212,175,55,0.2); }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(212,175,55,0.4); } 70% { box-shadow: 0 0 0 20px rgba(212,175,55,0); } 100% { box-shadow: 0 0 0 0 rgba(212,175,55,0); } }
+
+.reading-card { background: var(--form-bg); border: 1px solid var(--c-gold-dim); backdrop-filter: blur(20px); padding: 40px 32px; margin-bottom: 24px; border-radius: 12px; }
+
+.typewriter-content { font-size: 15px; color: rgba(255,255,255,0.85); line-height: 2.2; font-weight: 300; }
+.highlight { color: var(--c-gold); font-weight: 600; border-bottom: 1px solid var(--c-gold-dim); padding-bottom: 2px; }
+.cursor { display: inline-block; width: 4px; height: 18px; background: var(--c-gold); margin-left: 4px; animation: blink 1s infinite; vertical-align: middle; }
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+.aigc-disclaimer { display: flex; gap: 12px; align-items: flex-start; padding: 16px 0 0; border-top: 1px solid rgba(212,175,55,0.1); margin-top: 32px; }
+.aigc-icon { color: var(--c-gold); font-size: 16px; flex-shrink: 0; }
+.aigc-text { font-size: 11px; color: rgba(255,255,255,0.45); line-height: 1.7; letter-spacing: 0.5px; }
+
+/* AIGC 水印（位置 1：页面级固定徽章） */
+.aigc-badge-fixed { position: fixed; right: 16px; bottom: 80px; z-index: 99; padding: 8px 14px; border: 1px solid var(--c-gold-dim); border-radius: 99px; background: rgba(0,0,0,0.7); backdrop-filter: blur(10px); font-size: 10px; color: var(--c-gold); letter-spacing: 1px; pointer-events: none; display: flex; gap: 6px; align-items: center; }
+.aigc-badge-fixed::before { content: '⚠'; font-size: 11px; }
+
+/* 操作按钮组 */
+.action-row { display: flex; gap: 12px; margin-top: 20px; }
+.btn-action { flex: 1; padding: 16px; border: 1px solid var(--c-gold); color: var(--c-gold); text-decoration: none; font-size: 13px; letter-spacing: 4px; font-family: 'Noto Serif SC', serif; transition: 0.3s; background: rgba(0,0,0,0.5); border-radius: 99px; text-align: center; cursor: pointer; }
+.btn-action:hover { background: rgba(212,175,55,0.1); box-shadow: 0 0 20px rgba(212,175,55,0.2); }
+.btn-action.secondary { border-color: var(--c-gold-dim); color: rgba(212,175,55,0.7); }
+
+/* 错误状态 */
+.reading-error { text-align: center; padding: 60px 24px; }
+.error-text { font-size: 14px; color: #ff8888; letter-spacing: 2px; margin-bottom: 8px; }
+.error-refund { font-size: 11px; color: rgba(255,255,255,0.5); margin-bottom: 24px; }
+.error-retry { padding: 12px 32px; border: 1px solid var(--c-gold); color: var(--c-gold); border-radius: 99px; cursor: pointer; background: transparent; font-family: inherit; letter-spacing: 2px; font-size: 12px; }
+
+/* 分享 modal */
+.share-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 999; display: none; align-items: center; justify-content: center; padding: 24px; backdrop-filter: blur(8px); }
+.share-mask.show { display: flex; }
+.share-card { background: linear-gradient(135deg, #1a0e2e, #000); border: 1px solid var(--c-gold); padding: 32px 24px; max-width: 360px; width: 100%; border-radius: 12px; box-shadow: 0 0 50px rgba(212,175,55,0.3); position: relative; }
+.share-card-title { font-size: 16px; color: var(--c-gold); letter-spacing: 4px; text-align: center; margin-bottom: 16px; }
+.share-card-excerpt { font-size: 13px; color: rgba(255,255,255,0.85); line-height: 1.8; padding: 16px; background: rgba(0,0,0,0.5); border-left: 2px solid var(--c-gold); margin-bottom: 16px; }
+.share-card-watermark { font-size: 9px; color: rgba(212,175,55,0.6); text-align: center; padding: 8px 0; border-top: 1px solid var(--c-gold-dim); letter-spacing: 1px; }
+.share-actions { display: flex; gap: 8px; margin-top: 20px; }
+.share-action { flex: 1; padding: 10px; border: 1px solid var(--c-gold-dim); color: var(--c-gold); background: transparent; cursor: pointer; font-family: inherit; font-size: 11px; letter-spacing: 2px; border-radius: 99px; }
+
+.tab-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #000; border-top: 1px solid var(--c-gold-dim); display: flex; justify-content: space-around; padding: 12px 0 24px 0; z-index: 100; }
+.tab-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: rgba(255,255,255,0.3); text-decoration: none; transition: 0.3s; }
+.tab-item.active { color: var(--c-gold); }
+.tab-icon { font-size: 20px; }
+.tab-label { font-family: 'Noto Serif SC', serif; font-size: 8px; letter-spacing: 1px; }
+</style>
+</head>
+<body>
+
+<div class="starfield"></div><div class="bg-ambient"></div>
+
+<div class="state-switcher">
+  <button onclick="setState('streaming')" id="btn-streaming">流式中</button>
+  <button onclick="setState('done')" id="btn-done" class="active">完成</button>
+  <button onclick="setState('error')" id="btn-error">错误（含退积分）</button>
+</div>
+
+<nav class="nav">
+  <a href="P02-paipan.html" class="nav-back">← 降维返回</a>
+  <div class="nav-title">深层推理引流</div>
+</nav>
+
+<!-- AIGC 水印徽章（位置 1：固定页面右下） -->
+<div class="aigc-badge-fixed">AI · gemini-2.5-pro</div>
+
+<div class="container" id="contentMain">
+  <div class="reading-header">
+    <div class="pulse-orb"></div>
+    <div class="header-title">事业财帛全景观</div>
+    <div class="header-badge" id="statusBadge">星盘推演完成 · 1,234 字</div>
+  </div>
+
+  <div class="reading-card" id="readingCard">
+    <div class="typewriter-content" id="typewriterContent">
+      缘主你好，您的命宫主星为<span class="highlight">紫微</span>与<span class="highlight">天府</span>，乃是极具领导力与稳重心态的核心格局。<br><br>
+      当前大限走入丙申（2024-2033年），正是事业破局的关键周期。财帛宫中<span class="highlight">武曲化禄</span>，预示着现金流的实质性跃升。然而，夫妻宫受流年巨门化忌波及，在追求扩张的同时，切莫忽视与伴侣的情感沟通，今年易因口舌引发气运损耗。<br><br>
+      神谕建议：宜守善蓄能，<span class="highlight">规避高杠杆风险</span>。下半年将有贵客自西方而来，需留意合作契机。<span class="cursor" id="cursor" style="display:none;"></span>
+    </div>
+
+    <!-- AIGC 位置 2：卡片底部声明 -->
+    <div class="aigc-disclaimer">
+      <div class="aigc-icon">⚠</div>
+      <div class="aigc-text">
+        本报告由 AI（gemini-2.5-pro）生成，仅供文化娱乐参考，不构成医疗、法律、投资等任何决策建议。<br>
+        命运齿轮的最终咬合器，永远是缘主自身的意志。
+      </div>
+    </div>
+  </div>
+
+  <div class="action-row" id="actionRow">
+    <button class="btn-action" onclick="openShare()">引灵结缘</button>
+    <button class="btn-action" onclick="alert('已封存至神谕印记 →P12');location.href='P12-my-reports.html'">将神谕封存入库</button>
+  </div>
+</div>
+
+<!-- 错误状态 -->
+<div class="container reading-error" id="errorView" style="display:none;">
+  <div class="pulse-orb" style="border-color:#ff6666;"></div>
+  <div class="error-text">星象暂迷 · 神谕推演失败</div>
+  <div class="error-refund">已扣除的 10 灵犀点数已原路退回</div>
+  <button class="error-retry" onclick="setState('done')">重新推演</button>
+</div>
+
+<!-- 分享 modal -->
+<div class="share-mask" id="shareMask" onclick="if(event.target===this)closeShare()">
+  <div class="share-card">
+    <div class="share-card-title">事业财帛全景观</div>
+    <div class="share-card-excerpt">缘主命宫主星为紫微与天府，乃极具领导力与稳重心态之核心格局。当前大限走入丙申，正是事业破局关键周期...</div>
+    <!-- AIGC 位置 3：分享卡水印（不可裁剪，与卡片一体） -->
+    <div class="share-card-watermark">⚠ 本内容由 AI 生成 · 仅供文化娱乐参考 · 紫微灵犀</div>
+    <div class="share-actions">
+      <button class="share-action" onclick="alert('已复制结缘链路')">复制链路</button>
+      <button class="share-action" onclick="closeShare()">闭合</button>
+    </div>
+  </div>
+</div>
+
+<div class="tab-bar">
+  <a href="P01-home.html" class="tab-item"><div class="tab-icon">⌂</div><div class="tab-label">主页</div></a>
+  <a href="P02-paipan.html" class="tab-item"><div class="tab-icon">✧</div><div class="tab-label">排盘</div></a>
+  <a href="P03-reading.html" class="tab-item active"><div class="tab-icon">◎</div><div class="tab-label">解盘</div></a>
+  <a href="P04-profile.html" class="tab-item"><div class="tab-icon">👤</div><div class="tab-label">本我</div></a>
+</div>
+
+<script>
+function setState(s) {
+  document.querySelectorAll('.state-switcher button').forEach(b => b.classList.remove('active'));
+  document.getElementById('btn-' + s).classList.add('active');
+  const main = document.getElementById('contentMain');
+  const err = document.getElementById('errorView');
+  const cursor = document.getElementById('cursor');
+  const badge = document.getElementById('statusBadge');
+  const actionRow = document.getElementById('actionRow');
+
+  if (s === 'streaming') {
+    main.style.display = 'block'; err.style.display = 'none';
+    cursor.style.display = 'inline-block'; badge.textContent = '星盘推演中 · 已生成 856 字';
+    actionRow.style.display = 'none';
+  } else if (s === 'done') {
+    main.style.display = 'block'; err.style.display = 'none';
+    cursor.style.display = 'none'; badge.textContent = '星盘推演完成 · 1,234 字';
+    actionRow.style.display = 'flex';
+  } else if (s === 'error') {
+    main.style.display = 'none'; err.style.display = 'flex';
+  }
+}
+
+function openShare() { document.getElementById('shareMask').classList.add('show'); }
+function closeShare() { document.getElementById('shareMask').classList.remove('show'); }
+</script>
+
+</body>
+</html>

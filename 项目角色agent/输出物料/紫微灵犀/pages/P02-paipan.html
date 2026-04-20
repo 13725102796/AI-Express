@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>紫微灵犀 — 时空轮盘</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Noto+Serif+SC:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --c-gold: #D4AF37;
+  --c-gold-dim: rgba(212, 175, 55, 0.4);
+  --c-bg: #000000;
+  --text-main: rgba(255,255,255,0.9);
+  --form-bg: rgba(10, 10, 15, 0.8);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+body {
+  background: var(--c-bg); color: var(--text-main); fill: var(--text-main);
+  font-family: 'Noto Serif SC', serif; min-height: 100vh; overflow-x: hidden; padding-bottom: 100px;
+}
+
+.starfield { position: fixed; inset: 0; z-index: -2; pointer-events: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Ccircle cx='50' cy='150' r='1' fill='rgba(212,175,55,0.4)'/%3E%3Ccircle cx='300' cy='80' r='1.5' fill='rgba(255,255,255,0.6)'/%3E%3Ccircle cx='120' cy='320' r='0.5' fill='rgba(212,175,55,0.2)'/%3E%3C/svg%3E"); background-size: 200px 200px; }
+.bg-ambient { position: fixed; inset: 0; z-index: -1; background-image: radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.08) 0%, transparent 70%); }
+
+.nav { position: sticky; top: 0; z-index: 100; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent); border-bottom: 1px solid rgba(212,175,55,0.1); backdrop-filter: blur(10px); }
+.nav-back { color: var(--c-gold); text-decoration: none; font-size: 12px; letter-spacing: 2px; font-family: 'Noto Serif SC', serif; }
+.nav-title { font-size: 12px; color: rgba(212,175,55,0.6); letter-spacing: 4px; }
+
+.state-switcher { position: fixed; top: 60px; right: 12px; z-index: 200; display: flex; flex-direction: column; gap: 4px; opacity: 0.85; }
+.state-switcher button { padding: 4px 10px; font-size: 10px; background: rgba(0,0,0,0.7); color: var(--c-gold); border: 1px solid var(--c-gold-dim); cursor: pointer; font-family: inherit; letter-spacing: 1px; }
+.state-switcher button.active { background: rgba(212,175,55,0.2); }
+
+.container { max-width: 760px; margin: 0 auto; padding: 16px; }
+
+/* 用户信息条 */
+.user-strip { padding: 12px 16px; background: rgba(10,10,15,0.5); border: 1px solid rgba(212,175,55,0.15); border-radius: 8px; margin-bottom: 16px; display: flex; justify-content: space-between; font-size: 11px; color: rgba(255,255,255,0.6); letter-spacing: 1px; }
+.user-strip strong { color: var(--c-gold); font-weight: 600; }
+
+/* === 4x4 + 中宫 2x2 命盘（PRD 硬约束 9） === */
+.chart-frame {
+  display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, 1fr);
+  gap: 4px; aspect-ratio: 1; max-width: 760px; margin: 0 auto;
+  background: rgba(10,10,15,0.4); border: 1px solid var(--c-gold-dim); padding: 4px;
+  border-radius: 4px;
+}
+.palace {
+  background: rgba(0,0,0,0.5); border: 1px solid rgba(212,175,55,0.15);
+  padding: 6px 5px; display: flex; flex-direction: column; gap: 3px;
+  font-size: 10px; line-height: 1.3; cursor: pointer; transition: 0.3s;
+  position: relative; min-height: 0;
+}
+.palace:hover { border-color: var(--c-gold); background: rgba(212,175,55,0.05); transform: scale(1.02); z-index: 5; box-shadow: 0 0 15px rgba(212,175,55,0.3); }
+
+/* 中宫 2x2 合并 — 占据网格中央 4 格 */
+.palace.center {
+  grid-column: 2 / 4; grid-row: 2 / 4;
+  background: rgba(212,175,55,0.04); border: 1px solid var(--c-gold-dim);
+  padding: 16px 12px; cursor: default; align-items: center; justify-content: center;
+  text-align: center; gap: 8px;
+}
+.palace.center:hover { transform: none; }
+
+.palace-header { display: flex; justify-content: space-between; align-items: baseline; padding-bottom: 3px; border-bottom: 1px solid rgba(212,175,55,0.1); }
+.palace-name { font-size: 11px; color: var(--c-gold); letter-spacing: 1px; font-weight: 600; }
+.palace-stem { font-size: 9px; color: rgba(255,255,255,0.5); }
+
+.palace-stars { color: rgba(255,255,255,0.85); font-size: 10px; line-height: 1.4; }
+.star-main { color: var(--c-gold); font-weight: 600; }
+.star-bright { font-size: 8px; color: rgba(212,175,55,0.6); margin-left: 1px; }
+.star-mod { font-size: 8px; padding: 0 3px; border: 1px solid var(--c-gold-dim); border-radius: 2px; color: var(--c-gold); margin-left: 2px; vertical-align: 1px; }
+
+.palace-aux { color: rgba(255,255,255,0.5); font-size: 9px; }
+.palace-decadal { color: rgba(255,255,255,0.4); font-size: 8px; margin-top: auto; padding-top: 3px; letter-spacing: 0.5px; }
+
+/* 中宫文字 */
+.center-title { font-size: 16px; color: var(--c-gold); letter-spacing: 4px; font-weight: 600; margin-bottom: 4px; }
+.center-info { font-size: 10px; color: rgba(255,255,255,0.7); line-height: 1.8; letter-spacing: 1px; }
+.center-info span { color: var(--c-gold); }
+
+/* 加载状态 */
+.chart-loading, .chart-empty, .chart-error { aspect-ratio: 1; max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 24px; padding: 48px; }
+.loading-orb { width: 60px; height: 60px; border: 1px solid var(--c-gold); border-radius: 50%; position: relative; animation: spin 4s linear infinite; }
+.loading-orb::before { content: ''; position: absolute; inset: -10px; border: 1px dashed var(--c-gold-dim); border-radius: 50%; animation: spin 8s linear infinite reverse; }
+@keyframes spin { 100% { transform: rotate(360deg); } }
+.loading-text { font-size: 12px; color: rgba(255,255,255,0.5); letter-spacing: 4px; }
+.empty-text { font-size: 14px; color: rgba(255,255,255,0.6); letter-spacing: 2px; }
+.empty-cta { padding: 12px 32px; border: 1px solid var(--c-gold); color: var(--c-gold); border-radius: 99px; text-decoration: none; font-size: 12px; letter-spacing: 4px; transition: 0.3s; }
+.empty-cta:hover { background: rgba(212,175,55,0.1); }
+.error-text { color: #ff6666; font-size: 13px; letter-spacing: 2px; }
+
+/* 宫位详情 modal */
+.modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 999; display: none; align-items: center; justify-content: center; padding: 24px; backdrop-filter: blur(8px); }
+.modal-mask.show { display: flex; }
+.modal-card { background: var(--form-bg); border: 1px solid var(--c-gold); padding: 32px 24px; max-width: 420px; width: 100%; max-height: 80vh; overflow-y: auto; border-radius: 12px; box-shadow: 0 0 40px rgba(212,175,55,0.2); }
+.modal-title { font-size: 18px; color: var(--c-gold); letter-spacing: 4px; text-align: center; margin-bottom: 6px; }
+.modal-stem { font-size: 11px; color: rgba(255,255,255,0.5); text-align: center; margin-bottom: 24px; letter-spacing: 2px; }
+.modal-row { display: flex; gap: 12px; padding: 10px 0; border-top: 1px solid rgba(212,175,55,0.1); font-size: 12px; }
+.modal-label { color: var(--c-gold); min-width: 64px; letter-spacing: 1px; }
+.modal-value { color: rgba(255,255,255,0.85); flex: 1; line-height: 1.6; }
+.modal-close { display: block; margin: 24px auto 0; padding: 10px 32px; background: transparent; border: 1px solid var(--c-gold-dim); color: var(--c-gold); border-radius: 99px; cursor: pointer; font-size: 12px; letter-spacing: 4px; font-family: inherit; }
+
+.tab-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #000; border-top: 1px solid var(--c-gold-dim); display: flex; justify-content: space-around; padding: 12px 0 24px 0; z-index: 100; }
+.tab-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: rgba(255,255,255,0.3); text-decoration: none; transition: 0.3s; }
+.tab-item.active { color: var(--c-gold); }
+.tab-icon { font-size: 20px; }
+.tab-label { font-family: 'Noto Serif SC', serif; font-size: 8px; letter-spacing: 1px; }
+</style>
+</head>
+<body>
+
+<div class="starfield"></div><div class="bg-ambient"></div>
+
+<div class="state-switcher">
+  <button onclick="setState('loaded')" id="btn-loaded" class="active">命盘已加载</button>
+  <button onclick="setState('loading')" id="btn-loading">加载中</button>
+  <button onclick="setState('error')" id="btn-error">API 错误</button>
+  <button onclick="setState('empty')" id="btn-empty">未排盘</button>
+</div>
+
+<nav class="nav">
+  <a href="P01-home.html" class="nav-back">← 返回主枢</a>
+  <div class="nav-title">时空轮盘</div>
+</nav>
+
+<div class="container">
+  <div class="user-strip" id="userStrip">
+    <span><strong>缘主</strong> 李伟（乾造）</span>
+    <span>1995-10-15 早子时 · 浙江杭州</span>
+  </div>
+
+  <!-- 命盘主体（loaded） -->
+  <div class="chart-frame" id="chartLoaded">
+    <!-- Row 1：巳 / 午 / 未 / 申 -->
+    <div class="palace" data-palace="迁移">
+      <div class="palace-header"><span class="palace-name">迁移</span><span class="palace-stem">辛巳</span></div>
+      <div class="palace-stars"><span class="star-main">天机</span><span class="star-bright">·平</span></div>
+      <div class="palace-aux">文曲 · 火星</div>
+      <div class="palace-decadal">76-85</div>
+    </div>
+    <div class="palace" data-palace="疾厄">
+      <div class="palace-header"><span class="palace-name">疾厄</span><span class="palace-stem">壬午</span></div>
+      <div class="palace-stars"><span class="star-main">紫微</span><span class="star-bright">·庙</span></div>
+      <div class="palace-aux">右弼 · 天魁</div>
+      <div class="palace-decadal">66-75</div>
+    </div>
+    <div class="palace" data-palace="财帛">
+      <div class="palace-header"><span class="palace-name">财帛</span><span class="palace-stem">癸未</span></div>
+      <div class="palace-stars"><span class="star-main">太阴</span><span class="star-mod">禄</span></div>
+      <div class="palace-aux">左辅 · 天钺</div>
+      <div class="palace-decadal">56-65</div>
+    </div>
+    <div class="palace" data-palace="子女">
+      <div class="palace-header"><span class="palace-name">子女</span><span class="palace-stem">甲申</span></div>
+      <div class="palace-stars"><span class="star-main">贪狼</span><span class="star-bright">·旺</span></div>
+      <div class="palace-aux">陀罗</div>
+      <div class="palace-decadal">46-55</div>
+    </div>
+
+    <!-- Row 2：辰 / 中宫 / 中宫 / 酉 -->
+    <div class="palace" data-palace="奴仆">
+      <div class="palace-header"><span class="palace-name">奴仆</span><span class="palace-stem">庚辰</span></div>
+      <div class="palace-stars"><span class="star-main">七杀</span><span class="star-bright">·庙</span></div>
+      <div class="palace-aux">铃星</div>
+      <div class="palace-decadal">86-95</div>
+    </div>
+    <div class="palace center">
+      <div class="center-title">紫微列阵</div>
+      <div class="center-info">
+        姓名：<span>李伟</span> · 乾造<br>
+        阴历：乙亥年八月廿二 子时<br>
+        四柱：乙亥 · 丙戌 · 戊午 · 壬子<br>
+        五行局：<span>木三局</span><br>
+        命主：<span>廉贞</span> · 身主：<span>天梁</span><br>
+        斗君：寅宫 · 身宫在迁移<br>
+        当前大限：<span>16-25</span>（兄弟宫）
+      </div>
+    </div>
+    <div class="palace" data-palace="夫妻">
+      <div class="palace-header"><span class="palace-name">夫妻</span><span class="palace-stem">乙酉</span></div>
+      <div class="palace-stars"><span class="star-main">巨门</span><span class="star-mod">忌</span></div>
+      <div class="palace-aux">天空 · 地劫</div>
+      <div class="palace-decadal">36-45</div>
+    </div>
+
+    <!-- Row 3：卯 / 中宫续 / 中宫续 / 戌 -->
+    <div class="palace" data-palace="官禄">
+      <div class="palace-header"><span class="palace-name">官禄</span><span class="palace-stem">己卯</span></div>
+      <div class="palace-stars"><span class="star-main">太阳</span><span class="star-mod">权</span></div>
+      <div class="palace-aux">文昌</div>
+      <div class="palace-decadal">96-105</div>
+    </div>
+    <div class="palace" data-palace="兄弟">
+      <div class="palace-header"><span class="palace-name">兄弟</span><span class="palace-stem">丙戌</span></div>
+      <div class="palace-stars"><span class="star-main">天相</span><span class="star-bright">·得</span></div>
+      <div class="palace-aux">擎羊</div>
+      <div class="palace-decadal">26-35</div>
+    </div>
+
+    <!-- Row 4：寅 / 丑 / 子 / 亥 -->
+    <div class="palace" data-palace="田宅">
+      <div class="palace-header"><span class="palace-name">田宅</span><span class="palace-stem">戊寅</span></div>
+      <div class="palace-stars"><span class="star-main">武曲</span><span class="star-bright">·庙</span></div>
+      <div class="palace-aux">三台 · 八座</div>
+      <div class="palace-decadal">106-115</div>
+    </div>
+    <div class="palace" data-palace="福德">
+      <div class="palace-header"><span class="palace-name">福德</span><span class="palace-stem">丁丑</span></div>
+      <div class="palace-stars"><span class="star-main">天同</span><span class="star-mod">科</span></div>
+      <div class="palace-aux">天马</div>
+      <div class="palace-decadal">116-125</div>
+    </div>
+    <div class="palace" data-palace="父母">
+      <div class="palace-header"><span class="palace-name">父母</span><span class="palace-stem">丙子</span></div>
+      <div class="palace-stars"><span class="star-main">天梁</span><span class="star-bright">·旺</span></div>
+      <div class="palace-aux">恩光 · 天贵</div>
+      <div class="palace-decadal">6-15</div>
+    </div>
+    <div class="palace" data-palace="命宫" style="border-color: var(--c-gold); background: rgba(212,175,55,0.08);">
+      <div class="palace-header"><span class="palace-name" style="color:#fff;">命宫</span><span class="palace-stem">乙亥</span></div>
+      <div class="palace-stars"><span class="star-main">紫微</span><span class="star-bright">·庙</span><br><span class="star-main">天府</span><span class="star-bright">·旺</span></div>
+      <div class="palace-aux">禄存 · 天钺</div>
+      <div class="palace-decadal">命宫 · 大限 16-25 当行</div>
+    </div>
+  </div>
+
+  <!-- 加载中 -->
+  <div class="chart-loading" id="chartLoading" style="display:none;">
+    <div class="loading-orb"></div>
+    <div class="loading-text">命盘凝结中...</div>
+  </div>
+
+  <!-- 未排盘 -->
+  <div class="chart-empty" id="chartEmptyState" style="display:none;">
+    <div class="empty-text">尚未铸造命盘</div>
+    <a href="P06-setup.html" class="empty-cta">前往锚定本我坐标</a>
+  </div>
+
+  <!-- 错误 -->
+  <div class="chart-error" id="chartError" style="display:none;">
+    <div class="error-text">星象暂迷 · 排盘服务暂时不可达</div>
+    <button class="empty-cta" onclick="setState('loading');setTimeout(()=>setState('loaded'),1500)" style="background:transparent;cursor:pointer;font-family:inherit;">重试凝结</button>
+  </div>
+</div>
+
+<!-- 宫位详情 modal -->
+<div class="modal-mask" id="palaceModal" onclick="if(event.target===this)closeModal()">
+  <div class="modal-card">
+    <div class="modal-title" id="modalPalaceName">命宫</div>
+    <div class="modal-stem" id="modalPalaceStem">乙亥</div>
+    <div class="modal-row"><span class="modal-label">主星</span><span class="modal-value" id="modalMain">紫微（庙）· 天府（旺）</span></div>
+    <div class="modal-row"><span class="modal-label">辅星</span><span class="modal-value" id="modalAux">禄存 · 天钺 · 文昌</span></div>
+    <div class="modal-row"><span class="modal-label">小星</span><span class="modal-value" id="modalMinor">天厨 · 天福 · 月德</span></div>
+    <div class="modal-row"><span class="modal-label">神煞</span><span class="modal-value" id="modalShensha">岁前：龙德 / 将前：劫煞 / 长生：临官 / 太岁：太岁</span></div>
+    <div class="modal-row"><span class="modal-label">大限</span><span class="modal-value" id="modalDecadal">16-25 岁</span></div>
+    <div class="modal-row"><span class="modal-label">小限</span><span class="modal-value" id="modalAge">2026 流年小限：未宫</span></div>
+    <div class="modal-row"><span class="modal-label">流年</span><span class="modal-value" id="modalYear">2026 丙午年 · 流昌入官禄</span></div>
+    <button class="modal-close" onclick="closeModal()">闭合</button>
+  </div>
+</div>
+
+<div class="tab-bar">
+  <a href="P01-home.html" class="tab-item"><div class="tab-icon">⌂</div><div class="tab-label">主页</div></a>
+  <a href="P02-paipan.html" class="tab-item active"><div class="tab-icon">✧</div><div class="tab-label">排盘</div></a>
+  <a href="P03-reading.html" class="tab-item"><div class="tab-icon">◎</div><div class="tab-label">解盘</div></a>
+  <a href="P04-profile.html" class="tab-item"><div class="tab-icon">👤</div><div class="tab-label">本我</div></a>
+</div>
+
+<script>
+function setState(s) {
+  document.querySelectorAll('.state-switcher button').forEach(b => b.classList.remove('active'));
+  document.getElementById('btn-' + s).classList.add('active');
+  ['chartLoaded','chartLoading','chartEmptyState','chartError'].forEach(id => document.getElementById(id).style.display = 'none');
+  if (s === 'loaded') document.getElementById('chartLoaded').style.display = 'grid';
+  if (s === 'loading') document.getElementById('chartLoading').style.display = 'flex';
+  if (s === 'empty') document.getElementById('chartEmptyState').style.display = 'flex';
+  if (s === 'error') document.getElementById('chartError').style.display = 'flex';
+}
+
+document.querySelectorAll('.palace:not(.center)').forEach(p => {
+  p.addEventListener('click', () => {
+    const name = p.dataset.palace;
+    const stem = p.querySelector('.palace-stem').textContent;
+    const main = p.querySelector('.palace-stars').textContent.trim();
+    const aux = p.querySelector('.palace-aux').textContent;
+    const decadal = p.querySelector('.palace-decadal').textContent;
+    document.getElementById('modalPalaceName').textContent = name + '宫';
+    document.getElementById('modalPalaceStem').textContent = stem;
+    document.getElementById('modalMain').textContent = main;
+    document.getElementById('modalAux').textContent = aux;
+    document.getElementById('modalDecadal').textContent = decadal + ' 岁';
+    document.getElementById('palaceModal').classList.add('show');
+  });
+});
+
+function closeModal() { document.getElementById('palaceModal').classList.remove('show'); }
+</script>
+
+</body>
+</html>

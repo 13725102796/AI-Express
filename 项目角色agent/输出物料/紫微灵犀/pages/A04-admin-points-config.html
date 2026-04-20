@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>主控核心 — 灵犀经济配置</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root { --c-gold: #D4AF37; --c-gold-dim: rgba(212, 175, 55, 0.4); --c-bg: #000000; --text-main: rgba(255,255,255,0.9); }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--c-bg); color: var(--text-main); font-family: 'Noto Serif SC', serif; min-height: 100vh; display: flex; }
+.starfield { position: fixed; inset: 0; z-index: -2; pointer-events: none; opacity: 0.5; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Ccircle cx='50' cy='150' r='1' fill='rgba(212,175,55,0.4)'/%3E%3Ccircle cx='300' cy='80' r='1.5' fill='rgba(255,255,255,0.6)'/%3E%3C/svg%3E"); background-size: 200px 200px; }
+
+.sidebar { width: 200px; min-height: 100vh; background: rgba(10,10,15,0.9); border-right: 1px solid var(--c-gold-dim); padding: 24px 0; flex-shrink: 0; position: sticky; top: 0; }
+.side-logo { padding: 0 24px 24px; border-bottom: 1px solid rgba(212,175,55,0.15); margin-bottom: 16px; }
+.side-logo-title { font-size: 16px; color: var(--c-gold); letter-spacing: 4px; font-weight: 600; }
+.side-logo-sub { font-size: 9px; color: rgba(255,255,255,0.4); letter-spacing: 3px; margin-top: 4px; }
+.side-menu { display: flex; flex-direction: column; }
+.side-item { padding: 14px 24px; color: rgba(255,255,255,0.6); text-decoration: none; font-size: 13px; letter-spacing: 1px; border-left: 2px solid transparent; transition: 0.3s; }
+.side-item:hover { background: rgba(212,175,55,0.05); color: var(--c-gold); }
+.side-item.active { background: rgba(212,175,55,0.08); color: var(--c-gold); border-left-color: var(--c-gold); }
+.side-divider { height: 1px; background: rgba(212,175,55,0.1); margin: 16px 24px; }
+
+.main { flex: 1; min-width: 0; }
+.topbar { padding: 14px 32px; background: rgba(10,10,15,0.6); border-bottom: 1px solid rgba(212,175,55,0.1); display: flex; justify-content: space-between; align-items: center; }
+.topbar-title { font-size: 14px; color: rgba(255,255,255,0.7); letter-spacing: 2px; }
+.topbar-user { font-size: 12px; color: rgba(255,255,255,0.6); }
+.topbar-user a { color: var(--c-gold); text-decoration: none; padding: 4px 12px; border: 1px solid var(--c-gold-dim); border-radius: 99px; font-size: 11px; margin-left: 12px; }
+
+.content { padding: 32px; max-width: 1200px; }
+.page-title { font-size: 22px; color: var(--c-gold); letter-spacing: 4px; margin-bottom: 8px; font-weight: 600; }
+.page-desc { font-size: 12px; color: rgba(255,255,255,0.5); letter-spacing: 1px; margin-bottom: 28px; line-height: 1.7; }
+
+.config-section { margin-bottom: 36px; }
+.section-header { font-size: 13px; color: var(--c-gold); letter-spacing: 3px; padding-bottom: 10px; border-bottom: 1px solid var(--c-gold-dim); margin-bottom: 18px; }
+
+.config-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+.config-card { padding: 18px 20px; background: rgba(10,10,15,0.6); border: 1px solid rgba(212,175,55,0.1); border-radius: 8px; transition: 0.3s; }
+.config-card:hover { border-color: var(--c-gold-dim); }
+.config-key { font-size: 11px; color: rgba(255,255,255,0.5); font-family: monospace; letter-spacing: 1px; margin-bottom: 8px; }
+.config-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.config-value { font-size: 28px; color: var(--c-gold); font-weight: 600; letter-spacing: 1px; }
+.config-edit { padding: 6px 14px; background: transparent; border: 1px solid var(--c-gold-dim); color: var(--c-gold); cursor: pointer; font-family: inherit; font-size: 11px; letter-spacing: 1px; }
+.config-edit:hover { background: rgba(212,175,55,0.1); }
+.config-desc { font-size: 11px; color: rgba(255,255,255,0.55); line-height: 1.6; }
+
+/* 编辑 modal */
+.modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 999; display: none; align-items: center; justify-content: center; padding: 24px; backdrop-filter: blur(8px); }
+.modal-mask.show { display: flex; }
+.modal-card { background: #0a0a0f; border: 1px solid var(--c-gold); padding: 28px; max-width: 380px; width: 100%; box-shadow: 0 0 50px rgba(212,175,55,0.2); }
+.modal-title { font-size: 16px; color: var(--c-gold); letter-spacing: 3px; margin-bottom: 6px; }
+.modal-key { font-size: 11px; color: rgba(255,255,255,0.5); font-family: monospace; margin-bottom: 20px; }
+.modal-input { width: 100%; padding: 12px 14px; background: rgba(0,0,0,0.6); border: 1px solid var(--c-gold-dim); color: #fff; font-family: inherit; font-size: 18px; outline: none; }
+.modal-input:focus { border-color: var(--c-gold); }
+.modal-actions { display: flex; gap: 12px; margin-top: 20px; }
+.btn-primary { flex: 1; padding: 10px; background: rgba(212,175,55,0.15); border: 1px solid var(--c-gold); color: var(--c-gold); font-family: inherit; font-size: 13px; letter-spacing: 2px; cursor: pointer; }
+.btn-ghost { flex: 1; padding: 10px; background: transparent; border: 1px solid var(--c-gold-dim); color: rgba(212,175,55,0.7); font-family: inherit; font-size: 13px; cursor: pointer; }
+</style>
+</head>
+<body>
+<div class="starfield"></div>
+
+<aside class="sidebar">
+  <div class="side-logo">
+    <div class="side-logo-title">紫微灵犀</div>
+    <div class="side-logo-sub">主控核心</div>
+  </div>
+  <nav class="side-menu">
+    <a href="A05-admin-stats.html" class="side-item">数据概览</a>
+    <a href="A02-admin-templates.html" class="side-item">神谕模块管理</a>
+    <a href="A04-admin-points-config.html" class="side-item active">灵犀经济配置</a>
+    <a href="A03-admin-users.html" class="side-item">缘主管理</a>
+    <div class="side-divider"></div>
+    <a href="A01-admin-login.html" class="side-item">切断接入</a>
+  </nav>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-title">灵犀经济配置</div>
+    <div class="topbar-user">操守者：admin <a href="A01-admin-login.html">退出</a></div>
+  </div>
+
+  <div class="content">
+    <h1 class="page-title">灵犀经济配置</h1>
+    <p class="page-desc">配置项修改后即时生效，影响所有缘主的积分获取与消耗。<br>修改前请确保理解每项配置对生态平衡的影响。</p>
+
+    <div class="config-section">
+      <div class="section-header">汲取规则 · 注册与签到</div>
+      <div class="config-grid">
+        <div class="config-card">
+          <div class="config-key">register_bonus</div>
+          <div class="config-row"><span class="config-value">100 ¤</span><button class="config-edit" onclick="openModal('注册赠送', 'register_bonus', 100)">编辑</button></div>
+          <div class="config-desc">新缘主接入即时赠送的灵犀点数</div>
+        </div>
+        <div class="config-card">
+          <div class="config-key">checkin_day_1 ~ day_7</div>
+          <div class="config-row"><span class="config-value">5 → 20 ¤</span><button class="config-edit" onclick="openModal('连续签到（7 日递增）', 'checkin_day_*', '5,8,10,12,15,18,20')">编辑</button></div>
+          <div class="config-desc">连续签到 1 至 7 天的递增积分（7 天后循环）</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="config-section">
+      <div class="section-header">汲取规则 · 分享与邀请</div>
+      <div class="config-grid">
+        <div class="config-card">
+          <div class="config-key">share_reward</div>
+          <div class="config-row"><span class="config-value">10 ¤</span><button class="config-edit" onclick="openModal('单次分享奖励', 'share_reward', 10)">编辑</button></div>
+          <div class="config-desc">每次成功分享的奖励积分</div>
+        </div>
+        <div class="config-card">
+          <div class="config-key">share_daily_limit</div>
+          <div class="config-row"><span class="config-value">3 次</span><button class="config-edit" onclick="openModal('每日分享次数上限', 'share_daily_limit', 3)">编辑</button></div>
+          <div class="config-desc">单缘主每日分享奖励次数封顶</div>
+        </div>
+        <div class="config-card">
+          <div class="config-key">invite_reward</div>
+          <div class="config-row"><span class="config-value">50 ¤</span><button class="config-edit" onclick="openModal('邀请奖励', 'invite_reward', 50)">编辑</button></div>
+          <div class="config-desc">邀请新缘主接入并完成注册的奖励</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="config-section">
+      <div class="section-header">汲取规则 · 广告（阶段二开放）</div>
+      <div class="config-grid">
+        <div class="config-card" style="opacity:0.55;">
+          <div class="config-key">ad_reward</div>
+          <div class="config-row"><span class="config-value">20 ¤</span><button class="config-edit">编辑</button></div>
+          <div class="config-desc">观看完整激励视频的奖励</div>
+        </div>
+        <div class="config-card" style="opacity:0.55;">
+          <div class="config-key">ad_daily_limit</div>
+          <div class="config-row"><span class="config-value">5 次</span><button class="config-edit">编辑</button></div>
+          <div class="config-desc">每日观看广告奖励次数封顶</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="config-section">
+      <div class="section-header">消耗规则</div>
+      <div class="config-grid">
+        <div class="config-card">
+          <div class="config-key">reading_cost</div>
+          <div class="config-row"><span class="config-value">10 ¤</span><button class="config-edit" onclick="openModal('单次推演消耗', 'reading_cost', 10)">编辑</button></div>
+          <div class="config-desc">每次发起 AI 神谕推演的消耗（异常时退回）</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="modal-mask" id="modalMask" onclick="if(event.target===this)closeModal()">
+  <div class="modal-card">
+    <div class="modal-title" id="modalTitle">编辑配置</div>
+    <div class="modal-key" id="modalKey">key</div>
+    <input type="text" class="modal-input" id="modalInput" />
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeModal()">取消</button>
+      <button class="btn-primary" onclick="saveConfig()">保存（即时生效）</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function openModal(title, key, value) {
+  document.getElementById('modalTitle').textContent = '编辑：' + title;
+  document.getElementById('modalKey').textContent = key;
+  document.getElementById('modalInput').value = value;
+  document.getElementById('modalMask').classList.add('show');
+}
+function closeModal() { document.getElementById('modalMask').classList.remove('show'); }
+function saveConfig() { closeModal(); alert('配置已生效'); }
+</script>
+
+</body>
+</html>

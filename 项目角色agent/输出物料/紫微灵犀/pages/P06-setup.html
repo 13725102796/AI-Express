@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>紫微灵犀 — 锚点铸造</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --c-gold: #D4AF37;
+  --c-gold-dim: rgba(212, 175, 55, 0.4);
+  --c-bg: #000000;
+  --text-main: rgba(255,255,255,0.9);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+body { background: var(--c-bg); color: var(--text-main); fill: var(--text-main); font-family: 'Noto Serif SC', serif; min-height: 100vh; overflow-x: hidden; padding-bottom: 80px; }
+
+.starfield { position: fixed; inset: 0; z-index: -2; pointer-events: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Ccircle cx='50' cy='150' r='1' fill='rgba(212,175,55,0.4)'/%3E%3Ccircle cx='300' cy='80' r='1.5' fill='rgba(255,255,255,0.6)'/%3E%3Ccircle cx='120' cy='320' r='0.5' fill='rgba(212,175,55,0.2)'/%3E%3C/svg%3E"); background-size: 200px 200px; }
+.bg-ambient { position: fixed; inset: 0; z-index: -1; background-image: radial-gradient(circle at 50% 10%, rgba(212, 175, 55, 0.08) 0%, transparent 70%); }
+
+.nav { position: sticky; top: 0; z-index: 100; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent); border-bottom: 1px solid rgba(212,175,55,0.1); backdrop-filter: blur(10px); }
+.nav-brand { font-family: 'Noto Serif SC', serif; font-size: 16px; font-weight: 400; color: rgba(255,255,255,0.6); letter-spacing: 2px; }
+.nav-step { color: var(--c-gold); font-size: 12px; letter-spacing: 4px; }
+
+.state-switcher { position: fixed; top: 60px; right: 12px; z-index: 200; display: flex; flex-direction: column; gap: 4px; opacity: 0.85; }
+.state-switcher button { padding: 4px 10px; font-size: 10px; background: rgba(0,0,0,0.7); color: var(--c-gold); border: 1px solid var(--c-gold-dim); cursor: pointer; font-family: inherit; letter-spacing: 1px; }
+.state-switcher button.active { background: rgba(212,175,55,0.2); }
+
+.container { max-width: 500px; margin: 0 auto; padding: 32px 24px; display: flex; flex-direction: column; gap: 32px; }
+
+.compass-header { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.compass-icon { width: 60px; height: 60px; border: 1px solid var(--c-gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 20px; }
+.compass-icon::before { content: ''; position: absolute; width: 80px; height: 80px; border: 1px dashed var(--c-gold-dim); border-radius: 50%; animation: spin 20s linear infinite; }
+.compass-icon::after { content: '☯'; font-size: 24px; color: var(--c-gold); text-shadow: 0 0 10px rgba(212,175,55,0.5); }
+.header-title { font-size: 20px; color: #fff; letter-spacing: 4px; font-weight: 300; margin-bottom: 8px; }
+.header-desc { font-size: 11px; color: rgba(255,255,255,0.4); text-align: center; letter-spacing: 2px; line-height: 1.8; }
+@keyframes spin { 100% { transform: rotate(360deg); } }
+
+.form-section { background: rgba(10, 10, 15, 0.6); border: 1px solid rgba(212,175,55,0.15); border-radius: 12px; padding: 28px 24px; box-shadow: inset 0 0 20px rgba(0,0,0,0.8); }
+.form-label { font-size: 12px; color: var(--c-gold); letter-spacing: 4px; margin-bottom: 16px; display: block; border-bottom: 1px solid var(--c-gold-dim); padding-bottom: 8px; text-align: center; }
+.form-label:not(:first-child) { margin-top: 24px; }
+
+.toggle-group { display: flex; gap: 12px; margin-bottom: 8px; }
+.toggle-btn { flex: 1; padding: 12px 0; text-align: center; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: rgba(255,255,255,0.4); font-size: 14px; letter-spacing: 4px; cursor: pointer; transition: 0.3s; background: rgba(0,0,0,0.5); }
+.toggle-btn.active { border-color: var(--c-gold); color: var(--c-gold); background: rgba(212,175,55,0.05); box-shadow: inset 0 0 15px rgba(212,175,55,0.1); }
+
+.input-row { display: flex; gap: 12px; margin-bottom: 8px; }
+.input-box { flex: 1; position: relative; }
+.input-box::after { content: '▼'; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 10px; color: var(--c-gold-dim); pointer-events: none; }
+.native-select { width: 100%; appearance: none; background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.2); color: #fff; font-family: 'Noto Serif SC', serif; font-size: 15px; padding: 10px 28px 10px 12px; outline: none; border-radius: 0; transition: 0.3s; letter-spacing: 1px; cursor: pointer; }
+.native-select:focus { border-bottom-color: var(--c-gold); background: rgba(212,175,55,0.02); }
+.native-select option { background: #111; color: #fff; padding: 10px; }
+
+/* 闰月（条件展示） */
+.leap-row { display: none; align-items: center; gap: 8px; padding: 12px 4px; }
+.leap-row.show { display: flex; }
+.leap-checkbox { width: 16px; height: 16px; border: 1px solid var(--c-gold-dim); cursor: pointer; position: relative; flex-shrink: 0; }
+.leap-checkbox.checked { background: var(--c-gold); }
+.leap-checkbox.checked::after { content: '✓'; position: absolute; inset: 0; color: #000; font-size: 13px; font-weight: bold; display: flex; align-items: center; justify-content: center; }
+.leap-text { font-size: 12px; color: rgba(255,255,255,0.7); letter-spacing: 1px; }
+
+.action-btn { width: 100%; background: transparent; border: 1px solid var(--c-gold); color: var(--c-gold); font-family: 'Noto Serif SC', serif; font-size: 15px; letter-spacing: 6px; padding: 18px; border-radius: 99px; text-decoration: none; text-align: center; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); cursor: pointer; box-shadow: inset 0 0 20px rgba(212,175,55,0.05); position: relative; overflow: hidden; display: block; margin-top: 12px; }
+.action-btn:hover, .action-btn:active { background: rgba(212,175,55,0.1); box-shadow: 0 0 30px rgba(212,175,55,0.2), inset 0 0 20px rgba(212,175,55,0.2); }
+.action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.corner-dec { position: fixed; width: 20px; height: 20px; border: 1px solid var(--c-gold-dim); opacity: 0.5; pointer-events: none; }
+.ctl { top: 20px; left: 20px; border-right: none; border-bottom: none; }
+.ctr { top: 20px; right: 20px; border-left: none; border-bottom: none; }
+.cbl { bottom: 20px; left: 20px; border-right: none; border-top: none; }
+.cbr { bottom: 20px; right: 20px; border-left: none; border-top: none; }
+</style>
+</head>
+<body>
+
+<div class="starfield"></div><div class="bg-ambient"></div>
+<div class="corner-dec ctl"></div><div class="corner-dec ctr"></div>
+<div class="corner-dec cbl"></div><div class="corner-dec cbr"></div>
+
+<div class="state-switcher">
+  <button onclick="setState('solar')" id="btn-solar" class="active">阳历</button>
+  <button onclick="setState('lunar')" id="btn-lunar">农历（闰月）</button>
+  <button onclick="setState('submitting')" id="btn-submitting">提交中</button>
+</div>
+
+<nav class="nav">
+  <div class="nav-brand">紫微灵犀</div>
+  <div class="nav-step">相位校准 2/2</div>
+</nav>
+
+<div class="container">
+
+  <div class="compass-header">
+    <div class="compass-icon"></div>
+    <div class="header-title">锚定本我坐标</div>
+    <div class="header-desc">请精确定位您的降生时空坐标<br>以完成最终命盘引灵</div>
+  </div>
+
+  <div class="form-section">
+
+    <span class="form-label">元辰属性</span>
+    <div class="toggle-group">
+      <div class="toggle-btn active" onclick="toggle(this, 'gender')">乾造（男）</div>
+      <div class="toggle-btn" onclick="toggle(this, 'gender')">坤造（女）</div>
+    </div>
+
+    <span class="form-label">历法历元</span>
+    <div class="toggle-group" id="calendarToggle">
+      <div class="toggle-btn active" onclick="toggle(this, 'calendar', 'solar')">阳历（公历）</div>
+      <div class="toggle-btn" onclick="toggle(this, 'calendar', 'lunar')">阴历（农历）</div>
+    </div>
+
+    <!-- 闰月（仅农历模式可见） -->
+    <div class="leap-row" id="leapRow">
+      <div class="leap-checkbox" id="leapBox" onclick="toggleLeap()"></div>
+      <span class="leap-text">本月为闰月</span>
+    </div>
+
+    <span class="form-label">降生时刻</span>
+    <div class="input-row">
+      <div class="input-box" style="flex: 1.5;">
+        <select class="native-select" id="yearSel" onchange="updateDay()">
+          <option value="" disabled>选择纪年</option>
+        </select>
+      </div>
+      <div class="input-box" style="flex: 1;">
+        <select class="native-select" id="monthSel" onchange="updateDay()">
+          <option value="" disabled>月份</option>
+        </select>
+      </div>
+      <div class="input-box" style="flex: 1;">
+        <select class="native-select" id="daySel">
+          <option value="" disabled>日子</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="input-row">
+      <div class="input-box" style="flex: 1;">
+        <select class="native-select" id="hourSel">
+          <option value="" disabled selected>选择具体时辰</option>
+          <option value="0">早子时（00:00-01:00）</option>
+          <option value="1">丑时（01:00-03:00）</option>
+          <option value="2">寅时（03:00-05:00）</option>
+          <option value="3">卯时（05:00-07:00）</option>
+          <option value="4">辰时（07:00-09:00）</option>
+          <option value="5">巳时（09:00-11:00）</option>
+          <option value="6">午时（11:00-13:00）</option>
+          <option value="7">未时（13:00-15:00）</option>
+          <option value="8">申时（15:00-17:00）</option>
+          <option value="9">酉时（17:00-19:00）</option>
+          <option value="10">戌时（19:00-21:00）</option>
+          <option value="11">亥时（21:00-23:00）</option>
+          <option value="12">晚子时（23:00-24:00）</option>
+        </select>
+      </div>
+    </div>
+
+    <span class="form-label">出生地（选填）</span>
+    <div class="input-row">
+      <div class="input-box" style="flex: 1;">
+        <select class="native-select" id="provSel" onchange="updateCity()">
+          <option value="" selected>选择省份</option>
+          <option value="zj">浙江</option>
+          <option value="bj">北京</option>
+          <option value="sh">上海</option>
+          <option value="gd">广东</option>
+          <option value="js">江苏</option>
+          <option value="sc">四川</option>
+        </select>
+      </div>
+      <div class="input-box" style="flex: 1;">
+        <select class="native-select" id="citySel">
+          <option value="">选择城市</option>
+        </select>
+      </div>
+    </div>
+
+  </div>
+
+  <button class="action-btn" id="submitBtn" onclick="submit()">熔铸命理法则 ✧</button>
+
+</div>
+
+<script>
+// 年份 1900 - 当年
+(function initYears() {
+  const sel = document.getElementById('yearSel');
+  const cur = new Date().getFullYear();
+  for (let y = cur; y >= 1900; y--) {
+    const opt = document.createElement('option');
+    opt.value = y; opt.textContent = y + ' 年';
+    if (y === 1995) opt.selected = true;
+    sel.appendChild(opt);
+  }
+  // 月份
+  const monthSel = document.getElementById('monthSel');
+  for (let m = 1; m <= 12; m++) {
+    const opt = document.createElement('option');
+    opt.value = m; opt.textContent = m + ' 月';
+    if (m === 10) opt.selected = true;
+    monthSel.appendChild(opt);
+  }
+  updateDay();
+})();
+
+function daysInMonth(year, month) {
+  if ([1,3,5,7,8,10,12].includes(month)) return 31;
+  if ([4,6,9,11].includes(month)) return 30;
+  // 2 月
+  return ((year % 4 === 0 && year % 100 !== 0) || year % 400 === 0) ? 29 : 28;
+}
+
+function updateDay() {
+  const y = parseInt(document.getElementById('yearSel').value);
+  const m = parseInt(document.getElementById('monthSel').value);
+  const sel = document.getElementById('daySel');
+  if (!y || !m) return;
+  const max = daysInMonth(y, m);
+  sel.innerHTML = '<option value="" disabled>日子</option>';
+  for (let d = 1; d <= max; d++) {
+    const opt = document.createElement('option');
+    opt.value = d; opt.textContent = d + ' 日';
+    if (d === 15) opt.selected = true;
+    sel.appendChild(opt);
+  }
+}
+
+const cities = {
+  zj: ['杭州','宁波','温州','绍兴','嘉兴'],
+  bj: ['北京'], sh: ['上海'],
+  gd: ['广州','深圳','东莞','佛山'],
+  js: ['南京','苏州','无锡','常州'],
+  sc: ['成都','绵阳','德阳']
+};
+function updateCity() {
+  const p = document.getElementById('provSel').value;
+  const sel = document.getElementById('citySel');
+  sel.innerHTML = '<option value="">选择城市</option>';
+  if (cities[p]) cities[p].forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c; opt.textContent = c; sel.appendChild(opt);
+  });
+}
+
+function toggle(el, group, value) {
+  const siblings = el.parentElement.children;
+  for (let i = 0; i < siblings.length; i++) siblings[i].classList.remove('active');
+  el.classList.add('active');
+  if (group === 'calendar') {
+    document.getElementById('leapRow').classList.toggle('show', value === 'lunar');
+  }
+}
+
+function toggleLeap() {
+  document.getElementById('leapBox').classList.toggle('checked');
+}
+
+function setState(s) {
+  document.querySelectorAll('.state-switcher button').forEach(b => b.classList.remove('active'));
+  document.getElementById('btn-' + s).classList.add('active');
+  if (s === 'solar') toggle(document.querySelectorAll('#calendarToggle .toggle-btn')[0], 'calendar', 'solar');
+  if (s === 'lunar') toggle(document.querySelectorAll('#calendarToggle .toggle-btn')[1], 'calendar', 'lunar');
+  if (s === 'submitting') {
+    const btn = document.getElementById('submitBtn');
+    btn.textContent = '铸造中...'; btn.disabled = true;
+    setTimeout(() => { btn.textContent = '熔铸命理法则 ✧'; btn.disabled = false; }, 2000);
+  }
+}
+
+function submit() {
+  const btn = document.getElementById('submitBtn');
+  btn.textContent = '铸造中...'; btn.disabled = true;
+  setTimeout(() => { location.href = 'P01-home.html'; }, 1500);
+}
+</script>
+
+</body>
+</html>

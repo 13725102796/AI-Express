@@ -452,7 +452,9 @@ Round N 审查：
 
 ---
 
-### Part C：交付
+### Part C：交付（含用户确认门）
+
+> ⛔ **重要**：Part C 的输出顺序是：先输出交付清单 → **暂停等待用户确认** → 收到确认后才生成 `phase1-to-phase2.md`。**不可在用户确认前自动生成过渡文档或主动启动 Phase 2。**
 
 所有页面完成后，输出交付清单：
 
@@ -480,11 +482,43 @@ Round N 审查：
 - 状态切换栏仅用于预览，实际开发时移除
 - 假数据结构可作为后端 API 接口设计的参考
 - [其他注意事项]
+
+### ⛔ 用户确认门（强制暂停）
+
+> 设计阶段完成。请在浏览器中逐页预览 `pages/*.html`，从以下三条岔路中选择：
+>
+> - **路径 A：通过** — 回复 `设计确认通过 / Phase 2 / 开始开发`
+> - **路径 B：换其他模型重做设计** — 用其他模型/工具重新生成 HTML，**保留原文件名**替换 `pages/` 下的对应文件后，回复 `设计已替换，继续 Phase 2`
+> - **路径 C：小幅修改** — 列出具体修改点（页面编号 + 问题描述），phase1-orchestrator 将启动新一轮修复
+>
+> 在收到上述任一确认前，本 orchestrator 将停止，**不生成 phase1-to-phase2.md，不调用 phase2-orchestrator**。
 ```
 
-### 最终步骤：生成 Phase 过渡文档
+### 最终步骤：等用户确认后再生成 Phase 过渡文档
 
-按 `_phase-transition-template.md` 模板，生成 `phase1-to-phase2.md`：
+> ⚠️ **执行顺序硬性规定**：本步骤仅在用户回复路径 A 或路径 B 的确认语之后才执行。如果收到路径 C，回到 Step 7-12 的对应轮次执行修改，修改完成后重新进入 Part C。
+
+按 `_phase-transition-template.md` 模板，生成 `phase1-to-phase2.md`，并在文档**最顶部**插入 `<user-approval>` 块：
+
+```xml
+<user-approval>
+  <status>approved</status>
+  <approved-at>[ISO 8601 时间戳]</approved-at>
+  <approval-message>[用户确认语原文]</approval-message>
+  <design-source>[original-page-design-agent | user-replaced]</design-source>
+  <replaced-files>[如果是 user-replaced，列出被替换的文件名清单；否则填"无"]</replaced-files>
+  <notes>[任何需要 Phase 2 知晓的特殊说明，如设计风格变化、新增组件等]</notes>
+</user-approval>
+```
+
+如果是路径 B（用户外部替换设计稿），生成过渡文档前必须额外执行：
+1. Glob 校验 `pages/*.html` 文件是否仍存在且非空
+2. Grep 校验是否仍引用 demo.html 的设计令牌（`--color-primary` 等）
+3. 如令牌缺失，在 `<notes>` 中明确标注"用户替换的设计稿不再引用原 demo.html 令牌，Phase 2 需重新对齐设计系统"
+
+接着按模板继续：
+
+
 
 1. 列出最终页面清单及审查状态
 2. 提取共享组件列表

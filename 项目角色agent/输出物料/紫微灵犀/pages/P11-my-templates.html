@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>紫微灵犀 — 已启封模块</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root { --c-gold: #D4AF37; --c-gold-dim: rgba(212, 175, 55, 0.4); --c-bg: #000000; --text-main: rgba(255,255,255,0.9); --form-bg: rgba(10, 10, 15, 0.8); }
+* { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+body { background: var(--c-bg); color: var(--text-main); font-family: 'Noto Serif SC', serif; min-height: 100vh; padding-bottom: 100px; overflow-x: hidden; }
+.starfield { position: fixed; inset: 0; z-index: -2; pointer-events: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Ccircle cx='50' cy='150' r='1' fill='rgba(212,175,55,0.4)'/%3E%3Ccircle cx='300' cy='80' r='1.5' fill='rgba(255,255,255,0.6)'/%3E%3Ccircle cx='120' cy='320' r='0.5' fill='rgba(212,175,55,0.2)'/%3E%3C/svg%3E"); background-size: 200px 200px; }
+.bg-ambient { position: fixed; inset: 0; z-index: -1; background-image: radial-gradient(circle at 50% -10%, rgba(212, 175, 55, 0.08) 0%, transparent 70%); }
+.nav { position: sticky; top: 0; z-index: 100; padding: 16px 24px; display: flex; align-items: center; background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent); border-bottom: 1px solid rgba(212,175,55,0.1); backdrop-filter: blur(10px); }
+.nav-back { color: var(--c-gold); text-decoration: none; font-size: 12px; letter-spacing: 2px; }
+.state-switcher { position: fixed; top: 60px; right: 12px; z-index: 200; display: flex; flex-direction: column; gap: 4px; opacity: 0.85; }
+.state-switcher button { padding: 4px 10px; font-size: 10px; background: rgba(0,0,0,0.7); color: var(--c-gold); border: 1px solid var(--c-gold-dim); cursor: pointer; font-family: inherit; }
+.state-switcher button.active { background: rgba(212,175,55,0.2); }
+.container { max-width: 600px; margin: 0 auto; padding: 24px; }
+
+.header-card { padding: 24px; background: rgba(10,10,15,0.6); border: 1px solid var(--c-gold-dim); border-radius: 12px; text-align: center; margin-bottom: 24px; }
+.header-stat { font-size: 32px; color: var(--c-gold); font-weight: 300; margin-bottom: 6px; letter-spacing: 2px; }
+.header-stat span { color: rgba(255,255,255,0.5); font-size: 18px; }
+.header-label { font-size: 11px; color: rgba(255,255,255,0.5); letter-spacing: 4px; }
+
+.tpl-grid { display: flex; flex-direction: column; gap: 12px; }
+.tpl-card { background: rgba(10,10,15,0.6); border: 1px solid var(--c-gold-dim); border-radius: 12px; padding: 18px 20px; box-shadow: inset 0 0 20px rgba(212,175,55,0.04); transition: 0.3s; }
+.tpl-card:hover { border-color: var(--c-gold); }
+.tpl-row1 { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.tpl-name { font-size: 16px; color: var(--c-gold); font-weight: 600; letter-spacing: 1px; }
+.tpl-times { font-size: 10px; color: rgba(255,255,255,0.4); }
+.tpl-tags { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+.tpl-tag { font-size: 10px; padding: 2px 8px; border: 1px solid var(--c-gold-dim); color: rgba(212,175,55,0.8); border-radius: 4px; }
+.tpl-foot { display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px solid rgba(212,175,55,0.1); }
+.tpl-last { font-size: 11px; color: rgba(255,255,255,0.5); }
+.tpl-cta { padding: 8px 18px; border: 1px solid var(--c-gold); color: var(--c-gold); border-radius: 99px; text-decoration: none; font-size: 12px; letter-spacing: 2px; transition: 0.3s; }
+.tpl-cta:hover { background: rgba(212,175,55,0.1); }
+
+.empty-state { padding: 80px 24px; text-align: center; color: rgba(255,255,255,0.5); }
+.empty-text { font-size: 13px; letter-spacing: 2px; margin-bottom: 24px; }
+.empty-cta { display: inline-block; padding: 12px 32px; border: 1px solid var(--c-gold); color: var(--c-gold); border-radius: 99px; text-decoration: none; font-size: 12px; letter-spacing: 4px; }
+
+.tab-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #000; border-top: 1px solid var(--c-gold-dim); display: flex; justify-content: space-around; padding: 12px 0 24px 0; z-index: 100; }
+.tab-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: rgba(255,255,255,0.3); text-decoration: none; transition: 0.3s; }
+.tab-item.active { color: var(--c-gold); }
+.tab-icon { font-size: 20px; } .tab-label { font-size: 8px; letter-spacing: 1px; }
+</style>
+</head>
+<body>
+<div class="starfield"></div><div class="bg-ambient"></div>
+
+<div class="state-switcher">
+  <button onclick="setState('normal')" id="btn-normal" class="active">有模板</button>
+  <button onclick="setState('empty')" id="btn-empty">空</button>
+</div>
+
+<nav class="nav"><a href="P04-profile.html" class="nav-back">← 返回缘主</a></nav>
+
+<div class="container">
+
+  <div class="header-card" id="headerCard">
+    <div class="header-stat">4 <span>/ 7</span></div>
+    <div class="header-label">已启封模块</div>
+  </div>
+
+  <div class="tpl-grid" id="grid">
+    <div class="tpl-card">
+      <div class="tpl-row1"><span class="tpl-name">命格初探</span><span class="tpl-times">已推演 3 次</span></div>
+      <div class="tpl-tags"><span class="tpl-tag">命宫</span><span class="tpl-tag">性格</span></div>
+      <div class="tpl-foot"><span class="tpl-last">上次推演 · 3 日前</span><a href="P03-reading.html" class="tpl-cta">开始推演</a></div>
+    </div>
+    <div class="tpl-card">
+      <div class="tpl-row1"><span class="tpl-name">事业财帛全景观</span><span class="tpl-times">已推演 2 次</span></div>
+      <div class="tpl-tags"><span class="tpl-tag">事业</span><span class="tpl-tag">财帛</span></div>
+      <div class="tpl-foot"><span class="tpl-last">上次推演 · 2 日前</span><a href="P03-reading.html" class="tpl-cta">开始推演</a></div>
+    </div>
+    <div class="tpl-card">
+      <div class="tpl-row1"><span class="tpl-name">感情桃花密码</span><span class="tpl-times">已推演 1 次</span></div>
+      <div class="tpl-tags"><span class="tpl-tag">感情</span><span class="tpl-tag">夫妻</span></div>
+      <div class="tpl-foot"><span class="tpl-last">上次推演 · 5 日前</span><a href="P03-reading.html" class="tpl-cta">开始推演</a></div>
+    </div>
+    <div class="tpl-card">
+      <div class="tpl-row1"><span class="tpl-name">今日运势</span><span class="tpl-times">已推演 7 次</span></div>
+      <div class="tpl-tags"><span class="tpl-tag">流日</span><span class="tpl-tag">运势</span></div>
+      <div class="tpl-foot"><span class="tpl-last">上次推演 · 今日 09:30</span><a href="P03-reading.html" class="tpl-cta">开始推演</a></div>
+    </div>
+  </div>
+
+  <div class="empty-state" id="emptyView" style="display:none;">
+    <div class="empty-text">尚未启封任何神谕模块</div>
+    <a href="P07-templates.html" class="empty-cta">前往神谕殿堂</a>
+  </div>
+</div>
+
+<div class="tab-bar">
+  <a href="P01-home.html" class="tab-item"><div class="tab-icon">⌂</div><div class="tab-label">主页</div></a>
+  <a href="P02-paipan.html" class="tab-item"><div class="tab-icon">✧</div><div class="tab-label">排盘</div></a>
+  <a href="P03-reading.html" class="tab-item"><div class="tab-icon">◎</div><div class="tab-label">解盘</div></a>
+  <a href="P04-profile.html" class="tab-item active"><div class="tab-icon">👤</div><div class="tab-label">本我</div></a>
+</div>
+
+<script>
+function setState(s) {
+  document.querySelectorAll('.state-switcher button').forEach(b => b.classList.remove('active'));
+  document.getElementById('btn-' + s).classList.add('active');
+  document.getElementById('grid').style.display = s === 'normal' ? 'flex' : 'none';
+  document.getElementById('headerCard').style.display = s === 'normal' ? 'block' : 'none';
+  document.getElementById('emptyView').style.display = s === 'empty' ? 'block' : 'none';
+}
+</script>
+
+</body>
+</html>
